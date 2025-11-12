@@ -13,15 +13,99 @@ package model {
 }
 
 package view {
-    class ConfigPanel
-    class PlacementScreen
+    class GameView {
+        - _statusLabel : JLabel
+        + <<Create>> GameView(gridSize : Integer)
+        + getPlayerGridView() : LabeledGridView
+        + getComputerGridView() : LabeledGridView
+        + setStatus(text : String)
+    }
+
+    class LabeledGridView {
+        - _titleLabel : JLabel
+        + <<Create>> LabeledGridView(title : String, gridSize : Integer)
+        + <<Create>> LabeledGridView(title : String, gridSize : Integer, locked : Boolean)
+        - setupComponents()
+        + getGridView() : GridView
+        + setTitle(title : String)
+    }
+
+    class GridView {
+        - _gridSize : Integer
+        - _cells : JButton[][]
+        - _locked : Boolean
+        + <<Create>> GridView(gridSize : Integer)
+        - createGridPanel() : JPanel
+        + setLocked(locked : Boolean)
+        + setCellEnabled(row : Integer, col : Integer, enabled : Boolean)
+        + addCellClickListener(listener : ActionListener)
+        + getCell(row : Integer, col : Integer) : JButton
+        + getGridSize() : Integer
+        + isLocked() : Boolean
+    }
+
     class MainScreen
+
+    class ConfigScreen {
+        - {static} MAX_OCCUPIABLE_CELLS : Integer
+        - _gridSizeSpinner : JSpinner
+        - _carrierSpinner : JSpinner
+        - _cruiserSpinner : JSpinner
+        - _destroyerSpinner : JSpinner
+        - _submarineSpinner : JSpinner
+        - _torpedoSpinner : JSpinner
+        - _islandCheckBox : JCheckBox
+        - _backButton : JButton
+        - _startPlacementButton : JButton
+        - _occupiedCellsLabel : JLabel
+        + <<Create>> ConfigScreen()
+        - createShipSpinner(label : String) : JSpinner
+        - getOccupiedCellsCount() : Integer
+        - updateOccupiedCellsLabel(occupiedCells : Integer)
+        + getBackButton() : JButton
+        + getStartPlacementButton() : JButton
+        + getGridSize() : Integer
+    }
+
+    class PlacementScreen {
+        - _fixedPlacementButton : JButton
+        - _randomPlacementButton : JButton
+        - _startGameButton : JButton
+        - _backButton : JButton
+        + <<Create>> PlacementScreen(gridSize : Integer)
+        + getBackButton() : JButton
+    }
+
+    class StartScreen {
+        - _playButton : JButton
+        - _quitButton : JButton
+        + <<Create>> StartScreen()
+        + getPlayButton() : JButton
+        + getQuitButton() : JButton
+    }
+
     class EndScreen
+
     class TerminalOutput
+
+    class MainFrame {
+        + <<Create>> MainFrame()
+        - updateScreen(panel : JPanel)
+    }
 }
 
 package controller {
     class GridController
 }
+
+MainFrame "1" *-> "1" StartScreen : contient >
+MainFrame "1" *-> "1" ConfigScreen : contient >
+MainFrame "1" *-> "1" PlacementScreen : contient >
+
+PlacementScreen "1" *-> "1" LabeledGridView : affiche >
+
+LabeledGridView "1" *-> "1" GridView : contient >
+
+GameView "1" *-> "2" LabeledGridView : affiche >
 
 @enduml
