@@ -13,6 +13,8 @@ class BatailleNavale {
 
 package model {
     class Grid
+
+
 }
 
 package view {
@@ -24,7 +26,26 @@ package view {
 }
 
 package controller {
-    class GridController
+    class GridController {
+        +placeShip(ship: Ship, position: Position, orientation: Orientation): boolean
+    }
+
+    class ShipController {
+        +createShip(type: ShipType): Ship
+    }
+
+    class GameController {
+        +startGame(): void
+        +endGame(): void
+    }
 }
+
+package util {
+    class RandomUtil {
+
+    }
+}
+
+' Relationships
 
 @enduml
