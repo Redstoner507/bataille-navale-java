@@ -2,9 +2,14 @@ package model;
 
 public class Grid {
 
+    private static final int MIN_SIZE = 6;
+    private static final int MAX_SIZE = 10;
+    private int _size;
+
     private int[] grid;
     public Grid(int size) {
-        if (size >= 6 && size <= 10) {
+        if (size >= MIN_SIZE && size <= MAX_SIZE) {
+            this._size = size;
             this.grid = new int[size * size];
         }
         else {
