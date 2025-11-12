@@ -4,8 +4,8 @@ import javax.swing.*;
 import java.awt.*;
 
 public class StartScreen extends JPanel {
-    public JButton _playButton;
-    public JButton _quitButton;
+    private final JButton _playButton;
+    private final JButton _quitButton;
 
     public StartScreen() {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));

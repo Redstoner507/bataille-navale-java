@@ -4,11 +4,11 @@ import javax.swing.*;
 import java.awt.*;
 
 public class PlacementScreen extends JPanel {
-    public JButton _fixedPlacementButton;
-    public JButton _randomPlacementButton;
-    public JButton _startGameButton;
-    public JButton _backButton;
-    public LabeledGridView _playerGrid;
+    private final JButton _fixedPlacementButton;
+    private final JButton _randomPlacementButton;
+    private final JButton _startGameButton;
+    private final JButton _backButton;
+    private final LabeledGridView _playerGrid;
 
     public PlacementScreen(int gridSize) {
         setLayout(new BorderLayout(10, 10));
