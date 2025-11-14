@@ -12,17 +12,80 @@ class BatailleNavale {
 }
 
 package model {
-    class Grid
+    class Grid {
+        - _size : Integer
+        - _grid : 
+        + <<Create>> Grid(size: Integer)
+        + getSize() : Integer
+    }
 
+    class Case {
+        - _isHit : Boolean
+        - _hasShip : Boolean
+        - _isSunk : Boolean
+        + <<Create>> Case()
+        + isHit() : Boolean
+        + hasShip() : Boolean
+        + isSunk() : Boolean
+        + hit() : void
+        + placeShip() : void
+    }
 
+    package Ship {
+        interface Ship {
+            - _type : ShipType
+            - _size : Integer
+            - _positions : Position[]
+            + <<Create>> Ship(type: ShipType, size: Integer)
+            + getType() : ShipType
+            + getSize() : Integer
+            + getPositions() : Position[]
+        }
+
+        class ShipFactory {
+            + <<Create>> ShipFactory()
+            + createShip(type: ShipType) : Ship
+        }
+
+        class AircraftCarrier implements Ship {
+            + <<Create>> AircraftCarrier()
+        }
+        class BattleShip implements Ship {
+            + <<Create>> BattleShip()
+        }
+        class Cruiser implements Ship {
+            + <<Create>> Cruiser()
+        }
+        class Destroyer implements Ship {
+            + <<Create>> Destroyer()
+        }
+        class Submarine implements Ship {
+            + <<Create>> Submarine()
+        }
+        ShipFactory --> Ship
+    }
+    ' Relationships
+    Grid --> Case
+   
 }
 
 package view {
     class ConfigPanel
     class PlacementScreen
-    class MainScreen
+    class MainScreen {
+        - _mainPanel : GridView
+        + <<Create>> MainScreen()
+    }
     class EndScreen
     class TerminalOutput
+    package grid {
+        class GridView {
+            - _gridSize : Integer
+            - _cells : JButton[][]
+            + <<Create>> GridView()
+            + getGridSize() : Integer
+        }
+    }
 }
 
 package controller {
@@ -47,5 +110,10 @@ package util {
 }
 
 ' Relationships
+MainScreen --> view.grid.GridView
+BatailleNavale --> controller.GameController
+controller.GameController --> controller.GridController
+controller.GameController --> controller.ShipController
+controller.GridController --> model.Grid
 
 @enduml
