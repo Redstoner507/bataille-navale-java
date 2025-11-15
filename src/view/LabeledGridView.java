@@ -19,7 +19,7 @@ public class LabeledGridView extends JPanel {
     }
 
     /**
-     * Crée le titre de la grille et ajoute le titre et la grille au panel.
+     * Creates the title of the grid and adds the title and the grid to the panel.
      */
     private void setupComponents() {
         setLayout(new BorderLayout());

@@ -18,7 +18,7 @@ public class GridView extends JPanel {
     }
 
     /**
-     * Crée le panneau principal de la grille avec en-têtes de colonnes et lignes.
+     * Creates the main grid panel with column and row headers.
      * @return JPanel
      */
     private JPanel createGridPanel() {
@@ -58,7 +58,7 @@ public class GridView extends JPanel {
     }
 
     /**
-     * Active ou désactive la grille entière.
+     * Activates or deactivates the entire grid.
      */
     public void setLocked(boolean locked) {
         _locked = locked;
@@ -70,7 +70,7 @@ public class GridView extends JPanel {
     }
 
     /**
-     * Active ou désactive une seule case.
+     * Activates or deactivates a single cell.
      */
     public void setCellEnabled(int row, int col, boolean enabled) {
         if (row < 0 || row >= _gridSize || col < 0 || col >= _gridSize) {
@@ -80,7 +80,7 @@ public class GridView extends JPanel {
     }
 
     /**
-     * Ajoute un écouteur de clics sur toutes les cases.
+     * Adds a click listener to every cell.
      */
     public void addCellClickListener(ActionListener listener) {
         for (int r = 0; r < _gridSize; r++) {
@@ -90,9 +90,6 @@ public class GridView extends JPanel {
         }
     }
 
-    /**
-     * Renvoie la cellule à une position donnée.
-     */
     public JButton getCell(int row, int col) {
         return _cells[row][col];
     }
