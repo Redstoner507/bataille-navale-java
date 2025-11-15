@@ -1,5 +1,5 @@
 package model;
 
-public class Case {
+public class Cell {
     
 }

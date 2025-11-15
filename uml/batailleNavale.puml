@@ -19,11 +19,11 @@ package model {
         + getSize() : Integer
     }
 
-    class Case {
+    class Cell {
         - _isHit : Boolean
         - _hasShip : Boolean
         - _isSunk : Boolean
-        + <<Create>> Case()
+        + <<Create>> Cell()
         + isHit() : Boolean
         + hasShip() : Boolean
         + isSunk() : Boolean
@@ -64,9 +64,6 @@ package model {
         }
         ShipFactory --> Ship
     }
-    ' Relationships
-    Grid --> Case
-   
 }
 
 package view {
@@ -173,12 +170,12 @@ package util {
 }
 
 ' Relationships
-MainScreen --> view.grid.GridView
-BatailleNavale --> controller.GameController
-controller.GameController --> controller.GridController
-controller.GameController --> controller.ShipController
-controller.GridController --> model.Grid
-controller.ShipController --> model.ship.ShipFactory
+Main --> GameController
+GameController --> GridController
+GameController --> ShipController
+GridController --> Grid
+ShipController --> ShipFactory
+Grid --> Cell
 
 MainFrame "1" *-> "1" StartScreen : contient >
 MainFrame "1" *-> "1" ConfigScreen : contient >
