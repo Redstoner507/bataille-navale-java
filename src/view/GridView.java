@@ -1,17 +1,18 @@
 package view;
 
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.awt.event.ActionListener;
+import java.awt.event.MouseListener;
 
 public class GridView extends JPanel {
     private final int _gridSize;        // Taille de la grille
-    private final JButton[][] _cells;   // Cases de la grille
+    private final CellView[][] _cells;  // Cases de la grille
     private boolean _locked = false;    // Etat verrouillé
 
     public GridView(int gridSize) {
         this._gridSize = gridSize;
-        this._cells = new JButton[gridSize][gridSize];
+        this._cells = new CellView[gridSize][gridSize];
 
         setLayout(new BorderLayout());
         add(createGridPanel(), BorderLayout.CENTER);
@@ -23,7 +24,7 @@ public class GridView extends JPanel {
      */
     private JPanel createGridPanel() {
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(_gridSize + 1, _gridSize + 1)); // +1 pour les labels
+        panel.setLayout(new GridLayout(_gridSize + 1, _gridSize + 1, 0, 0)); // +1 pour les labels
 
         // Première cellule vide (coin supérieur gauche)
         panel.add(new JLabel(" "));
@@ -31,9 +32,10 @@ public class GridView extends JPanel {
         // En-têtes de colonnes : A, B, C, ...
         for (int col = 0; col < _gridSize; col++) {
             char letter = (char) ('A' + col);
-            JLabel label = new JLabel(String.valueOf(letter), SwingConstants.CENTER);
-            label.setFont(new Font("Arial", Font.BOLD, 14));
-            panel.add(label);
+            JLabel columnLabel = new JLabel(String.valueOf(letter), SwingConstants.CENTER);
+            columnLabel.setFont(new Font("Arial", Font.BOLD, 14));
+            columnLabel.setBorder(new LineBorder(Color.BLACK)); // bordure en haut
+            panel.add(columnLabel);
         }
 
         // Lignes avec numéros + boutons
@@ -41,13 +43,14 @@ public class GridView extends JPanel {
             // Numéro de ligne
             JLabel rowLabel = new JLabel(String.valueOf(row + 1), SwingConstants.CENTER);
             rowLabel.setFont(new Font("Arial", Font.BOLD, 14));
+            rowLabel.setBorder(new LineBorder(Color.BLACK)); // bordure à gauche
             panel.add(rowLabel);
 
             // Cases de la grille
             for (int col = 0; col < _gridSize; col++) {
-                JButton cell = new JButton();
+                CellView cell = new CellView();
                 cell.setPreferredSize(new Dimension(50, 50)); // taille carrée
-                cell.setFocusPainted(false);
+                cell.setBorder(new LineBorder(Color.BLACK)); // quadrillage
                 cell.setEnabled(false); // désactivée par défaut
                 _cells[row][col] = cell;
                 panel.add(cell);
@@ -82,15 +85,15 @@ public class GridView extends JPanel {
     /**
      * Adds a click listener to every cell.
      */
-    public void addCellClickListener(ActionListener listener) {
+    public void addCellClickListener(MouseListener listener) {
         for (int r = 0; r < _gridSize; r++) {
             for (int c = 0; c < _gridSize; c++) {
-                _cells[r][c].addActionListener(listener);
+                _cells[r][c].addMouseListener(listener);
             }
         }
     }
 
-    public JButton getCell(int row, int col) {
+    public CellView getCell(int row, int col) {
         return _cells[row][col];
     }
 

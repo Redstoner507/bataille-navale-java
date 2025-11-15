@@ -6,7 +6,7 @@ import java.awt.*;
 public class ConfigScreen extends JPanel {
     private static final int MAX_OCCUPIABLE_CELLS = 35;
     private final JSpinner _gridSizeSpinner;
-    private final JSpinner _carrierSpinner, _cruiserSpinner, _destroyerSpinner, _submarineSpinner, _torpedoSpinner;
+    private final JSpinner _carrierSpinner, _battleshipSpinner, _cruiserSpinner, _submarineSpinner, _destroyerSpinner;
     private final JCheckBox _islandCheckBox;
     private final JButton _backButton;
     private final JButton _startPlacementButton;
@@ -35,10 +35,10 @@ public class ConfigScreen extends JPanel {
         add(_occupiedCellsLabel);
 
         _carrierSpinner = createShipSpinner("Carrier (5 cells) : ");
-        _cruiserSpinner = createShipSpinner("Cruiser (4 cells) : ");
-        _destroyerSpinner = createShipSpinner("Destroyer (3 cells) : ");
+        _battleshipSpinner = createShipSpinner("Battleship (4 cells) : ");
+        _cruiserSpinner = createShipSpinner("Cruiser (3 cells) : ");
         _submarineSpinner = createShipSpinner("Submarine (3 cells) : ");
-        _torpedoSpinner = createShipSpinner("Torpedo (2 cells) : ");
+        _destroyerSpinner = createShipSpinner("Destroyer (2 cells) : ");
 
         updateOccupiedCellsLabel(getOccupiedCellsCount());
 
@@ -78,10 +78,10 @@ public class ConfigScreen extends JPanel {
 
     private int getOccupiedCellsCount() {
         return (int) _carrierSpinner.getValue() * 5
-                + (int) _cruiserSpinner.getValue() * 4
-                + (int) _destroyerSpinner.getValue() * 3
+                + (int) _battleshipSpinner.getValue() * 4
+                + (int) _cruiserSpinner.getValue() * 3
                 + (int) _submarineSpinner.getValue() * 3
-                + (int) _torpedoSpinner.getValue() * 2;
+                + (int) _destroyerSpinner.getValue() * 2;
     }
 
     private void updateOccupiedCellsLabel(int occupiedCells) {

@@ -12,10 +12,27 @@ class Main {
 }
 
 package model {
+
+    enum Orientation {
+         HORIZONTAL_LEFT
+         HORIZONTAL_RIGHT
+         VERTICAL_UP
+         VERTICAL_DOWN
+    }
+
+    enum CellState {
+        EMPTY
+        SHIP_SEGMENT
+        HIT
+    }
+
     class Grid {
+        - {static} MIN_SIZE : Integer
+        - {static} MAX_SIZE : Integer
         - _size : Integer
-        - _grid : 
         + <<Create>> Grid(size: Integer)
+        + canPlaceShip(ship: Ship, startRow: Integer, startCol: Integer) : boolean
+        + placeShip(ship: Ship, startRow: Integer, startCol: Integer) : boolean
         + getSize() : Integer
     }
 
@@ -32,14 +49,24 @@ package model {
     }
 
     package ship {
-        interface Ship {
-            - _type : ShipType
-            - _size : Integer
-            - _positions : Position[]
-            + <<Create>> Ship(type: ShipType, size: Integer)
-            + getType() : ShipType
+        class Ship {
+            - _startRow : Integer
+            - _startCol : Integer
+            + <<Create>> Ship(type: ShipType)
             + getSize() : Integer
-            + getPositions() : Position[]
+            + setOrientation(_orientation: Orientation)
+            + getOrientation() : Orientation
+            + setStart(row: Integer, col: Integer)
+            + getStartRow() : Integer
+            + getStartCol() : Integer
+            + getType() : ShipType
+            + getCoordinates() : Point[*]
+        }
+
+        abstract class ShipType {
+            - _size : Integer
+            + <<Create>> ShipType(size: Integer)
+            + getSize() : Integer
         }
 
         class ShipFactory {
@@ -47,22 +74,21 @@ package model {
             + createShip(type: ShipType) : Ship
         }
 
-        class AircraftCarrier implements Ship {
-            + <<Create>> AircraftCarrier()
+        class Carrier implements ShipType {
+            + <<Create>> Carrier()
         }
-        class BattleShip implements Ship {
+        class BattleShip implements ShipType {
             + <<Create>> BattleShip()
         }
-        class Cruiser implements Ship {
+        class Cruiser implements ShipType {
             + <<Create>> Cruiser()
         }
-        class Destroyer implements Ship {
-            + <<Create>> Destroyer()
-        }
-        class Submarine implements Ship {
+        class Submarine implements ShipType {
             + <<Create>> Submarine()
         }
-        ShipFactory --> Ship
+        class Destroyer implements ShipType {
+            + <<Create>> Destroyer()
+        }
     }
 }
 
@@ -96,6 +122,21 @@ package view {
         + getCell(row : Integer, col : Integer) : JButton
         + getGridSize() : Integer
         + isLocked() : Boolean
+    }
+
+    class CellView {
+        - _segmentImage : Image
+        - _isClickable : boolean
+        + <<Create>> CellView()
+        + setSegmentImage(imagePath: String)
+        # paintComponent(g: Graphics)
+        + addMouseListener(l: MouseListener)
+        + setClickable(clickable: boolean)
+        + isClickable() : boolean
+    }
+
+    class ShipView {
+        + <<Create>> ShipView(ship: Ship)
     }
 
     class ConfigScreen {
@@ -144,6 +185,10 @@ package view {
         + <<Create>> MainFrame()
         - updateScreen(panel : JPanel)
     }
+
+    class ShipView {
+
+    }
 }
 
 package controller {
@@ -173,7 +218,14 @@ GameController --> GridController
 GameController --> ShipController
 GridController --> Grid
 ShipController --> ShipFactory
-Grid --> Cell
+
+Grid "1" o-> "*" CellState : contient >
+Grid "1" o-> "*" Ship : contient >
+
+ShipFactory .> Ship : Crée
+Ship "1" *-> "1" ShipType : est de type >
+Ship "1" *-> "1" Orientation : est orienté >
+
 
 MainFrame "1" *-> "1" StartScreen : contient >
 MainFrame "1" *-> "1" ConfigScreen : contient >
@@ -182,6 +234,10 @@ MainFrame "1" *-> "1" PlacementScreen : contient >
 PlacementScreen "1" *-> "1" LabeledGridView : affiche >
 
 LabeledGridView "1" *-> "1" GridView : contient >
+
+GridView "1" o-> "*" CellView : contient >
+
+ShipView "1" *-> "1" Ship : représente >
 
 GameView "1" *-> "2" LabeledGridView : affiche >
 
