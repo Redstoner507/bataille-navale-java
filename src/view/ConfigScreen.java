@@ -31,6 +31,7 @@ public class ConfigScreen extends JPanel {
 
         // Nombre de bateaux
         _occupiedCellsLabel = new JLabel();
+        _occupiedCellsLabel.setAlignmentX(CENTER_ALIGNMENT);
         add(_occupiedCellsLabel);
 
         _carrierSpinner = createShipSpinner("Carrier (5 cells) : ");
