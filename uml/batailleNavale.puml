@@ -1,4 +1,4 @@
-@startuml
+@startuml BatailleNavale
 'https://plantuml.com/class-diagram
 
 skinparam style strictuml
@@ -7,9 +7,66 @@ skinparam classFontStyle Bold
 hide enum methods
 hide interface attributes
 
+class Main {
+    +main(args: String[]): void
+}
 
 package model {
-    class Grid
+    class Grid {
+        - _size : Integer
+        - _grid : 
+        + <<Create>> Grid(size: Integer)
+        + getSize() : Integer
+    }
+
+    class Case {
+        - _isHit : Boolean
+        - _hasShip : Boolean
+        - _isSunk : Boolean
+        + <<Create>> Case()
+        + isHit() : Boolean
+        + hasShip() : Boolean
+        + isSunk() : Boolean
+        + hit() : void
+        + placeShip() : void
+    }
+
+    package ship {
+        interface Ship {
+            - _type : ShipType
+            - _size : Integer
+            - _positions : Position[]
+            + <<Create>> Ship(type: ShipType, size: Integer)
+            + getType() : ShipType
+            + getSize() : Integer
+            + getPositions() : Position[]
+        }
+
+        class ShipFactory {
+            + <<Create>> ShipFactory()
+            + createShip(type: ShipType) : Ship
+        }
+
+        class AircraftCarrier implements Ship {
+            + <<Create>> AircraftCarrier()
+        }
+        class BattleShip implements Ship {
+            + <<Create>> BattleShip()
+        }
+        class Cruiser implements Ship {
+            + <<Create>> Cruiser()
+        }
+        class Destroyer implements Ship {
+            + <<Create>> Destroyer()
+        }
+        class Submarine implements Ship {
+            + <<Create>> Submarine()
+        }
+        ShipFactory --> Ship
+    }
+    ' Relationships
+    Grid --> Case
+   
 }
 
 package view {
@@ -95,8 +152,33 @@ package view {
 }
 
 package controller {
-    class GridController
+    class GridController {
+        +placeShip(ship: Ship, position: Position, orientation: Orientation): boolean
+    }
+
+    class ShipController {
+        +createShip(type: ShipType): Ship
+    }
+
+    class GameController {
+        +startGame(): void
+        +endGame(): void
+    }
 }
+
+package util {
+    class RandomUtil {
+
+    }
+}
+
+' Relationships
+MainScreen --> view.grid.GridView
+BatailleNavale --> controller.GameController
+controller.GameController --> controller.GridController
+controller.GameController --> controller.ShipController
+controller.GridController --> model.Grid
+controller.ShipController --> model.ship.ShipFactory
 
 MainFrame "1" *-> "1" StartScreen : contient >
 MainFrame "1" *-> "1" ConfigScreen : contient >
