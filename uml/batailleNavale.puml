@@ -31,7 +31,7 @@ package model {
         + placeShip() : void
     }
 
-    package Ship {
+    package ship {
         interface Ship {
             - _type : ShipType
             - _size : Integer
@@ -115,5 +115,6 @@ BatailleNavale --> controller.GameController
 controller.GameController --> controller.GridController
 controller.GameController --> controller.ShipController
 controller.GridController --> model.Grid
+controller.ShipController --> model.ship.ShipFactory
 
 @enduml

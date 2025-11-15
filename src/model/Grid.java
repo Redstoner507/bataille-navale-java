@@ -6,18 +6,20 @@ public class Grid {
     private static final int MAX_SIZE = 10;
     private int _size;
 
-    private int[] grid;
+    private Case[] grid;
+    
     public Grid(int size) {
         if (size >= MIN_SIZE && size <= MAX_SIZE) {
             this._size = size;
-            this.grid = new int[size * size];
+            this.grid = new Case[size * size];
         }
         else {
             throw new IllegalArgumentException("Size must be between 6 and 10");
         }
-        for (int i : grid) {
-            grid[i] = 0;
-        }
+    }
+
+    public int getSize() {
+        return this._size;
     }
 
 }
