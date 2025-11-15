@@ -1,0 +1,102 @@
+package view;
+
+import javax.swing.*;
+import java.awt.*;
+
+public class ConfigScreen extends JPanel {
+    private static final int MAX_OCCUPIABLE_CELLS = 35;
+    private final JSpinner _gridSizeSpinner;
+    private final JSpinner _carrierSpinner, _cruiserSpinner, _destroyerSpinner, _submarineSpinner, _torpedoSpinner;
+    private final JCheckBox _islandCheckBox;
+    private final JButton _backButton;
+    private final JButton _startPlacementButton;
+    private final JLabel _occupiedCellsLabel;
+
+    public ConfigScreen() {
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        JLabel title = new JLabel("Game configuration", SwingConstants.CENTER);
+        title.setAlignmentX(CENTER_ALIGNMENT);
+        title.setFont(new Font("Arial", Font.BOLD, 20));
+        add(title);
+        add(Box.createVerticalStrut(20));
+
+        // Taille de la grille
+        JPanel gridPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        gridPanel.add(new JLabel("Grid size :"));
+        _gridSizeSpinner = new JSpinner(new SpinnerNumberModel(10, 6, 10, 1));
+        gridPanel.add(_gridSizeSpinner);
+        add(gridPanel);
+
+        // Nombre de bateaux
+        _occupiedCellsLabel = new JLabel();
+        _occupiedCellsLabel.setAlignmentX(CENTER_ALIGNMENT);
+        add(_occupiedCellsLabel);
+
+        _carrierSpinner = createShipSpinner("Carrier (5 cells) : ");
+        _cruiserSpinner = createShipSpinner("Cruiser (4 cells) : ");
+        _destroyerSpinner = createShipSpinner("Destroyer (3 cells) : ");
+        _submarineSpinner = createShipSpinner("Submarine (3 cells) : ");
+        _torpedoSpinner = createShipSpinner("Torpedo (2 cells) : ");
+
+        updateOccupiedCellsLabel(getOccupiedCellsCount());
+
+        // Mode île
+        JPanel islandPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        _islandCheckBox = new JCheckBox("Island mode");
+        _islandCheckBox.setSelected(false);
+        islandPanel.add(_islandCheckBox);
+        add(islandPanel);
+
+        add(Box.createVerticalStrut(20));
+
+        // Boutons
+        _backButton = new JButton("Back");
+        _startPlacementButton = new JButton("Confirm");
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(_backButton);
+        buttonPanel.add(_startPlacementButton);
+        add(buttonPanel);
+    }
+
+    private JSpinner createShipSpinner(String label) {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panel.add(new JLabel(label));
+        JSpinner spinner = new JSpinner(new SpinnerNumberModel(1, 1, 3, 1));
+        spinner.addChangeListener(_ -> {
+            int occupiedCells = getOccupiedCellsCount();
+            updateOccupiedCellsLabel(occupiedCells);
+            if (occupiedCells > MAX_OCCUPIABLE_CELLS) {
+                spinner.setValue(spinner.getPreviousValue());
+            }
+        });
+        panel.add(spinner);
+        add(panel);
+        return spinner;
+    }
+
+    private int getOccupiedCellsCount() {
+        return (int) _carrierSpinner.getValue() * 5
+                + (int) _cruiserSpinner.getValue() * 4
+                + (int) _destroyerSpinner.getValue() * 3
+                + (int) _submarineSpinner.getValue() * 3
+                + (int) _torpedoSpinner.getValue() * 2;
+    }
+
+    private void updateOccupiedCellsLabel(int occupiedCells) {
+        _occupiedCellsLabel.setText("Occupied cells : " + occupiedCells + " / " + MAX_OCCUPIABLE_CELLS);
+    }
+
+    public JButton getBackButton() {
+        return _backButton;
+    }
+
+    public JButton getStartPlacementButton() {
+        return _startPlacementButton;
+    }
+
+    public int getGridSize() {
+        return (int)_gridSizeSpinner.getValue();
+    }
+}
