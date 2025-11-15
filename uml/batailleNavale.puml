@@ -98,8 +98,6 @@ package view {
         + isLocked() : Boolean
     }
 
-    class MainScreen
-
     class ConfigScreen {
         - {static} MAX_OCCUPIABLE_CELLS : Integer
         - _gridSizeSpinner : JSpinner
