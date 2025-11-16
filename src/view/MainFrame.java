@@ -21,15 +21,15 @@ public class MainFrame extends JFrame {
         setVisible(true);
 
         // Navigation
-        _startScreen.getPlayButton().addActionListener(_ -> updateScreen(_configScreen));
-        _startScreen.getQuitButton().addActionListener(_ -> dispose());
+        _startScreen.getPlayButton().addActionListener(e -> updateScreen(_configScreen));
+        _startScreen.getQuitButton().addActionListener(e -> dispose());
 
-        _configScreen.getBackButton().addActionListener(_ -> updateScreen(_startScreen));
-        _configScreen.getStartPlacementButton().addActionListener(_ -> {
+        _configScreen.getBackButton().addActionListener(e -> updateScreen(_startScreen));
+        _configScreen.getStartPlacementButton().addActionListener(e -> {
             int size = _configScreen.getGridSize();
             _placementScreen = new PlacementScreen(size, _configScreen.getShipList(), CELL_SIZE);
-            _placementScreen.getBackButton().addActionListener(_ -> updateScreen(_configScreen));
-            _placementScreen.getBackButton().addActionListener(_ -> updateScreen(_configScreen));
+            _placementScreen.getBackButton().addActionListener(f -> updateScreen(_configScreen));
+            _placementScreen.getBackButton().addActionListener(f -> updateScreen(_configScreen));
             updateScreen(_placementScreen);
         });
     }

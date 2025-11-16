@@ -72,7 +72,7 @@ public class PlacementScreen extends JPanel {
             _shipPanel.add(Box.createRigidArea(new Dimension(0, 10))); // espacement vertical
         }
 
-        rotateButton.addActionListener(_ -> {
+        rotateButton.addActionListener(e -> {
             // Change l'orientation globale
             _currentOrientation = (_currentOrientation == Orientation.HORIZONTAL)
                     ? Orientation.VERTICAL: Orientation.HORIZONTAL;

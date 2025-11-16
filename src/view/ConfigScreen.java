@@ -68,7 +68,7 @@ public class ConfigScreen extends JPanel {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panel.add(new JLabel(label));
         JSpinner spinner = new JSpinner(new SpinnerNumberModel(1, 1, 3, 1));
-        spinner.addChangeListener(_ -> {
+        spinner.addChangeListener(e -> {
             int occupiedCells = getOccupiedCellsCount();
             updateOccupiedCellsLabel(occupiedCells);
             if (occupiedCells > MAX_OCCUPIABLE_CELLS) {
