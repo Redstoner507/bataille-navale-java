@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 public class Ship {
     private final ShipType _type;
-    private Orientation _orientation = Orientation.HORIZONTAL_RIGHT;
+    private Orientation _orientation = Orientation.HORIZONTAL;
     private int _startRow = -1;
     private int _startCol = -1;
 
@@ -42,21 +42,23 @@ public class Ship {
         return _type;
     }
 
-    public ArrayList<Point> getCoordinates() {
+    public ArrayList<Point> getCoordinates(int startRow, int startCol) {
         ArrayList<Point> coordinates = new ArrayList<>();
         for (int i = 0; i < _type.getSize(); i++) {
-            int r = _startRow;
-            int c = _startCol;
+            int r = startRow;
+            int c = startCol;
 
             switch (_orientation) {
-                case HORIZONTAL_LEFT -> c -= i;
-                case HORIZONTAL_RIGHT -> c += i;
-                case VERTICAL_UP -> r -= i;
-                case VERTICAL_DOWN -> r += i;
+                case HORIZONTAL -> c += i;
+                case VERTICAL -> r += i;
             }
 
             coordinates.add(new Point(r, c));
         }
         return coordinates;
+    }
+
+    public ArrayList<Point> getCoordinates() {
+        return getCoordinates(_startRow, _startCol);
     }
 }

@@ -10,12 +10,11 @@ public class MainFrame extends JFrame {
     public MainFrame() {
         setTitle("Bataille Navale");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(800, 600);
+        setSize(1000, 800);
         setLocationRelativeTo(null);
 
         _startScreen = new StartScreen();
         _configScreen = new ConfigScreen();
-        _placementScreen = new PlacementScreen(10);
 
         updateScreen(_startScreen);
         setVisible(true);
@@ -27,12 +26,11 @@ public class MainFrame extends JFrame {
         _configScreen.getBackButton().addActionListener(_ -> updateScreen(_startScreen));
         _configScreen.getStartPlacementButton().addActionListener(_ -> {
             int size = _configScreen.getGridSize();
-            _placementScreen = new PlacementScreen(size);
+            _placementScreen = new PlacementScreen(size, _configScreen.getShipList());
+            _placementScreen.getBackButton().addActionListener(_ -> updateScreen(_configScreen));
             _placementScreen.getBackButton().addActionListener(_ -> updateScreen(_configScreen));
             updateScreen(_placementScreen);
         });
-
-        _placementScreen.getBackButton().addActionListener(_ -> updateScreen(_configScreen));
     }
 
     private void updateScreen(JPanel panel) {

@@ -1,7 +1,11 @@
 package view;
 
+import model.Ship;
+import model.ShipType;
+
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 
 public class ConfigScreen extends JPanel {
     private static final int MAX_OCCUPIABLE_CELLS = 35;
@@ -98,5 +102,25 @@ public class ConfigScreen extends JPanel {
 
     public int getGridSize() {
         return (int)_gridSizeSpinner.getValue();
+    }
+
+    public ArrayList<Ship> getShipList() {
+        ArrayList<Ship> ships = new ArrayList<>();
+        for (int i = 0; i < (int)_carrierSpinner.getValue(); i++) {
+            ships.add(new Ship(ShipType.CARRIER));
+        }
+        for (int i = 0; i < (int)_battleshipSpinner.getValue(); i++) {
+            ships.add(new Ship(ShipType.BATTLESHIP));
+        }
+        for (int i = 0; i < (int)_cruiserSpinner.getValue(); i++) {
+            ships.add(new Ship(ShipType.CRUISER));
+        }
+        for (int i = 0; i < (int)_submarineSpinner.getValue(); i++) {
+            ships.add(new Ship(ShipType.SUBMARINE));
+        }
+        for (int i = 0; i < (int)_destroyerSpinner.getValue(); i++) {
+            ships.add(new Ship(ShipType.DESTROYER));
+        }
+        return ships;
     }
 }

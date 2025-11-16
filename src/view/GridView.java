@@ -1,5 +1,8 @@
 package view;
 
+import controller.GridActionListener;
+import model.Grid;
+
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
@@ -9,10 +12,13 @@ public class GridView extends JPanel {
     private final int _gridSize;        // Taille de la grille
     private final CellView[][] _cells;  // Cases de la grille
     private boolean _locked = false;    // Etat verrouillé
+    private final Grid _grid;           // Grille concrète
+    private GridActionListener _listener;
 
     public GridView(int gridSize) {
         this._gridSize = gridSize;
         this._cells = new CellView[gridSize][gridSize];
+        this._grid = new Grid(gridSize);
 
         setLayout(new BorderLayout());
         add(createGridPanel(), BorderLayout.CENTER);
@@ -23,8 +29,7 @@ public class GridView extends JPanel {
      * @return JPanel
      */
     private JPanel createGridPanel() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(_gridSize + 1, _gridSize + 1, 0, 0)); // +1 pour les labels
+        JPanel panel = new JPanel(new GridLayout(_gridSize + 1, _gridSize + 1)); // +1 pour les labels
 
         // Première cellule vide (coin supérieur gauche)
         panel.add(new JLabel(" "));
@@ -48,7 +53,7 @@ public class GridView extends JPanel {
 
             // Cases de la grille
             for (int col = 0; col < _gridSize; col++) {
-                CellView cell = new CellView();
+                CellView cell = new CellView(new Point(row, col));
                 cell.setPreferredSize(new Dimension(50, 50)); // taille carrée
                 cell.setBorder(new LineBorder(Color.BLACK)); // quadrillage
                 cell.setEnabled(false); // désactivée par défaut
@@ -93,6 +98,20 @@ public class GridView extends JPanel {
         }
     }
 
+    public void setGridActionListener(GridActionListener listener) {
+        this._listener = listener;
+    }
+
+    /**
+     * Called by ShipView when a ship is dropped.
+     */
+    public boolean notifyShipDropped(ShipView shipView, int row, int col) {
+        if (_listener != null) {
+            return _listener.shipDropped(shipView, row, col);
+        }
+        return false;
+    }
+
     public CellView getCell(int row, int col) {
         return _cells[row][col];
     }
@@ -104,4 +123,9 @@ public class GridView extends JPanel {
     public boolean isLocked() {
         return _locked;
     }
+
+    public Grid getGrid() {
+        return _grid;
+    }
+
 }
