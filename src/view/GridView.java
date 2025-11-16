@@ -18,7 +18,7 @@ public class GridView extends JPanel {
     public GridView(int gridSize, int cellSize) {
         this._gridSize = gridSize;
         this._cells = new CellView[gridSize][gridSize];
-        this._grid = new Grid(gridSize, cellSize);
+        this._grid = new Grid(gridSize);
 
         setLayout(new BorderLayout());
         add(createGridPanel(cellSize), BorderLayout.CENTER);

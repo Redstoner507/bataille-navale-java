@@ -17,8 +17,8 @@ public class Ship {
         return _type.getSize();
     }
 
-    public void setOrientation(Orientation _orientation) {
-        this._orientation = _orientation;
+    public void setOrientation(Orientation orientation) {
+        this._orientation = orientation;
     }
 
     public Orientation getOrientation() {

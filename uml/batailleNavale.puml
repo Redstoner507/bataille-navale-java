@@ -14,10 +14,8 @@ class Main {
 package model {
 
     enum Orientation {
-         HORIZONTAL_LEFT
-         HORIZONTAL_RIGHT
-         VERTICAL_UP
-         VERTICAL_DOWN
+         HORIZONTAL
+         VERTICAL
     }
 
     enum CellState {
@@ -31,9 +29,11 @@ package model {
         - {static} MAX_SIZE : Integer
         - _size : Integer
         + <<Create>> Grid(size: Integer)
-        + canPlaceShip(ship: Ship, startRow: Integer, startCol: Integer) : boolean
-        + placeShip(ship: Ship, startRow: Integer, startCol: Integer) : boolean
+        + canPlaceShip(ship: Ship, startRow: Integer, startCol: Integer) : Boolean
+        + placeShip(ship: Ship, startRow: Integer, startCol: Integer) : Boolean
         + getSize() : Integer
+        + getCellState(row: Integer, col: Integer) : CellState
+        + getShips() : Ship[*]
     }
 
     class Cell {
@@ -60,6 +60,7 @@ package model {
             + getStartRow() : Integer
             + getStartCol() : Integer
             + getType() : ShipType
+            + getCoordinates(startRow: Integer, startCol: Integer) : Point[*]
             + getCoordinates() : Point[*]
         }
 
@@ -95,44 +96,51 @@ package model {
 package view {
     class GameView {
         - _statusLabel : JLabel
-        + <<Create>> GameView(gridSize : Integer)
+        + <<Create>> GameView(gridSize : Integer, cellSize : Integer)
         + getPlayerGridView() : LabeledGridView
         + getComputerGridView() : LabeledGridView
-        + setStatus(text : String)
+        + setStatus(text: String)
     }
 
     class LabeledGridView {
         - _titleLabel : JLabel
-        + <<Create>> LabeledGridView(title : String, gridSize : Integer)
-        + <<Create>> LabeledGridView(title : String, gridSize : Integer, locked : Boolean)
+        + <<Create>> LabeledGridView(title: String, gridSize: Integer, cellSize: Integer)
+        + <<Create>> LabeledGridView(title: String, gridSize: Integer, cellSize: Integer, locked: Boolean)
         - setupComponents()
         + getGridView() : GridView
-        + setTitle(title : String)
+        + setTitle(title: String)
     }
 
     class GridView {
         - _gridSize : Integer
-        - _cells : JButton[][]
         - _locked : Boolean
-        + <<Create>> GridView(gridSize : Integer)
-        - createGridPanel() : JPanel
-        + setLocked(locked : Boolean)
-        + setCellEnabled(row : Integer, col : Integer, enabled : Boolean)
-        + addCellClickListener(listener : ActionListener)
-        + getCell(row : Integer, col : Integer) : JButton
+        + <<Create>> GridView(gridSize: Integer, cellSize: Integer)
+        - createGridPanel(cellSize: Integer) : JPanel
+        + setLocked(locked: Boolean)
+        + setCellEnabled(row: Integer, col: Integer, enabled: Boolean)
+        + addCellClickListener(listener: ActionListener)
+        + setGridActionListener(listener: GridActionListener)
+        + notifyShipDropped(shipView: ShipView, row: Integer, col: Integer) : Boolean
+        + getCell(row: Integer, col: Integer) : JButton
         + getGridSize() : Integer
         + isLocked() : Boolean
+        + getGrid() : Grid
     }
 
     class CellView {
         - _segmentImage : Image
-        - _isClickable : boolean
-        + <<Create>> CellView()
-        + setSegmentImage(imagePath: String)
+        - _isClickable : Boolean
+        - _cellPosition : Point
+        - _cellSize : Integer
+        + <<Create>> CellView(cellPosition: Point, cellSize: Integer)
+        + setSegmentImage()
         # paintComponent(g: Graphics)
         + addMouseListener(l: MouseListener)
-        + setClickable(clickable: boolean)
-        + isClickable() : boolean
+        + setClickable(clickable: Boolean)
+        + isClickable() : Boolean
+        + getState() : CellState
+        + setState(state: CellState)
+        + getCellPosition() : Point
     }
 
     class ShipView {
@@ -158,14 +166,15 @@ package view {
         + getBackButton() : JButton
         + getStartPlacementButton() : JButton
         + getGridSize() : Integer
+        + getShipList() : Ship[*]
     }
 
     class PlacementScreen {
-        - _fixedPlacementButton : JButton
-        - _randomPlacementButton : JButton
-        - _startGameButton : JButton
+        - {static} SHIP_PANEL_WIDTH : Integer
+        - {static} LABEL_HEIGHT : Integer
         - _backButton : JButton
-        + <<Create>> PlacementScreen(gridSize : Integer)
+        - _shipPanel : JPanel
+        + <<Create>> PlacementScreen(gridSize: Integer, ships: Ships[*], cellSize: Integer)
         + getBackButton() : JButton
     }
 
@@ -182,18 +191,30 @@ package view {
     class TerminalOutput
 
     class MainFrame {
+        - {static} CELL_SIZE : Integer
         + <<Create>> MainFrame()
-        - updateScreen(panel : JPanel)
+        - updateScreen(panel: JPanel)
     }
 
     class ShipView {
-
+        - _topLayer : JLayeredPane
+        - _originalPanel : JPanel
+        - _cellSize : Integer
+        - _dragging : Boolean
+        - _dragOffset : Point
+        - _segmentPanel : JPanel
+        + <<Create>> ShipView(ship: ShipView, grid: LabeledGridView, topLayer: JLayeredPane, originalPanel: JPanel, cellSize: Integer)
+        - loadSegments()
+        - updateSize()
+        + setOrientation(orientation: Orientation)
+        - initDragAndDrop()
+        + getShip() : Ship
     }
 }
 
 package controller {
     class GridController {
-        +placeShip(ship: Ship, position: Position, orientation: Orientation): boolean
+        +placeShip(ship: Ship, position: Position, orientation: Orientation): Boolean
     }
 
     class ShipController {
@@ -204,11 +225,27 @@ package controller {
         +startGame(): void
         +endGame(): void
     }
+
+    class PlacementController {
+        + <<Create>> PlacementController(modelGrid: Grid, viewGrid: GridView)
+        + placeShip(ship: Ship, row: Integer, col: Integer) : Boolean
+        + rotateShip(ship: Ship)
+    }
+
+    interface GridActionListener {
+        shipDropped(shipView: ShipView, row: Integer, col: Integer) : Boolean
+    }
 }
 
 package util {
     class RandomUtil {
 
+    }
+
+    class ShipImageProvider {
+        - {static} BASE_PATH : String
+        - {static} _segmentBase : Image
+        + {static} getShipSegment(cellSize: Integer) : Image
     }
 }
 
@@ -232,13 +269,25 @@ MainFrame "1" *-> "1" ConfigScreen : contient >
 MainFrame "1" *-> "1" PlacementScreen : contient >
 
 PlacementScreen "1" *-> "1" LabeledGridView : affiche >
+PlacementScreen "1" *-> "1" Orientation : est orienté >
+PlacementScreen .> PlacementController : demande le placement des bateaux >
 
 LabeledGridView "1" *-> "1" GridView : contient >
 
 GridView "1" o-> "*" CellView : contient >
+GridView "1" *-> "1" Grid : représente >
+GridView "1" *-> "1" GridActionListener : est écouté par >
+
+CellView "1" *-> "1" CellState : a un état >
+CellView .> ShipImageProvider : demande l'image >
 
 ShipView "1" *-> "1" Ship : représente >
+ShipView "1" *-> "1" LabeledGridView : peut être déplacé dans >
+ShipView "1" *-> "1" Orientation : est orienté >
+ShipView .> ShipImageProvider : demande l'image >
 
 GameView "1" *-> "2" LabeledGridView : affiche >
 
+PlacementController "1" *-> "1" Grid : a comme modèle >
+PlacementController "1" *-> "1" GridView : a comme vue >
 @enduml

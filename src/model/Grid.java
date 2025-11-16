@@ -10,13 +10,11 @@ public class Grid {
     private final int _size;
     private final CellState[][] _cells;
     private final ArrayList<Ship> _ships = new ArrayList<>();
-    private final int cellSize;
 
-    public Grid(int size, int cellSize) {
+    public Grid(int size) {
         if (size < MIN_SIZE || size > MAX_SIZE)
             throw new IllegalArgumentException("Size must be between " + MIN_SIZE + " and " + MAX_SIZE);
         this._size = size;
-        this.cellSize = cellSize;
         this._cells = new CellState[size][size];
         for (int r = 0; r < size; r++)
             for (int c = 0; c < size; c++)
@@ -57,16 +55,6 @@ public class Grid {
         return true;
     }
 
-    public Ship getShipAt(int row, int col) {
-        for (Ship s : _ships) {
-            for (Point p : s.getCoordinates()) {
-                if (p.x == row && p.y == col)
-                    return s;
-            }
-        }
-        return null;
-    }
-
     public int getSize() {
         return this._size;
     }
@@ -78,9 +66,4 @@ public class Grid {
     public ArrayList<Ship> getShips() {
         return _ships;
     }
-
-    public int getCellSize() {
-        return cellSize;
-    }
-
 }
