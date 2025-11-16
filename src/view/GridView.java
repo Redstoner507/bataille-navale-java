@@ -15,20 +15,20 @@ public class GridView extends JPanel {
     private final Grid _grid;           // Grille concrète
     private GridActionListener _listener;
 
-    public GridView(int gridSize) {
+    public GridView(int gridSize, int cellSize) {
         this._gridSize = gridSize;
         this._cells = new CellView[gridSize][gridSize];
-        this._grid = new Grid(gridSize);
+        this._grid = new Grid(gridSize, cellSize);
 
         setLayout(new BorderLayout());
-        add(createGridPanel(), BorderLayout.CENTER);
+        add(createGridPanel(cellSize), BorderLayout.CENTER);
     }
 
     /**
      * Creates the main grid panel with column and row headers.
      * @return JPanel
      */
-    private JPanel createGridPanel() {
+    private JPanel createGridPanel(int cellSize) {
         JPanel panel = new JPanel(new GridLayout(_gridSize + 1, _gridSize + 1)); // +1 pour les labels
 
         // Première cellule vide (coin supérieur gauche)
@@ -53,7 +53,7 @@ public class GridView extends JPanel {
 
             // Cases de la grille
             for (int col = 0; col < _gridSize; col++) {
-                CellView cell = new CellView(new Point(row, col));
+                CellView cell = new CellView(new Point(row, col), cellSize);
                 cell.setPreferredSize(new Dimension(50, 50)); // taille carrée
                 cell.setBorder(new LineBorder(Color.BLACK)); // quadrillage
                 cell.setEnabled(false); // désactivée par défaut
@@ -70,9 +70,9 @@ public class GridView extends JPanel {
      */
     public void setLocked(boolean locked) {
         _locked = locked;
-        for (int r = 0; r < _gridSize; r++) {
-            for (int c = 0; c < _gridSize; c++) {
-                _cells[r][c].setEnabled(!locked);
+        for (int row = 0; row < _gridSize; row++) {
+            for (int col = 0; col < _gridSize; col++) {
+                _cells[row][col].setEnabled(!locked);
             }
         }
     }
@@ -91,9 +91,9 @@ public class GridView extends JPanel {
      * Adds a click listener to every cell.
      */
     public void addCellClickListener(MouseListener listener) {
-        for (int r = 0; r < _gridSize; r++) {
-            for (int c = 0; c < _gridSize; c++) {
-                _cells[r][c].addMouseListener(listener);
+        for (int row = 0; row < _gridSize; row++) {
+            for (int col = 0; col < _gridSize; col++) {
+                _cells[row][col].addMouseListener(listener);
             }
         }
     }
@@ -127,5 +127,4 @@ public class GridView extends JPanel {
     public Grid getGrid() {
         return _grid;
     }
-
 }

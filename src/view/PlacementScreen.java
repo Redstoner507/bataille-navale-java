@@ -9,18 +9,17 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class PlacementScreen extends JPanel {
-    private static final int CELL_SIZE = 50;
     private static final int SHIP_PANEL_WIDTH = 300;
     private static final int LABEL_HEIGHT = 20;
     private final JButton _backButton;
     private final JPanel _shipPanel;
     private Orientation _currentOrientation = Orientation.HORIZONTAL;
 
-    public PlacementScreen(int gridSize, ArrayList<Ship> ships) {
+    public PlacementScreen(int gridSize, ArrayList<Ship> ships, int cellSize) {
         setLayout(new BorderLayout(10, 10));
 
-        int width = SHIP_PANEL_WIDTH + (gridSize+1) * CELL_SIZE;
-        int height = (gridSize+1) * CELL_SIZE + LABEL_HEIGHT;
+        int width = SHIP_PANEL_WIDTH + (gridSize+1) * cellSize;
+        int height = (gridSize+1) * cellSize + LABEL_HEIGHT;
 
         // Panneau boutons
         JPanel buttonPanel = new JPanel(new FlowLayout());
@@ -44,7 +43,7 @@ public class PlacementScreen extends JPanel {
         add(layeredPane, BorderLayout.CENTER);
 
         // Grille joueur
-        LabeledGridView playerGrid = new LabeledGridView("Place your ships in the grid", gridSize, false);
+        LabeledGridView playerGrid = new LabeledGridView("Place your ships in the grid", gridSize, cellSize, false);
         playerGrid.setOpaque(true);
         playerGrid.setBackground(Color.CYAN);
         playerGrid.setBounds(SHIP_PANEL_WIDTH, 0, width - SHIP_PANEL_WIDTH, height);
@@ -62,12 +61,12 @@ public class PlacementScreen extends JPanel {
         // PlacementController
         PlacementController controller = new PlacementController(playerGrid.getGridView().getGrid(), playerGrid.getGridView());
         playerGrid.getGridView().setGridActionListener((shipView, row, col) ->
-                controller.placeShip(shipView.getShip(), row, col, shipView.getSegmentImage())
+                controller.placeShip(shipView.getShip(), row, col)
         );
 
         // Ajouter les ShipView
         for (Ship ship : ships) {
-            ShipView shipView = new ShipView(ship, playerGrid, layeredPane, _shipPanel, CELL_SIZE);
+            ShipView shipView = new ShipView(ship, playerGrid, layeredPane, _shipPanel, cellSize);
             shipView.setAlignmentX(Component.CENTER_ALIGNMENT);
             _shipPanel.add(shipView);
             _shipPanel.add(Box.createRigidArea(new Dimension(0, 10))); // espacement vertical

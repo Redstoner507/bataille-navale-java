@@ -2,12 +2,12 @@ package view;
 
 import model.Orientation;
 import model.Ship;
+import utils.ShipImageProvider;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
 
 public class ShipView extends JPanel {
     private final Ship _ship;
@@ -18,7 +18,7 @@ public class ShipView extends JPanel {
     private Orientation _orientation;
     private boolean _dragging = false;
     private Point _dragOffset;
-    private final JPanel segmentPanel = new JPanel();
+    private final JPanel _segmentPanel = new JPanel();
 
     public ShipView(Ship ship, LabeledGridView grid, JLayeredPane topLayer, JPanel originalPanel, int cellSize) {
         this._ship = ship;
@@ -37,68 +37,52 @@ public class ShipView extends JPanel {
         add(title);
 
         // panel des segments
-        segmentPanel.setOpaque(false);
-        segmentPanel.setLayout(new BoxLayout(segmentPanel, BoxLayout.X_AXIS));
-        add(segmentPanel);
+        _segmentPanel.setOpaque(false);
+        _segmentPanel.setLayout(new BoxLayout(_segmentPanel, BoxLayout.X_AXIS));
+        add(_segmentPanel);
 
         loadSegments();
-        adjustSize();
+        updateSize();
         initDragAndDrop();
     }
 
-    private void adjustSize() {
-        Component title = getComponent(0);
-        int panelWidth = _orientation == Orientation.HORIZONTAL ? _cellSize * _ship.getSize() : _cellSize;
-        int panelHeight = _orientation == Orientation.HORIZONTAL ? _cellSize : _cellSize * _ship.getSize();
-
-        segmentPanel.setPreferredSize(new Dimension(panelWidth, panelHeight));
-        segmentPanel.setMaximumSize(new Dimension(panelWidth, panelHeight));
-        segmentPanel.setMinimumSize(new Dimension(panelWidth, panelHeight));
-
-        int shipWidth = Math.max(panelWidth, title.getPreferredSize().width);
-        int shipHeight = panelHeight + title.getPreferredSize().height;
-        Dimension shipDim = new Dimension(shipWidth, shipHeight);
-        setPreferredSize(shipDim);
-        setMaximumSize(shipDim);
-        setMinimumSize(shipDim);
-
-        revalidate();
-        repaint();
-    }
-
     private void loadSegments() {
-        segmentPanel.removeAll();
-
-        // Layout selon orientation
-        segmentPanel.setLayout(new BoxLayout(segmentPanel,
+        _segmentPanel.removeAll();
+        _segmentPanel.setLayout(new BoxLayout(_segmentPanel,
                 _orientation == Orientation.HORIZONTAL ? BoxLayout.X_AXIS : BoxLayout.Y_AXIS));
 
         for (int i = 0; i < _ship.getSize(); i++) {
-            Image img = getSegmentImage();
+            Image img = ShipImageProvider.getShipSegment(_cellSize);
             JLabel seg = new JLabel(new ImageIcon(img));
             seg.setPreferredSize(new Dimension(_cellSize, _cellSize));
             seg.setMinimumSize(new Dimension(_cellSize, _cellSize));
             seg.setMaximumSize(new Dimension(_cellSize, _cellSize));
             seg.setAlignmentX(Component.CENTER_ALIGNMENT);
             seg.setAlignmentY(Component.CENTER_ALIGNMENT);
-            segmentPanel.add(seg);
+            _segmentPanel.add(seg);
         }
 
-        // Ajuster la taille du ShipView selon l'orientation
-        adjustSize();
+        _segmentPanel.revalidate();
+        _segmentPanel.repaint();
     }
 
-    private Image rotateImage90(Image img) {
-        int w = img.getWidth(null);
-        int h = img.getHeight(null);
-        BufferedImage rotated = new BufferedImage(h, w, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2d = rotated.createGraphics();
-        g2d.translate(h / 2.0, w / 2.0);
-        g2d.rotate(Math.toRadians(90));
-        g2d.translate(-w / 2.0, -h / 2.0);
-        g2d.drawImage(img, 0, 0, null);
-        g2d.dispose();
-        return rotated;
+    private void updateSize() {
+        int width = _orientation == Orientation.HORIZONTAL ? _cellSize * _ship.getSize() : _cellSize;
+        int height = _orientation == Orientation.HORIZONTAL ? _cellSize : _cellSize * _ship.getSize();
+
+        _segmentPanel.setPreferredSize(new Dimension(width, height));
+        _segmentPanel.setMaximumSize(new Dimension(width, height));
+        _segmentPanel.setMinimumSize(new Dimension(width, height));
+
+        revalidate();
+        repaint();
+    }
+
+    public void setOrientation(Orientation orientation) {
+        this._orientation = orientation;
+        _ship.setOrientation(orientation);
+        loadSegments(); // reconstruit les segments correctement
+        updateSize();
     }
 
     private void initDragAndDrop() {
@@ -154,10 +138,13 @@ public class ShipView extends JPanel {
                                 foundCol = col;
                                 break;
                             }
-                        } catch (IllegalComponentStateException ignored) {}
+                        } catch (IllegalComponentStateException ignored) {
+                        }
                     }
                     if (foundRow != -1) break;
                 }
+
+                _topLayer.remove(ShipView.this);
 
                 boolean placed = false;
                 if (foundRow != -1) {
@@ -168,13 +155,11 @@ public class ShipView extends JPanel {
                     _originalPanel.add(ShipView.this);
                     _originalPanel.revalidate();
                     _originalPanel.repaint();
-                    _topLayer.remove(ShipView.this);
-                } else {
-                    _topLayer.remove(ShipView.this);
                 }
-
                 _topLayer.revalidate();
                 _topLayer.repaint();
+                gridView.revalidate();
+                gridView.repaint();
             }
         };
 
@@ -184,18 +169,5 @@ public class ShipView extends JPanel {
 
     public Ship getShip() {
         return _ship;
-    }
-
-    public void setOrientation(Orientation orientation) {
-        this._orientation = orientation;
-        _ship.setOrientation(orientation);
-        loadSegments(); // reconstruit les segments correctement
-    }
-
-    public Image getSegmentImage() {
-        String path = "img/ship.png";
-        Image img = new ImageIcon(path).getImage();
-        if (_orientation == Orientation.VERTICAL) img = rotateImage90(img);
-        return img;
     }
 }

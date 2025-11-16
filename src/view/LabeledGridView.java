@@ -7,14 +7,14 @@ public class LabeledGridView extends JPanel {
     private final JLabel _titleLabel;   // Label du titre
     private final GridView _gridView;   // Grille
 
-    public LabeledGridView(String title, int gridSize) {
+    public LabeledGridView(String title, int gridSize, int cellSize) {
         _titleLabel = new JLabel(title, SwingConstants.CENTER);
-        _gridView = new GridView(gridSize);
+        _gridView = new GridView(gridSize, cellSize);
         setupComponents();
     }
 
-    public LabeledGridView(String title, int gridSize, boolean locked) {
-        this(title, gridSize);
+    public LabeledGridView(String title, int gridSize, int cellSize, boolean locked) {
+        this(title, gridSize, cellSize);
         _gridView.setLocked(locked);
     }
 

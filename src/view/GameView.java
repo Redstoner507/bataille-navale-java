@@ -8,7 +8,7 @@ public class GameView extends JPanel {
     private final LabeledGridView _computerGrid;    // Grille de l'ordinateur
     private final JLabel _statusLabel;              // Status du jeu
 
-    public GameView(int gridSize) {
+    public GameView(int gridSize, int cellSize) {
         setLayout(new BorderLayout(10, 10));
 
         // Titre principal
@@ -20,8 +20,8 @@ public class GameView extends JPanel {
         JPanel gridsPanel = new JPanel(new GridLayout(1, 2, 30, 0));
         gridsPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
-        _playerGrid = new LabeledGridView("Your ships", gridSize, false);
-        _computerGrid = new LabeledGridView("Enemy ships", gridSize);
+        _playerGrid = new LabeledGridView("Your ships", gridSize, cellSize, false);
+        _computerGrid = new LabeledGridView("Enemy ships", gridSize, cellSize);
 
         gridsPanel.add(_playerGrid);
         gridsPanel.add(_computerGrid);

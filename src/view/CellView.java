@@ -1,6 +1,7 @@
 package view;
 
 import model.CellState;
+import utils.ShipImageProvider;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,27 +11,23 @@ public class CellView extends JPanel {
     private Image _segmentImage;
     private boolean _isClickable = true;
     private CellState _cellState = CellState.EMPTY;
-    private Point _cellPosition;
+    private final Point _cellPosition;
+    private final int _cellSize;
 
-    public CellView(Point cellPosition) {
+    public CellView(Point cellPosition, int cellSize) {
         _cellPosition = cellPosition;
-        setPreferredSize(new Dimension(50, 50));
+        _cellSize = cellSize;
+        setPreferredSize(new Dimension(cellSize, cellSize));
         setBackground(Color.CYAN);
     }
 
     /**
      * Defines the segment of the ship to display.
-     * @param segmentImage path to the image.
      */
-    public void setSegmentImage(Image segmentImage) {
-        this._segmentImage = segmentImage;
+    public void setSegmentImage() {
+        this._segmentImage = ShipImageProvider.getShipSegment(_cellSize);
+        revalidate();
         repaint();
-    }
-
-    public void setShipSegment(Image image) {
-        // Charge l'image correspondant au segment index selon le type et l'orientation
-        setSegmentImage(image);
-        _cellState = CellState.SHIP_SEGMENT;
     }
 
     @Override
@@ -66,6 +63,10 @@ public class CellView extends JPanel {
 
     public CellState getState() {
         return _cellState;
+    }
+
+    public void setState(CellState state) {
+        _cellState = state;
     }
 
     public Point getCellPosition() {

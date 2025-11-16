@@ -7,7 +7,6 @@ import view.CellView;
 import view.GridView;
 
 import java.awt.*;
-import java.util.List;
 
 public class PlacementController {
     private final Grid _modelGrid;
@@ -22,15 +21,16 @@ public class PlacementController {
      * Tries to place a ship in the grid and updates the view if it was successful.
      * @return true if the ship was placed in the grid, false otherwise.
      */
-    public boolean placeShip(Ship ship, int row, int col, Image segmentImage) {
-        boolean placed = _modelGrid.placeShip(ship, row, col);
-        if (!placed) return false;
+    public boolean placeShip(Ship ship, int row, int col) {
+        if (!_modelGrid.placeShip(ship, row, col)) return false;
 
-        List<Point> coords = ship.getCoordinates();
-        for (Point p : coords) {
+        for (Point p : ship.getCoordinates()) {
             CellView cell = _viewGrid.getCell(p.x, p.y);
-            if (cell != null) cell.setShipSegment(segmentImage);
+            if (cell != null) {
+                cell.setSegmentImage();
+            }
         }
+
         return true;
     }
 

@@ -3,6 +3,7 @@ package view;
 import javax.swing.*;
 
 public class MainFrame extends JFrame {
+    private static final int CELL_SIZE = 50;
     private final StartScreen _startScreen;
     private final ConfigScreen _configScreen;
     private PlacementScreen _placementScreen;
@@ -26,7 +27,7 @@ public class MainFrame extends JFrame {
         _configScreen.getBackButton().addActionListener(_ -> updateScreen(_startScreen));
         _configScreen.getStartPlacementButton().addActionListener(_ -> {
             int size = _configScreen.getGridSize();
-            _placementScreen = new PlacementScreen(size, _configScreen.getShipList());
+            _placementScreen = new PlacementScreen(size, _configScreen.getShipList(), CELL_SIZE);
             _placementScreen.getBackButton().addActionListener(_ -> updateScreen(_configScreen));
             _placementScreen.getBackButton().addActionListener(_ -> updateScreen(_configScreen));
             updateScreen(_placementScreen);
