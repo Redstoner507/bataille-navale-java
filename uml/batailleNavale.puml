@@ -1,4 +1,4 @@
-@startuml
+@startuml BatailleNavale
 'https://plantuml.com/class-diagram
 
 skinparam style strictuml
@@ -7,21 +7,287 @@ skinparam classFontStyle Bold
 hide enum methods
 hide interface attributes
 
+class Main {
+    +main(args: String[]): void
+}
 
 package model {
-    class Grid
+
+    enum Orientation {
+         HORIZONTAL
+         VERTICAL
+    }
+
+    enum CellState {
+        EMPTY
+        SHIP_SEGMENT
+        HIT
+    }
+
+    class Grid {
+        - {static} MIN_SIZE : Integer
+        - {static} MAX_SIZE : Integer
+        - _size : Integer
+        + <<Create>> Grid(size: Integer)
+        + canPlaceShip(ship: Ship, startRow: Integer, startCol: Integer) : Boolean
+        + placeShip(ship: Ship, startRow: Integer, startCol: Integer) : Boolean
+        + getSize() : Integer
+        + getCellState(row: Integer, col: Integer) : CellState
+        + getShips() : Ship[*]
+    }
+
+    class Cell {
+        - _isHit : Boolean
+        - _hasShip : Boolean
+        - _isSunk : Boolean
+        + <<Create>> Cell()
+        + isHit() : Boolean
+        + hasShip() : Boolean
+        + isSunk() : Boolean
+        + hit() : void
+        + placeShip() : void
+    }
+
+    package ship {
+        class Ship {
+            - _startRow : Integer
+            - _startCol : Integer
+            + <<Create>> Ship(type: ShipType)
+            + getSize() : Integer
+            + setOrientation(_orientation: Orientation)
+            + getOrientation() : Orientation
+            + setStart(row: Integer, col: Integer)
+            + getStartRow() : Integer
+            + getStartCol() : Integer
+            + getType() : ShipType
+            + getCoordinates(startRow: Integer, startCol: Integer) : Point[*]
+            + getCoordinates() : Point[*]
+        }
+
+        abstract class ShipType {
+            - _size : Integer
+            + <<Create>> ShipType(size: Integer)
+            + getSize() : Integer
+        }
+
+        class ShipFactory {
+            + <<Create>> ShipFactory()
+            + createShip(type: ShipType) : Ship
+        }
+
+        class Carrier implements ShipType {
+            + <<Create>> Carrier()
+        }
+        class BattleShip implements ShipType {
+            + <<Create>> BattleShip()
+        }
+        class Cruiser implements ShipType {
+            + <<Create>> Cruiser()
+        }
+        class Submarine implements ShipType {
+            + <<Create>> Submarine()
+        }
+        class Destroyer implements ShipType {
+            + <<Create>> Destroyer()
+        }
+    }
 }
 
 package view {
-    class ConfigPanel
-    class PlacementScreen
-    class MainScreen
+    class GameView {
+        - _statusLabel : JLabel
+        + <<Create>> GameView(gridSize : Integer, cellSize : Integer)
+        + getPlayerGridView() : LabeledGridView
+        + getComputerGridView() : LabeledGridView
+        + setStatus(text: String)
+    }
+
+    class LabeledGridView {
+        - _titleLabel : JLabel
+        + <<Create>> LabeledGridView(title: String, gridSize: Integer, cellSize: Integer)
+        + <<Create>> LabeledGridView(title: String, gridSize: Integer, cellSize: Integer, locked: Boolean)
+        - setupComponents()
+        + getGridView() : GridView
+        + setTitle(title: String)
+    }
+
+    class GridView {
+        - _gridSize : Integer
+        - _locked : Boolean
+        + <<Create>> GridView(gridSize: Integer, cellSize: Integer)
+        - createGridPanel(cellSize: Integer) : JPanel
+        + setLocked(locked: Boolean)
+        + setCellEnabled(row: Integer, col: Integer, enabled: Boolean)
+        + addCellClickListener(listener: ActionListener)
+        + setGridActionListener(listener: GridActionListener)
+        + notifyShipDropped(shipView: ShipView, row: Integer, col: Integer) : Boolean
+        + getCell(row: Integer, col: Integer) : JButton
+        + getGridSize() : Integer
+        + isLocked() : Boolean
+        + getGrid() : Grid
+    }
+
+    class CellView {
+        - _segmentImage : Image
+        - _isClickable : Boolean
+        - _cellPosition : Point
+        - _cellSize : Integer
+        + <<Create>> CellView(cellPosition: Point, cellSize: Integer)
+        + setSegmentImage()
+        # paintComponent(g: Graphics)
+        + addMouseListener(l: MouseListener)
+        + setClickable(clickable: Boolean)
+        + isClickable() : Boolean
+        + getState() : CellState
+        + setState(state: CellState)
+        + getCellPosition() : Point
+    }
+
+    class ShipView {
+        + <<Create>> ShipView(ship: Ship)
+    }
+
+    class ConfigScreen {
+        - {static} MAX_OCCUPIABLE_CELLS : Integer
+        - _gridSizeSpinner : JSpinner
+        - _carrierSpinner : JSpinner
+        - _cruiserSpinner : JSpinner
+        - _destroyerSpinner : JSpinner
+        - _submarineSpinner : JSpinner
+        - _torpedoSpinner : JSpinner
+        - _islandCheckBox : JCheckBox
+        - _backButton : JButton
+        - _startPlacementButton : JButton
+        - _occupiedCellsLabel : JLabel
+        + <<Create>> ConfigScreen()
+        - createShipSpinner(label : String) : JSpinner
+        - getOccupiedCellsCount() : Integer
+        - updateOccupiedCellsLabel(occupiedCells : Integer)
+        + getBackButton() : JButton
+        + getStartPlacementButton() : JButton
+        + getGridSize() : Integer
+        + getShipList() : Ship[*]
+    }
+
+    class PlacementScreen {
+        - {static} SHIP_PANEL_WIDTH : Integer
+        - {static} LABEL_HEIGHT : Integer
+        - _backButton : JButton
+        - _shipPanel : JPanel
+        + <<Create>> PlacementScreen(gridSize: Integer, ships: Ships[*], cellSize: Integer)
+        + getBackButton() : JButton
+    }
+
+    class StartScreen {
+        - _playButton : JButton
+        - _quitButton : JButton
+        + <<Create>> StartScreen()
+        + getPlayButton() : JButton
+        + getQuitButton() : JButton
+    }
+
     class EndScreen
+
     class TerminalOutput
+
+    class MainFrame {
+        - {static} CELL_SIZE : Integer
+        + <<Create>> MainFrame()
+        - updateScreen(panel: JPanel)
+    }
+
+    class ShipView {
+        - _topLayer : JLayeredPane
+        - _originalPanel : JPanel
+        - _cellSize : Integer
+        - _dragging : Boolean
+        - _dragOffset : Point
+        - _segmentPanel : JPanel
+        + <<Create>> ShipView(ship: ShipView, grid: LabeledGridView, topLayer: JLayeredPane, originalPanel: JPanel, cellSize: Integer)
+        - loadSegments()
+        - updateSize()
+        + setOrientation(orientation: Orientation)
+        - initDragAndDrop()
+        + getShip() : Ship
+    }
 }
 
 package controller {
-    class GridController
+    class GridController {
+        +placeShip(ship: Ship, position: Position, orientation: Orientation): Boolean
+    }
+
+    class ShipController {
+        +createShip(type: ShipType): Ship
+    }
+
+    class GameController {
+        +startGame(): void
+        +endGame(): void
+    }
+
+    class PlacementController {
+        + <<Create>> PlacementController(modelGrid: Grid, viewGrid: GridView)
+        + placeShip(ship: Ship, row: Integer, col: Integer) : Boolean
+        + rotateShip(ship: Ship)
+    }
+
+    interface GridActionListener {
+        shipDropped(shipView: ShipView, row: Integer, col: Integer) : Boolean
+    }
 }
 
+package util {
+    class RandomUtil {
+
+    }
+
+    class ShipImageProvider {
+        - {static} BASE_PATH : String
+        - {static} _segmentBase : Image
+        + {static} getShipSegment(cellSize: Integer) : Image
+    }
+}
+
+' Relationships
+Main --> GameController
+GameController --> GridController
+GameController --> ShipController
+GridController --> Grid
+ShipController --> ShipFactory
+
+Grid "1" o-> "*" CellState : contient >
+Grid "1" o-> "*" Ship : contient >
+
+ShipFactory .> Ship : Crée
+Ship "1" *-> "1" ShipType : est de type >
+Ship "1" *-> "1" Orientation : est orienté >
+
+
+MainFrame "1" *-> "1" StartScreen : contient >
+MainFrame "1" *-> "1" ConfigScreen : contient >
+MainFrame "1" *-> "1" PlacementScreen : contient >
+
+PlacementScreen "1" *-> "1" LabeledGridView : affiche >
+PlacementScreen "1" *-> "1" Orientation : est orienté >
+PlacementScreen .> PlacementController : demande le placement des bateaux >
+
+LabeledGridView "1" *-> "1" GridView : contient >
+
+GridView "1" o-> "*" CellView : contient >
+GridView "1" *-> "1" Grid : représente >
+GridView "1" *-> "1" GridActionListener : est écouté par >
+
+CellView "1" *-> "1" CellState : a un état >
+CellView .> ShipImageProvider : demande l'image >
+
+ShipView "1" *-> "1" Ship : représente >
+ShipView "1" *-> "1" LabeledGridView : peut être déplacé dans >
+ShipView "1" *-> "1" Orientation : est orienté >
+ShipView .> ShipImageProvider : demande l'image >
+
+GameView "1" *-> "2" LabeledGridView : affiche >
+
+PlacementController "1" *-> "1" Grid : a comme modèle >
+PlacementController "1" *-> "1" GridView : a comme vue >
 @enduml
