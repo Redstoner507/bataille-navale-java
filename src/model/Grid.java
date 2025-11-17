@@ -18,7 +18,7 @@ public class Grid {
         this._cells = new Cell[size][size];
         for (int r = 0; r < size; r++)
             for (int c = 0; c < size; c++)
-                _cells[r][c] = new CellWater();
+                _cells[r][c] = new WaterCell();
     }
 
     /**
@@ -35,7 +35,12 @@ public class Grid {
             if (r < 0 || r >= _size || c < 0 || c >= _size) return false;
 
             if (_cells[r][c].getType() == CellType.WATER) {
-                if (_cells[r][c].hasShip()) return false;
+                try {
+                    if (_cells[r][c].hasShip()) return false;
+                }
+                catch (Exception e) {
+                    System.out.println(e);
+                }
             }
             else return false;
         }
@@ -53,9 +58,13 @@ public class Grid {
         _ships.add(ship);
 
         for (Point p : ship.getCoordinates()) {
-            _cells[p.x][p.y].placeShip();
+            try {
+                _cells[p.x][p.y].placeShip(ship);
+            }
+            catch (Exception e) {
+                System.out.println(e);
+            }
         }
-            
 
         return true;
     }
