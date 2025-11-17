@@ -14,14 +14,13 @@ class Main {
 package model {
 
     enum Orientation {
-         HORIZONTAL
-         VERTICAL
+        HORIZONTAL
+        VERTICAL
     }
 
-    enum CellState {
-        EMPTY
-        SHIP_SEGMENT
-        HIT
+    enum CellType {
+        WATER
+        ISLAND
     }
 
     class Grid {
@@ -32,20 +31,43 @@ package model {
         + canPlaceShip(ship: Ship, startRow: Integer, startCol: Integer) : Boolean
         + placeShip(ship: Ship, startRow: Integer, startCol: Integer) : Boolean
         + getSize() : Integer
-        + getCellState(row: Integer, col: Integer) : CellState
+        + getCell(row: Integer, col: Integer) : Cell
         + getShips() : Ship[*]
     }
 
-    class Cell {
+    abstract class Cell {
+        - _isHit : Boolean
+        + {abstract} <<Create>> Cell()
+        + {abstract} click() : void
+        + getType() : CellType
+    }
+
+    class WaterCell extends Cell {
         - _isHit : Boolean
         - _hasShip : Boolean
         - _isSunk : Boolean
-        + <<Create>> Cell()
+        _ _ship : Ship
+        + <<Create>> WaterCell()
         + isHit() : Boolean
         + hasShip() : Boolean
         + isSunk() : Boolean
-        + hit() : void
+        + click() : void
         + placeShip() : void
+    }
+
+    class IslandCell extends Cell {
+        - _isHit : Boolean
+        - _hasWeapon : Boolean
+        _ _weapon : Weapon
+        + <<Create>> IslandCell()
+        + isHit() : Boolean
+        + hasWeapon() : Boolean
+        + click() : void
+        + placeWeapon() : void
+    }
+
+    abstract class Weapon {
+
     }
 
     package ship {
@@ -95,7 +117,6 @@ package model {
 
 package view {
     class GameView {
-        - _statusLabel : JLabel
         + <<Create>> GameView(gridSize : Integer, cellSize : Integer)
         + getPlayerGridView() : LabeledGridView
         + getComputerGridView() : LabeledGridView
@@ -103,7 +124,6 @@ package view {
     }
 
     class LabeledGridView {
-        - _titleLabel : JLabel
         + <<Create>> LabeledGridView(title: String, gridSize: Integer, cellSize: Integer)
         + <<Create>> LabeledGridView(title: String, gridSize: Integer, cellSize: Integer, locked: Boolean)
         - setupComponents()
@@ -115,13 +135,12 @@ package view {
         - _gridSize : Integer
         - _locked : Boolean
         + <<Create>> GridView(gridSize: Integer, cellSize: Integer)
-        - createGridPanel(cellSize: Integer) : JPanel
         + setLocked(locked: Boolean)
         + setCellEnabled(row: Integer, col: Integer, enabled: Boolean)
         + addCellClickListener(listener: ActionListener)
         + setGridActionListener(listener: GridActionListener)
         + notifyShipDropped(shipView: ShipView, row: Integer, col: Integer) : Boolean
-        + getCell(row: Integer, col: Integer) : JButton
+        + getCell(row: Integer, col: Integer) : CellView
         + getGridSize() : Integer
         + isLocked() : Boolean
         + getGrid() : Grid
@@ -138,8 +157,6 @@ package view {
         + addMouseListener(l: MouseListener)
         + setClickable(clickable: Boolean)
         + isClickable() : Boolean
-        + getState() : CellState
-        + setState(state: CellState)
         + getCellPosition() : Point
     }
 
@@ -149,22 +166,9 @@ package view {
 
     class ConfigScreen {
         - {static} MAX_OCCUPIABLE_CELLS : Integer
-        - _gridSizeSpinner : JSpinner
-        - _carrierSpinner : JSpinner
-        - _cruiserSpinner : JSpinner
-        - _destroyerSpinner : JSpinner
-        - _submarineSpinner : JSpinner
-        - _torpedoSpinner : JSpinner
-        - _islandCheckBox : JCheckBox
-        - _backButton : JButton
-        - _startPlacementButton : JButton
-        - _occupiedCellsLabel : JLabel
         + <<Create>> ConfigScreen()
-        - createShipSpinner(label : String) : JSpinner
         - getOccupiedCellsCount() : Integer
-        - updateOccupiedCellsLabel(occupiedCells : Integer)
-        + getBackButton() : JButton
-        + getStartPlacementButton() : JButton
+        - updateOccupiedCellsLabel(occupiedCells: Integer)
         + getGridSize() : Integer
         + getShipList() : Ship[*]
     }
@@ -172,18 +176,11 @@ package view {
     class PlacementScreen {
         - {static} SHIP_PANEL_WIDTH : Integer
         - {static} LABEL_HEIGHT : Integer
-        - _backButton : JButton
-        - _shipPanel : JPanel
         + <<Create>> PlacementScreen(gridSize: Integer, ships: Ships[*], cellSize: Integer)
-        + getBackButton() : JButton
     }
 
     class StartScreen {
-        - _playButton : JButton
-        - _quitButton : JButton
         + <<Create>> StartScreen()
-        + getPlayButton() : JButton
-        + getQuitButton() : JButton
     }
 
     class EndScreen
@@ -193,7 +190,6 @@ package view {
     class MainFrame {
         - {static} CELL_SIZE : Integer
         + <<Create>> MainFrame()
-        - updateScreen(panel: JPanel)
     }
 
     class ShipView {
@@ -256,7 +252,12 @@ GameController --> ShipController
 GridController --> Grid
 ShipController --> ShipFactory
 
-Grid "1" o-> "*" CellState : contient >
+Cell "1" *-> "1" CellType : est de type >
+
+WaterCell "1" *-> "0,1" Ship : peut contenir >
+IslandCell "1" *-> "0,1" Weapon : peut contenir >
+
+Grid "1" o-> "*" Cell : contient >
 Grid "1" o-> "*" Ship : contient >
 
 ShipFactory .> Ship : Crée
@@ -278,7 +279,7 @@ GridView "1" o-> "*" CellView : contient >
 GridView "1" *-> "1" Grid : représente >
 GridView "1" *-> "1" GridActionListener : est écouté par >
 
-CellView "1" *-> "1" CellState : a un état >
+CellView "1" *-> "1" Cell : représente >
 CellView .> ShipImageProvider : demande l'image >
 
 ShipView "1" *-> "1" Ship : représente >
