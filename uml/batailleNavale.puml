@@ -38,7 +38,8 @@ package model {
     abstract class Cell {
         - _isHit : Boolean
         + {abstract} <<Create>> Cell()
-        + {abstract} click() : void
+        + {abstract} hit() : void
+        + isHit() : Boolean
         + getType() : CellType
     }
 
@@ -50,9 +51,10 @@ package model {
         + <<Create>> WaterCell()
         + isHit() : Boolean
         + hasShip() : Boolean
+        + getShip() : Ship
         + isSunk() : Boolean
-        + click() : void
-        + placeShip() : void
+        + hit() : void
+        + placeShip(newShip: Ship) : void
     }
 
     class IslandCell extends Cell {
@@ -62,8 +64,9 @@ package model {
         + <<Create>> IslandCell()
         + isHit() : Boolean
         + hasWeapon() : Boolean
-        + click() : void
-        + placeWeapon() : void
+        + getWeapon() : Weapon
+        + hit() : void
+        + placeWeapon(newWeapon: Weapon) : void
     }
 
     abstract class Weapon {

@@ -1,21 +1,30 @@
 package model;
 
 public abstract class Cell {
-    private CellType type;
-    private boolean isHit = false;
+    private CellType _type;
+    private boolean _isHit = false;
     
     public Cell(CellType type) {
-        this.type = type;
+        this._type = type;
     }
 
-    public void hit() {
-        isHit = true;
-    }
+    public abstract void hit();
+
+    public abstract boolean hasShip() throws Exception;
+
+    public abstract Ship getShip() throws Exception;
+
+    public abstract void placeShip(Ship newShip) throws Exception;
+
+    public abstract boolean isSunk() throws Exception;
+
+    public abstract boolean hasWeapon() throws Exception;
+
     public boolean isHit() {
-        return isHit;
+        return _isHit;
     }
 
     public CellType getType() {
-        return type;
+        return _type;
     }
 }
