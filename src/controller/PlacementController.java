@@ -42,4 +42,12 @@ public class PlacementController {
                 ship.getOrientation() == Orientation.HORIZONTAL ? Orientation.VERTICAL : Orientation.HORIZONTAL
         );
     }
+
+    /*
+    public void resetGrid() {
+        _modelGrid.resetGrid();
+        _viewGrid.resetGridView();
+    }
+     */
+    
 }

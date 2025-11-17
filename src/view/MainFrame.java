@@ -1,14 +1,16 @@
 package view;
 
 import javax.swing.*;
+import controller.GameController;
 
 public class MainFrame extends JFrame {
     private static final int CELL_SIZE = 50;
     private final StartScreen _startScreen;
     private final ConfigScreen _configScreen;
     private PlacementScreen _placementScreen;
+    private GameController _gameController;
 
-    public MainFrame() {
+    public MainFrame(GameController gameController) {
         setTitle("Bataille Navale");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(1000, 800);
@@ -32,6 +34,8 @@ public class MainFrame extends JFrame {
             _placementScreen.getBackButton().addActionListener(f -> updateScreen(_configScreen));
             updateScreen(_placementScreen);
         });
+
+        _gameController = gameController;
     }
 
     private void updateScreen(JPanel panel) {
