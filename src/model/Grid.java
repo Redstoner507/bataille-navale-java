@@ -8,17 +8,17 @@ public class Grid {
     private static final int MAX_SIZE = 10;
 
     private final int _size;
-    private final CellState[][] _cells;
+    private final Cell[][] _cells;
     private final ArrayList<Ship> _ships = new ArrayList<>();
 
     public Grid(int size) {
         if (size < MIN_SIZE || size > MAX_SIZE)
             throw new IllegalArgumentException("Size must be between " + MIN_SIZE + " and " + MAX_SIZE);
         this._size = size;
-        this._cells = new CellState[size][size];
+        this._cells = new Cell[size][size];
         for (int r = 0; r < size; r++)
             for (int c = 0; c < size; c++)
-                _cells[r][c] = CellState.EMPTY;
+                _cells[r][c] = new CellWater();
     }
 
     /**
@@ -29,12 +29,16 @@ public class Grid {
         for (int i = 0; i < ship.getSize(); i++) {
             int r = startRow;
             int c = startCol;
-
             if (ship.getOrientation() == Orientation.HORIZONTAL) c += i;
             else r += i;
 
             if (r < 0 || r >= _size || c < 0 || c >= _size) return false;
-            if (_cells[r][c] != CellState.EMPTY) return false;
+
+            if (_cells[r][c].getType() == CellType.WATER) {
+                CellWater cell = (CellWater) _cells[r][c];
+                if (cell.hasShip()) return false;
+            }
+            else return false;
         }
         return true;
     }
@@ -49,18 +53,17 @@ public class Grid {
         ship.setStart(startRow, startCol);
         _ships.add(ship);
 
-        for (Point p : ship.getCoordinates())
-            _cells[p.x][p.y] = CellState.SHIP_SEGMENT;
+        for (Point p : ship.getCoordinates()) {
+            CellWater cell = (CellWater) _cells[p.x][p.y];
+            cell.placeShip();
+        }
+            
 
         return true;
     }
 
     public int getSize() {
         return this._size;
-    }
-
-    public CellState getCellState(int row, int col) {
-        return _cells[row][col];
     }
 
     public ArrayList<Ship> getShips() {
