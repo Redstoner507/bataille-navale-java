@@ -1,6 +1,5 @@
 package view;
 
-import model.CellState;
 import utils.ShipImageProvider;
 
 import javax.swing.*;
@@ -10,7 +9,6 @@ import java.awt.event.MouseListener;
 public class CellView extends JPanel {
     private Image _segmentImage;
     private boolean _isClickable = true;
-    private CellState _cellState = CellState.EMPTY;
     private final Point _cellPosition;
     private final int _cellSize;
 
@@ -59,14 +57,6 @@ public class CellView extends JPanel {
 
     public boolean isClickable() {
         return _isClickable;
-    }
-
-    public CellState getState() {
-        return _cellState;
-    }
-
-    public void setState(CellState state) {
-        _cellState = state;
     }
 
     public Point getCellPosition() {
