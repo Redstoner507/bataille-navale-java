@@ -35,8 +35,7 @@ public class Grid {
             if (r < 0 || r >= _size || c < 0 || c >= _size) return false;
 
             if (_cells[r][c].getType() == CellType.WATER) {
-                CellWater cell = (CellWater) _cells[r][c];
-                if (cell.hasShip()) return false;
+                if (_cells[r][c].hasShip()) return false;
             }
             else return false;
         }
@@ -54,8 +53,7 @@ public class Grid {
         _ships.add(ship);
 
         for (Point p : ship.getCoordinates()) {
-            CellWater cell = (CellWater) _cells[p.x][p.y];
-            cell.placeShip();
+            _cells[p.x][p.y].placeShip();
         }
             
 
