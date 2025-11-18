@@ -4,6 +4,9 @@ import model.Ship;
 import model.ShipType;
 
 import javax.swing.*;
+
+import controller.GameController;
+
 import java.awt.*;
 import java.util.ArrayList;
 
@@ -15,8 +18,10 @@ public class ConfigScreen extends JPanel {
     private final JButton _backButton;
     private final JButton _startPlacementButton;
     private final JLabel _occupiedCellsLabel;
+    private final GameController _gameController;
 
-    public ConfigScreen() {
+    public ConfigScreen(GameController gameController) {
+        _gameController = gameController;
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 

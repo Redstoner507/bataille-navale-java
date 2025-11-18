@@ -8,16 +8,17 @@ public class MainFrame extends JFrame {
     private final StartScreen _startScreen;
     private final ConfigScreen _configScreen;
     private PlacementScreen _placementScreen;
-    private GameController _gameController;
+    private final GameController _gameController;
 
     public MainFrame(GameController gameController) {
+        _gameController = gameController;
         setTitle("Bataille Navale");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(1000, 800);
         setLocationRelativeTo(null);
 
         _startScreen = new StartScreen();
-        _configScreen = new ConfigScreen();
+        _configScreen = new ConfigScreen(_gameController);
 
         updateScreen(_startScreen);
         setVisible(true);
@@ -29,13 +30,11 @@ public class MainFrame extends JFrame {
         _configScreen.getBackButton().addActionListener(e -> updateScreen(_startScreen));
         _configScreen.getStartPlacementButton().addActionListener(e -> {
             int size = _configScreen.getGridSize();
-            _placementScreen = new PlacementScreen(size, _configScreen.getShipList(), CELL_SIZE);
+            _placementScreen = new PlacementScreen(_gameController,size, _configScreen.getShipList(), CELL_SIZE);
             _placementScreen.getBackButton().addActionListener(f -> updateScreen(_configScreen));
             _placementScreen.getBackButton().addActionListener(f -> updateScreen(_configScreen));
             updateScreen(_placementScreen);
         });
-
-        _gameController = gameController;
     }
 
     private void updateScreen(JPanel panel) {

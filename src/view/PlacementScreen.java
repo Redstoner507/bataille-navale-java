@@ -1,5 +1,6 @@
 package view;
 
+import controller.GameController;
 import controller.PlacementController;
 import model.Orientation;
 import model.Ship;
@@ -14,8 +15,11 @@ public class PlacementScreen extends JPanel {
     private final JButton _backButton;
     private final JPanel _shipPanel;
     private Orientation _currentOrientation = Orientation.HORIZONTAL;
+    private final GameController _gameController;
 
-    public PlacementScreen(int gridSize, ArrayList<Ship> ships, int cellSize) {
+    public PlacementScreen(GameController gameController, int gridSize, ArrayList<Ship> ships, int cellSize) {
+        _gameController = gameController;
+        
         setLayout(new BorderLayout(10, 10));
 
         int width = SHIP_PANEL_WIDTH + (gridSize+1) * cellSize;
