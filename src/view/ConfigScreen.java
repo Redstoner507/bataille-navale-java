@@ -1,14 +1,14 @@
 package view;
 
-import model.Ship;
-import model.ShipType;
+//import model.Ship;
+//import model.ShipType;
 
 import javax.swing.*;
 
 import controller.GameController;
 
 import java.awt.*;
-import java.util.ArrayList;
+//import java.util.ArrayList;
 
 public class ConfigScreen extends JPanel {
     private static final int MAX_OCCUPIABLE_CELLS = 35;
@@ -97,6 +97,7 @@ public class ConfigScreen extends JPanel {
         _occupiedCellsLabel.setText("Occupied cells : " + occupiedCells + " / " + MAX_OCCUPIABLE_CELLS);
     }
 
+    /* 
     public JButton getBackButton() {
         return _backButton;
     }
@@ -128,4 +129,5 @@ public class ConfigScreen extends JPanel {
         }
         return ships;
     }
+    */
 }
