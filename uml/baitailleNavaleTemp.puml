@@ -1,0 +1,157 @@
+@startuml BatailleNavale
+'https://plantuml.com/class-diagram
+
+skinparam style strictuml
+skinparam classAttributeIconSize 0
+skinparam classFontStyle Bold
+hide enum methods
+hide interface attributes
+
+class Main {
+    +main(args: String[]): void
+}
+
+package controller {
+    class GameController {
+        - _configScreen : ConfigScreen
+        - _startScreen : StartScreen
+        - _placementScreen : PlacementScreen
+        - _mainFrame : MainFrame
+
+        + <<Create>> GameController()
+        + showStartScreen() : void
+        + showConfigScreen() : void
+        + startPlacementScreen() : void
+        + dispose() : void
+    }
+}
+
+package model {
+    class Cell <<abstract>> {
+        - _type : CellType
+        - _isHit : boolean
+
+        + Cell(type : CellType)
+        {abstract} + hit() : void
+        {abstract} + hasShip() : boolean
+        {abstract} + getShip() : Ship
+        {abstract} + placeShip(newShip : Ship) : void
+        {abstract} + isSunk() : boolean
+        {abstract} + hasWeapon() : boolean
+        + isHit() : boolean
+        + getType() : CellType
+    }   
+
+    class WaterCell extends Cell {
+        - _ship : Ship
+
+        + <<Create>> WaterCell()
+        + hit() : void
+        + hasShip() : boolean
+        + getShip() : Ship
+        + placeShip(newShip : Ship) : void
+        + isSunk() : boolean
+        + hasWeapon() : boolean
+    }
+
+    class IslandCell extends Cell {
+        + <<Create>> IslandCell()
+        + hit() : void
+        + hasShip() : boolean
+        + getShip() : Ship
+        + placeShip(newShip : Ship) : void
+        + isSunk() : boolean
+        + hasWeapon() : boolean
+    }
+
+    enum CellType {
+        WATER
+        ISLAND
+    }
+
+    class Ship {
+        - _name : String
+        - _size : int
+        - _hits : int
+
+        + <<Create>> Ship(name : String, size : int)
+        + hit() : void
+        + isSunk() : boolean
+        + getName() : String
+        + getSize() : int
+    }
+
+    class ShipType <<enum>> {
+        CARRIER
+        BATTLESHIP
+        CRUISER
+        SUBMARINE
+        DESTROYER
+
+        + getSize() : int
+    }
+    
+    Cell --> CellType : uses
+
+}
+
+package view {
+    class ConfigScreen {
+        - MAX_OCCUPIABLE_CELLS : Integer <<static>>
+        - _gridSizeSpinner : JSpinner
+        - _carrierSpinner : JSpinner
+        - _battleshipSpinner : JSpinner
+        - _cruiserSpinner : JSpinner
+        - _submarineSpinner : JSpinner
+        - _destroyerSpinner : JSpinner
+        - _islandCheckBox : JCheckBox
+        - _backButton : JButton
+        - _startPlacementButton : JButton
+        - _occupiedCellsLabel : JLabel
+        - _gameController : GameController
+
+        + <<Create>> ConfigScreen(gameController : GameController)
+        - createShipSpinner(label : String) : JSpinner
+        - getOccupiedCellsCount() : int
+        - updateOccupiedCellsLabel(occupied : int) : void
+    }
+
+    class StartScreen {
+            - _gameController : GameController
+        - _playButton : JButton
+        - _quitButton : JButton
+
+        + <<Create>> StartScreen(gameController : GameController)
+    }
+
+    class PlacementScreen {
+    
+    }
+
+    class MainFrame {
+        - currentScreen : JPanel
+        - _gameController : GameController
+
+        + <<Create>> MainFrame(gameController : GameController)
+        + setCurrentScreen(panel : JPanel) : void
+    }
+}
+
+package utils {
+    
+}
+
+' Relations
+StartScreen "*" o--> "2..*\n - m_attribute" GameController
+ConfigScreen "*" o--> "2..*\n - m_attribute" GameController 
+PlacementScreen "*" o--> "2..*\n - m_attribute" GameController 
+MainFrame "*" o--> "2..*\n - m_attribute" GameController 
+
+GameController *-> MainFrame
+GameController *-> StartScreen
+GameController *-> ConfigScreen
+GameController *-> PlacementScreen
+
+Main ..> GameController : uses
+
+@enduml

@@ -62,10 +62,15 @@ public class ConfigScreen extends JPanel {
 
         // Boutons
         _backButton = new JButton("Back");
+        _backButton.addActionListener(e -> _gameController.showStartScreen());
+
         _startPlacementButton = new JButton("Confirm");
+        _startPlacementButton.addActionListener(e -> _gameController.startPlacementScreen());
+
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(_backButton);
         buttonPanel.add(_startPlacementButton);
+        
         add(buttonPanel);
     }
 

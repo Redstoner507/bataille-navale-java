@@ -46,12 +46,4 @@ public class MainFrame extends JFrame {
         revalidate();
         repaint();
     }
-
-    /* 
-    private void updateScreen(JPanel panel) {
-        setContentPane(panel);
-        revalidate();
-        repaint();
-    }
-    */
 }

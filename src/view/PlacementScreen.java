@@ -17,6 +17,9 @@ public class PlacementScreen extends JPanel {
     private Orientation _currentOrientation = Orientation.HORIZONTAL;
     private final GameController _gameController;
 
+    public PlacementScreen(GameController gameController, int gridSize, int cellSize) {
+        this(gameController, gridSize, new ArrayList<>(), cellSize);
+    }
     public PlacementScreen(GameController gameController, int gridSize, ArrayList<Ship> ships, int cellSize) {
         _gameController = gameController;
         

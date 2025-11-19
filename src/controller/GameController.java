@@ -1,14 +1,14 @@
 package controller;
 
-import java.io.ObjectInputFilter.Config;
-
 import view.ConfigScreen;
 import view.MainFrame;
+import view.PlacementScreen;
 import view.StartScreen;
 
 public class GameController {
     private ConfigScreen _configScreen;
     private StartScreen _startScreen;
+    private PlacementScreen _placementScreen;
     private MainFrame _mainFrame;
 
     public GameController() {
@@ -27,7 +27,16 @@ public class GameController {
         }
         _mainFrame.setCurrentScreen(_configScreen);
     }
-
+    public void startPlacementScreen() {
+        if (_placementScreen == null) {
+            // Example parameters; replace with actual configuration values
+            int gridSize = 10;
+            //var ships = _configScreen.getConfiguredShips();
+            int cellSize = 50; // Example cell size
+            _placementScreen = new PlacementScreen(this, gridSize, cellSize);
+        }
+        _mainFrame.setCurrentScreen(_placementScreen);
+    }
     public void dispose() {
         _mainFrame.dispose();
     }
