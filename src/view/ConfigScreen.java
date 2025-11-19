@@ -1,14 +1,11 @@
 package view;
 
-//import model.Ship;
-//import model.ShipType;
-
 import javax.swing.*;
-
 import controller.GameController;
 
 import java.awt.*;
-//import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Hashtable;
 
 public class ConfigScreen extends JPanel {
     private static final int MAX_OCCUPIABLE_CELLS = 35;
@@ -102,6 +99,16 @@ public class ConfigScreen extends JPanel {
         _occupiedCellsLabel.setText("Occupied cells : " + occupiedCells + " / " + MAX_OCCUPIABLE_CELLS);
     }
 
+    public Dictionary<String, Integer> getShipConfig(){
+        Dictionary<String, Integer> shipConfig = new Hashtable<>();
+        shipConfig.put("carrier", (Integer) _carrierSpinner.getValue());
+        shipConfig.put("battleShip", (Integer) _battleshipSpinner.getValue());
+        shipConfig.put("cruiser", (Integer) _cruiserSpinner.getValue());
+        shipConfig.put("submarine", (Integer) _submarineSpinner.getValue());
+        shipConfig.put("destroyer", (Integer) _destroyerSpinner.getValue());
+        return shipConfig;
+    }
+
     /* 
     public JButton getBackButton() {
         return _backButton;
@@ -113,26 +120,6 @@ public class ConfigScreen extends JPanel {
 
     public int getGridSize() {
         return (int)_gridSizeSpinner.getValue();
-    }
-
-    public ArrayList<Ship> getShipList() {
-        ArrayList<Ship> ships = new ArrayList<>();
-        for (int i = 0; i < (int)_carrierSpinner.getValue(); i++) {
-            ships.add(new Ship(ShipType.CARRIER));
-        }
-        for (int i = 0; i < (int)_battleshipSpinner.getValue(); i++) {
-            ships.add(new Ship(ShipType.BATTLESHIP));
-        }
-        for (int i = 0; i < (int)_cruiserSpinner.getValue(); i++) {
-            ships.add(new Ship(ShipType.CRUISER));
-        }
-        for (int i = 0; i < (int)_submarineSpinner.getValue(); i++) {
-            ships.add(new Ship(ShipType.SUBMARINE));
-        }
-        for (int i = 0; i < (int)_destroyerSpinner.getValue(); i++) {
-            ships.add(new Ship(ShipType.DESTROYER));
-        }
-        return ships;
     }
     */
 }
