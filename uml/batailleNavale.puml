@@ -1,6 +1,8 @@
 @startuml BatailleNavale
 'https://plantuml.com/class-diagram
 
+'skinparam linetype ortho
+'skinparam linetype polyline
 skinparam style strictuml
 skinparam classAttributeIconSize 0
 skinparam classFontStyle Bold
@@ -73,46 +75,49 @@ package model {
 
     }
 
-    package ship {
-        class Ship {
-            - _startRow : Integer
-            - _startCol : Integer
-            + <<Create>> Ship(type: ShipType)
-            + getSize() : Integer
-            + setOrientation(_orientation: Orientation)
-            + getOrientation() : Orientation
-            + setStart(row: Integer, col: Integer)
-            + getStartRow() : Integer
-            + getStartCol() : Integer
-            + getType() : ShipType
-            + getCoordinates(startRow: Integer, startCol: Integer) : Point[*]
-            + getCoordinates() : Point[*]
-        }
+    abstract class Placeable {
+        - _name : String
+        - _size : Integer
+        - _startRow : Integer
+        - _startCol : Integer
+        + <<Create>> Placeable(size: Integer, defaultOrientation: Orientation, name: String)
+        + getSize() : Integer
+        + setOrientation(orientation: Orientation)
+        + getOrientation() : Orientation
+        + getName() : String
+        + setStartPosition(row: Integer, col: Integer)
+        + getStartRow() : Integer
+        + getStartCol() : Integer
+        + getCoordinates() : Point[*]
+    }
 
-        abstract class ShipType {
-            - _size : Integer
-            + <<Create>> ShipType(size: Integer)
-            + getSize() : Integer
+    package ship {
+        class Ship extends model.Placeable{
+            + <<Create>> Ship(size: Integer, name: String)
         }
 
         class ShipFactory {
             + <<Create>> ShipFactory()
-            + createShip(type: ShipType) : Ship
+            + createCarrier() : Ship
+            + createBatteShip() : Ship
+            + createCruiser() : Ship
+            + createSubmarine() : Ship
+            + createDestroyer() : Ship
         }
 
-        class Carrier implements ShipType {
+        class Carrier extends Ship {
             + <<Create>> Carrier()
         }
-        class BattleShip implements ShipType {
+        class BattleShip extends Ship {
             + <<Create>> BattleShip()
         }
-        class Cruiser implements ShipType {
+        class Cruiser extends Ship {
             + <<Create>> Cruiser()
         }
-        class Submarine implements ShipType {
+        class Submarine extends Ship {
             + <<Create>> Submarine()
         }
-        class Destroyer implements ShipType {
+        class Destroyer extends Ship {
             + <<Create>> Destroyer()
         }
     }
@@ -173,7 +178,7 @@ package view {
         - getOccupiedCellsCount() : Integer
         - updateOccupiedCellsLabel(occupiedCells: Integer)
         + getGridSize() : Integer
-        + getShipList() : Ship[*]
+        + getShipConfig() : Dictionary<String, Integer>
     }
 
     class PlacementScreen {
@@ -216,13 +221,12 @@ package controller {
         +placeShip(ship: Ship, position: Position, orientation: Orientation): Boolean
     }
 
-    class ShipController {
-        +createShip(type: ShipType): Ship
-    }
-
     class GameController {
-        +startGame(): void
-        +endGame(): void
+        + <<Create>> GameController()
+        + showStartScreen()
+        + showConfigScreen()
+        + startPlacementScreen()
+        + dispose()
     }
 
     class PlacementController {
@@ -233,6 +237,12 @@ package controller {
 
     interface GridActionListener {
         shipDropped(shipView: ShipView, row: Integer, col: Integer) : Boolean
+    }
+
+    class ConfigController {
+        + <<Create>> ConfigController()
+        + getShipConfig(config: Dictionary<String, Integer>) : Ship[*]
+        + getShipConfig(carriers : Integer, batteShips : Integer, cruisers : Integer, submarines : Integer, destroyer : Integer) : Ship[*]
     }
 }
 
@@ -249,11 +259,20 @@ package util {
 }
 
 ' Relationships
-Main --> GameController
-GameController --> GridController
-GameController --> ShipController
+Main .> GameController : Instancie
+
+GameController "1" *-> "1" ConfigScreen : Gère l'affichage de >
+GameController "1" *-> "1" StartScreen : Gère l'affichage de >
+GameController "1" *-> "1" PlacementScreen : Gère l'affichage de >
+GameController "1" *-> "1" MainFrame : Gère l'affichage de >
+GameController .> ConfigScreen : Instancie
+GameController .> StartScreen : Instancie
+GameController .> PlacementScreen : Instancie
+GameController .> MainFrame : Instancie
+
 GridController --> Grid
-ShipController --> ShipFactory
+
+ConfigController --> ShipFactory
 
 Cell "1" *-> "1" CellType : est de type >
 
@@ -263,10 +282,9 @@ IslandCell "1" *-> "0,1" Weapon : peut contenir >
 Grid "1" o-> "*" Cell : contient >
 Grid "1" o-> "*" Ship : contient >
 
-ShipFactory .> Ship : Crée
-Ship "1" *-> "1" ShipType : est de type >
-Ship "1" *-> "1" Orientation : est orienté >
+Placeable "1" *-> "1" Orientation : est orienté >
 
+ShipFactory .> Ship : Instancie
 
 MainFrame "1" *-> "1" StartScreen : contient >
 MainFrame "1" *-> "1" ConfigScreen : contient >
