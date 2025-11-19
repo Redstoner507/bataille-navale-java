@@ -1,7 +1,7 @@
 package view;
 
 import model.Orientation;
-import model.Ship;
+import model.ship.Ship;
 import utils.ShipImageProvider;
 
 import javax.swing.*;
@@ -32,7 +32,7 @@ public class ShipView extends JPanel {
         setOpaque(false);
 
         // titre du bateau
-        JLabel title = new JLabel(ship.getType().name(), SwingConstants.CENTER);
+        JLabel title = new JLabel(ship.getName(), SwingConstants.CENTER);
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
         add(title);
 

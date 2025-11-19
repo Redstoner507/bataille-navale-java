@@ -3,7 +3,7 @@ package view;
 import controller.GameController;
 import controller.PlacementController;
 import model.Orientation;
-import model.Ship;
+import model.ship.Ship;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,9 +17,6 @@ public class PlacementScreen extends JPanel {
     private Orientation _currentOrientation = Orientation.HORIZONTAL;
     private final GameController _gameController;
 
-    public PlacementScreen(GameController gameController, int gridSize, int cellSize) {
-        this(gameController, gridSize, new ArrayList<>(), cellSize);
-    }
     public PlacementScreen(GameController gameController, int gridSize, ArrayList<Ship> ships, int cellSize) {
         _gameController = gameController;
         

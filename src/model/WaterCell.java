@@ -1,5 +1,7 @@
 package model;
 
+import model.ship.Ship;
+
 public class WaterCell extends Cell {
     private boolean _hasShip = false;
     private boolean _isSunk = false;

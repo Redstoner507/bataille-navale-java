@@ -1,5 +1,7 @@
 package model;
 
+import model.ship.Ship;
+
 import java.awt.*;
 import java.util.ArrayList;
 
@@ -54,7 +56,7 @@ public class Grid {
     public boolean placeShip(Ship ship, int startRow, int startCol) {
         if (!canPlaceShip(ship, startRow, startCol)) return false;
 
-        ship.setStart(startRow, startCol);
+        ship.setStartPosition(startRow, startCol);
         _ships.add(ship);
 
         for (Point p : ship.getCoordinates()) {

@@ -2,7 +2,7 @@ package controller;
 
 import model.Grid;
 import model.Orientation;
-import model.Ship;
+import model.ship.Ship;
 import view.CellView;
 import view.GridView;
 

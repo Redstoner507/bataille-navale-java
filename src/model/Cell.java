@@ -1,5 +1,7 @@
 package model;
 
+import model.ship.Ship;
+
 public abstract class Cell {
     private final CellType _type;
     private boolean _isHit = false;
