@@ -1,4 +1,4 @@
-package model;
+package model.cell;
 
 import model.ship.Ship;
 

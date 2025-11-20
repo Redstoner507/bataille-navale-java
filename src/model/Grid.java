@@ -1,5 +1,8 @@
 package model;
 
+import model.cell.Cell;
+import model.cell.CellType;
+import model.cell.WaterCell;
 import model.ship.Ship;
 
 import java.awt.*;

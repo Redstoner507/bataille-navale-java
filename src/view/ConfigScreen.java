@@ -1,11 +1,11 @@
 package view;
 
 import javax.swing.*;
+
+import controller.ConfigController;
 import controller.GameController;
 
 import java.awt.*;
-import java.util.Dictionary;
-import java.util.Hashtable;
 
 public class ConfigScreen extends JPanel {
     private static final int MAX_OCCUPIABLE_CELLS = 35;
@@ -17,7 +17,7 @@ public class ConfigScreen extends JPanel {
     private final JLabel _occupiedCellsLabel;
     private final GameController _gameController;
 
-    public ConfigScreen(GameController gameController) {
+    public ConfigScreen(GameController gameController, ConfigController configController) {
         _gameController = gameController;
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -34,6 +34,11 @@ public class ConfigScreen extends JPanel {
         _gridSizeSpinner = new JSpinner(new SpinnerNumberModel(10, 6, 10, 1));
         gridPanel.add(_gridSizeSpinner);
         add(gridPanel);
+
+        _gridSizeSpinner.addChangeListener(e -> {
+            int gridSize = (int) _gridSizeSpinner.getValue();
+            configController.setGridSize(gridSize);
+        });
 
         // Nombre de bateaux
         _occupiedCellsLabel = new JLabel();
@@ -98,28 +103,4 @@ public class ConfigScreen extends JPanel {
     private void updateOccupiedCellsLabel(int occupiedCells) {
         _occupiedCellsLabel.setText("Occupied cells : " + occupiedCells + " / " + MAX_OCCUPIABLE_CELLS);
     }
-
-    public Dictionary<String, Integer> getShipConfig(){
-        Dictionary<String, Integer> shipConfig = new Hashtable<>();
-        shipConfig.put("carrier", (Integer) _carrierSpinner.getValue());
-        shipConfig.put("battleShip", (Integer) _battleshipSpinner.getValue());
-        shipConfig.put("cruiser", (Integer) _cruiserSpinner.getValue());
-        shipConfig.put("submarine", (Integer) _submarineSpinner.getValue());
-        shipConfig.put("destroyer", (Integer) _destroyerSpinner.getValue());
-        return shipConfig;
-    }
-
-    /* 
-    public JButton getBackButton() {
-        return _backButton;
-    }
-
-    public JButton getStartPlacementButton() {
-        return _startPlacementButton;
-    }
-
-    public int getGridSize() {
-        return (int)_gridSizeSpinner.getValue();
-    }
-    */
 }

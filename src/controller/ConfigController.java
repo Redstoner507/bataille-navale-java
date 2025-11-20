@@ -1,26 +1,37 @@
 package controller;
 
+import model.GameConfig;
 import model.ship.Ship;
 import model.ship.ShipFactory;
-
 import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.Enumeration;
+import java.util.Map;
+
 
 public class ConfigController {
-
-    public ConfigController() {}
-
-    public ArrayList<Ship> getShipConfig(Dictionary<String, Integer> config) {
-        Enumeration<Integer> numbers = config.elements();
-        int carriers = numbers.nextElement();   //config.get("carrier");
-        int batteShips = numbers.nextElement(); //config.get("batteShip");
-        int cruisers = numbers.nextElement();   //config.get("cruiser");
-        int submarines = numbers.nextElement(); //config.get("submarine");
-        int destroyer = numbers.nextElement();  //config.get("destroyer");
-        return getShipConfig(carriers, batteShips, cruisers, submarines, destroyer);
+    GameConfig _gameConfig;
+    public ConfigController() {
+        _gameConfig = new GameConfig();
     }
 
+    public void setGridSize(int gridSize) {
+        _gameConfig.setGridSize(gridSize);
+    }
+
+    public GameConfig getGameConfig() {
+        return _gameConfig;
+    }
+
+    public ArrayList<Ship> getShipConfig() { 
+        Map<String, Integer> config = _gameConfig.getShipConfig();
+        int carriers    = config.get("carrier");
+        int battleShips = config.get("battleShip");
+        int cruisers    = config.get("cruiser");
+        int submarines  = config.get("submarine");
+        int destroyers  = config.get("destroyer");
+
+        return getShipConfig(carriers, battleShips, cruisers, submarines, destroyers);
+    }
+    
     public ArrayList<Ship> getShipConfig(int carriers, int batteShips, int cruisers, int submarines, int destroyer) {
         ArrayList<Ship> ships = new ArrayList<>();
         ShipFactory factory = new ShipFactory();
@@ -41,4 +52,5 @@ public class ConfigController {
         }
         return ships;
     }
+    
 }

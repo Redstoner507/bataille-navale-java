@@ -31,7 +31,9 @@ public class PlacementScreen extends JPanel {
         JButton fixedPlacementButton = new JButton("Fixed placement");
         JButton randomPlacementButton = new JButton("Random placement");
         JButton startGameButton = new JButton("Start game");
+        
         _backButton = new JButton("Cancel");
+        _backButton.addActionListener(e -> _gameController.showConfigScreen());
 
         buttonPanel.add(rotateButton);
         buttonPanel.add(fixedPlacementButton);
@@ -89,9 +91,5 @@ public class PlacementScreen extends JPanel {
                 }
             }
         });
-    }
-
-    public JButton getBackButton() {
-        return _backButton;
     }
 }
