@@ -3,18 +3,21 @@ package model;
 import java.awt.*;
 import java.util.ArrayList;
 
-public class Ship {
-    private final ShipType _type;
-    private Orientation _orientation = Orientation.HORIZONTAL;
+public abstract class Placeable {
+    private final String _name;
+    private final int _size;
     private int _startRow = -1;
     private int _startCol = -1;
+    private Orientation _orientation;
 
-    public Ship(ShipType type) {
-        this._type = type;
+    public Placeable(int size, Orientation defaultOrientation, String name) {
+        _size = size;
+        _orientation = defaultOrientation;
+        _name = name;
     }
 
     public int getSize() {
-        return _type.getSize();
+        return _size;
     }
 
     public void setOrientation(Orientation orientation) {
@@ -25,7 +28,11 @@ public class Ship {
         return _orientation;
     }
 
-    public void setStart(int row, int col) {
+    public String getName() {
+        return _name;
+    }
+
+    public void setStartPosition(int row, int col) {
         this._startRow = row;
         this._startCol = col;
     }
@@ -38,15 +45,11 @@ public class Ship {
         return _startCol;
     }
 
-    public ShipType getType() {
-        return _type;
-    }
-
-    public ArrayList<Point> getCoordinates(int startRow, int startCol) {
+    public ArrayList<Point> getCoordinates() {
         ArrayList<Point> coordinates = new ArrayList<>();
-        for (int i = 0; i < _type.getSize(); i++) {
-            int r = startRow;
-            int c = startCol;
+        for (int i = 0; i < _size; i++) {
+            int r = _startRow;
+            int c = _startCol;
 
             switch (_orientation) {
                 case HORIZONTAL -> c += i;
@@ -56,9 +59,5 @@ public class Ship {
             coordinates.add(new Point(r, c));
         }
         return coordinates;
-    }
-
-    public ArrayList<Point> getCoordinates() {
-        return getCoordinates(_startRow, _startCol);
     }
 }

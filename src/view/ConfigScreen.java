@@ -1,27 +1,19 @@
 package view;
 
-import model.Ship;
-import model.ShipType;
-
 import javax.swing.*;
 
+import controller.ConfigController;
 import controller.GameController;
 
 import java.awt.*;
-import java.util.ArrayList;
 
 public class ConfigScreen extends JPanel {
     private static final int MAX_OCCUPIABLE_CELLS = 35;
     private final JSpinner _gridSizeSpinner;
     private final JSpinner _carrierSpinner, _battleshipSpinner, _cruiserSpinner, _submarineSpinner, _destroyerSpinner;
-    private final JCheckBox _islandCheckBox;
-    private final JButton _backButton;
-    private final JButton _startPlacementButton;
     private final JLabel _occupiedCellsLabel;
-    private final GameController _gameController;
 
-    public ConfigScreen(GameController gameController) {
-        _gameController = gameController;
+    public ConfigScreen(GameController gameController, ConfigController configController) {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
@@ -38,6 +30,11 @@ public class ConfigScreen extends JPanel {
         gridPanel.add(_gridSizeSpinner);
         add(gridPanel);
 
+        _gridSizeSpinner.addChangeListener(e -> {
+            int gridSize = (int) _gridSizeSpinner.getValue();
+            configController.setGridSize(gridSize);
+        });
+
         // Nombre de bateaux
         _occupiedCellsLabel = new JLabel();
         _occupiedCellsLabel.setAlignmentX(CENTER_ALIGNMENT);
@@ -53,19 +50,24 @@ public class ConfigScreen extends JPanel {
 
         // Mode île
         JPanel islandPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        _islandCheckBox = new JCheckBox("Island mode");
-        _islandCheckBox.setSelected(false);
-        islandPanel.add(_islandCheckBox);
+        JCheckBox islandCheckBox = new JCheckBox("Island mode");
+        islandCheckBox.setSelected(false);
+        islandPanel.add(islandCheckBox);
         add(islandPanel);
 
         add(Box.createVerticalStrut(20));
 
         // Boutons
-        _backButton = new JButton("Back");
-        _startPlacementButton = new JButton("Confirm");
+        JButton backButton = new JButton("Back");
+        backButton.addActionListener(e -> gameController.showStartScreen());
+
+        JButton startPlacementButton = new JButton("Confirm");
+        startPlacementButton.addActionListener(e -> gameController.startPlacementScreen());
+
         JPanel buttonPanel = new JPanel();
-        buttonPanel.add(_backButton);
-        buttonPanel.add(_startPlacementButton);
+        buttonPanel.add(backButton);
+        buttonPanel.add(startPlacementButton);
+        
         add(buttonPanel);
     }
 
@@ -95,37 +97,5 @@ public class ConfigScreen extends JPanel {
 
     private void updateOccupiedCellsLabel(int occupiedCells) {
         _occupiedCellsLabel.setText("Occupied cells : " + occupiedCells + " / " + MAX_OCCUPIABLE_CELLS);
-    }
-
-    public JButton getBackButton() {
-        return _backButton;
-    }
-
-    public JButton getStartPlacementButton() {
-        return _startPlacementButton;
-    }
-
-    public int getGridSize() {
-        return (int)_gridSizeSpinner.getValue();
-    }
-
-    public ArrayList<Ship> getShipList() {
-        ArrayList<Ship> ships = new ArrayList<>();
-        for (int i = 0; i < (int)_carrierSpinner.getValue(); i++) {
-            ships.add(new Ship(ShipType.CARRIER));
-        }
-        for (int i = 0; i < (int)_battleshipSpinner.getValue(); i++) {
-            ships.add(new Ship(ShipType.BATTLESHIP));
-        }
-        for (int i = 0; i < (int)_cruiserSpinner.getValue(); i++) {
-            ships.add(new Ship(ShipType.CRUISER));
-        }
-        for (int i = 0; i < (int)_submarineSpinner.getValue(); i++) {
-            ships.add(new Ship(ShipType.SUBMARINE));
-        }
-        for (int i = 0; i < (int)_destroyerSpinner.getValue(); i++) {
-            ships.add(new Ship(ShipType.DESTROYER));
-        }
-        return ships;
     }
 }

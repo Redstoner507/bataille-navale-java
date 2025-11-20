@@ -1,7 +1,9 @@
-package model;
+package model.cell;
+
+import model.ship.Ship;
 
 public abstract class Cell {
-    private CellType _type;
+    private final CellType _type;
     private boolean _isHit = false;
     
     public Cell(CellType type) {

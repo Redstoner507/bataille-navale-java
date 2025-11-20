@@ -1,4 +1,6 @@
-package model;
+package model.cell;
+
+import model.ship.Ship;
 
 public class IslandCell extends Cell {
     private boolean _hasWeapon = false;
