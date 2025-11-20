@@ -13,6 +13,9 @@ public class ConfigController {
 
     public ArrayList<Ship> getShipConfig(Dictionary<String, Integer> config) {
         Enumeration<Integer> numbers = config.elements();
+        if (!numbers.hasMoreElements()) {
+            return null;
+        }
         int carriers = numbers.nextElement();   //config.get("carrier");
         int batteShips = numbers.nextElement(); //config.get("batteShip");
         int cruisers = numbers.nextElement();   //config.get("cruiser");

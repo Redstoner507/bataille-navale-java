@@ -11,14 +11,9 @@ public class ConfigScreen extends JPanel {
     private static final int MAX_OCCUPIABLE_CELLS = 35;
     private final JSpinner _gridSizeSpinner;
     private final JSpinner _carrierSpinner, _battleshipSpinner, _cruiserSpinner, _submarineSpinner, _destroyerSpinner;
-    private final JCheckBox _islandCheckBox;
-    private final JButton _backButton;
-    private final JButton _startPlacementButton;
     private final JLabel _occupiedCellsLabel;
-    private final GameController _gameController;
 
     public ConfigScreen(GameController gameController) {
-        _gameController = gameController;
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
@@ -50,23 +45,23 @@ public class ConfigScreen extends JPanel {
 
         // Mode île
         JPanel islandPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        _islandCheckBox = new JCheckBox("Island mode");
-        _islandCheckBox.setSelected(false);
-        islandPanel.add(_islandCheckBox);
+        JCheckBox islandCheckBox = new JCheckBox("Island mode");
+        islandCheckBox.setSelected(false);
+        islandPanel.add(islandCheckBox);
         add(islandPanel);
 
         add(Box.createVerticalStrut(20));
 
         // Boutons
-        _backButton = new JButton("Back");
-        _backButton.addActionListener(e -> _gameController.showStartScreen());
+        JButton backButton = new JButton("Back");
+        backButton.addActionListener(e -> gameController.showStartScreen());
 
-        _startPlacementButton = new JButton("Confirm");
-        _startPlacementButton.addActionListener(e -> _gameController.startPlacementScreen());
+        JButton startPlacementButton = new JButton("Confirm");
+        startPlacementButton.addActionListener(e -> gameController.startPlacementScreen(getShipConfig(), getGridSize()));
 
         JPanel buttonPanel = new JPanel();
-        buttonPanel.add(_backButton);
-        buttonPanel.add(_startPlacementButton);
+        buttonPanel.add(backButton);
+        buttonPanel.add(startPlacementButton);
         
         add(buttonPanel);
     }
@@ -109,17 +104,7 @@ public class ConfigScreen extends JPanel {
         return shipConfig;
     }
 
-    /* 
-    public JButton getBackButton() {
-        return _backButton;
-    }
-
-    public JButton getStartPlacementButton() {
-        return _startPlacementButton;
-    }
-
     public int getGridSize() {
         return (int)_gridSizeSpinner.getValue();
     }
-    */
 }
