@@ -174,7 +174,7 @@ package view {
 
     class ConfigScreen {
         - {static} MAX_OCCUPIABLE_CELLS : Integer
-        + <<Create>> ConfigScreen()
+        + <<Create>> ConfigScreen(gameController: GameController)
         - getOccupiedCellsCount() : Integer
         - updateOccupiedCellsLabel(occupiedCells: Integer)
         + getGridSize() : Integer
@@ -184,11 +184,11 @@ package view {
     class PlacementScreen {
         - {static} SHIP_PANEL_WIDTH : Integer
         - {static} LABEL_HEIGHT : Integer
-        + <<Create>> PlacementScreen(gridSize: Integer, ships: Ships[*], cellSize: Integer)
+        + <<Create>> PlacementScreen(gameController: GameController, gridSize: Integer, ships: Ships[*], cellSize: Integer, PlacementController placementController)
     }
 
     class StartScreen {
-        + <<Create>> StartScreen()
+        + <<Create>> StartScreen(gameController: GameController)
     }
 
     class EndScreen
@@ -196,8 +196,12 @@ package view {
     class TerminalOutput
 
     class MainFrame {
-        - {static} CELL_SIZE : Integer
+        - {static} START : String
+        - {static} CONFIG : String
+        - {static} PLACEMENT : String
         + <<Create>> MainFrame()
+        + addScreen(name: String, screen: JPanel)
+        + showScreen(name: String)
     }
 
     class ShipView {
@@ -222,16 +226,17 @@ package controller {
     }
 
     class GameController {
+        - {static} CELL_SIZE : Integer
         + <<Create>> GameController()
         + showStartScreen()
         + showConfigScreen()
-        + startPlacementScreen()
-        + dispose()
+        + startPlacementScreen(shipConfig: Dictionary<String, Integer>, gridSize: Integer)
+        + quit()
     }
 
     class PlacementController {
-        + <<Create>> PlacementController(modelGrid: Grid, viewGrid: GridView)
-        + placeShip(ship: Ship, row: Integer, col: Integer) : Boolean
+        + <<Create>> PlacementController()
+        + placeShip(modelGrid: Grid, viewGrid: GridView, ship: Ship, row: Integer, col: Integer) : Boolean
         + rotateShip(ship: Ship)
     }
 
@@ -259,20 +264,18 @@ package util {
 }
 
 ' Relationships
-Main .> GameController : Instancie
+Main .> GameController : Instancie >
 
-GameController "1" *-> "1" ConfigScreen : Gère l'affichage de >
-GameController "1" *-> "1" StartScreen : Gère l'affichage de >
-GameController "1" *-> "1" PlacementScreen : Gère l'affichage de >
 GameController "1" *-> "1" MainFrame : Gère l'affichage de >
-GameController .> ConfigScreen : Instancie
-GameController .> StartScreen : Instancie
-GameController .> PlacementScreen : Instancie
-GameController .> MainFrame : Instancie
+GameController .> MainFrame : Instancie >
+GameController .> ConfigScreen : Instancie >
+GameController .> StartScreen : Instancie >
+GameController .> PlacementScreen : Instancie >
+GameController .> PlacementController : Instancie >
 
 GridController --> Grid
 
-ConfigController --> ShipFactory
+ConfigController .> ShipFactory : Instancie >
 
 Cell "1" *-> "1" CellType : est de type >
 
@@ -284,13 +287,8 @@ Grid "1" o-> "*" Ship : contient >
 
 Placeable "1" *-> "1" Orientation : est orienté >
 
-ShipFactory .> Ship : Instancie
+ShipFactory .> Ship : Instancie >
 
-MainFrame "1" *-> "1" StartScreen : contient >
-MainFrame "1" *-> "1" ConfigScreen : contient >
-MainFrame "1" *-> "1" PlacementScreen : contient >
-
-PlacementScreen "1" *-> "1" LabeledGridView : affiche >
 PlacementScreen "1" *-> "1" Orientation : est orienté >
 PlacementScreen .> PlacementController : demande le placement des bateaux >
 

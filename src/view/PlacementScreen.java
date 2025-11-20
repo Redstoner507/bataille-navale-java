@@ -12,13 +12,10 @@ import java.util.ArrayList;
 public class PlacementScreen extends JPanel {
     private static final int SHIP_PANEL_WIDTH = 300;
     private static final int LABEL_HEIGHT = 20;
-    private final JButton _backButton;
     private final JPanel _shipPanel;
     private Orientation _currentOrientation = Orientation.HORIZONTAL;
-    private final GameController _gameController;
 
-    public PlacementScreen(GameController gameController, int gridSize, ArrayList<Ship> ships, int cellSize) {
-        _gameController = gameController;
+    public PlacementScreen(GameController gameController, int gridSize, ArrayList<Ship> ships, int cellSize, PlacementController placementController) {
         
         setLayout(new BorderLayout(10, 10));
 
@@ -31,15 +28,13 @@ public class PlacementScreen extends JPanel {
         JButton fixedPlacementButton = new JButton("Fixed placement");
         JButton randomPlacementButton = new JButton("Random placement");
         JButton startGameButton = new JButton("Start game");
-        
-        _backButton = new JButton("Cancel");
-        _backButton.addActionListener(e -> _gameController.showConfigScreen());
+        JButton cancelButton = new JButton("Cancel");
 
         buttonPanel.add(rotateButton);
         buttonPanel.add(fixedPlacementButton);
         buttonPanel.add(randomPlacementButton);
         buttonPanel.add(startGameButton);
-        buttonPanel.add(_backButton);
+        buttonPanel.add(cancelButton);
         add(buttonPanel, BorderLayout.SOUTH);
 
         // LayeredPane pour superposer la grille et les ShipView
@@ -65,18 +60,21 @@ public class PlacementScreen extends JPanel {
         layeredPane.add(_shipPanel, JLayeredPane.DEFAULT_LAYER);
 
         // PlacementController
-        PlacementController controller = new PlacementController(playerGrid.getGridView().getGrid(), playerGrid.getGridView());
         playerGrid.getGridView().setGridActionListener((shipView, row, col) ->
-                controller.placeShip(shipView.getShip(), row, col)
+                placementController.placeShip(playerGrid.getGridView().getGrid(), playerGrid.getGridView(), shipView.getShip(), row, col)
         );
 
         // Ajouter les ShipView
-        for (Ship ship : ships) {
-            ShipView shipView = new ShipView(ship, playerGrid, layeredPane, _shipPanel, cellSize);
-            shipView.setAlignmentX(Component.CENTER_ALIGNMENT);
-            _shipPanel.add(shipView);
-            _shipPanel.add(Box.createRigidArea(new Dimension(0, 10))); // espacement vertical
+        if (ships != null && !ships.isEmpty()) {
+            for (Ship ship : ships) {
+                ShipView shipView = new ShipView(ship, playerGrid, layeredPane, _shipPanel, cellSize);
+                shipView.setAlignmentX(Component.CENTER_ALIGNMENT);
+                _shipPanel.add(shipView);
+                _shipPanel.add(Box.createRigidArea(new Dimension(0, 10))); // espacement vertical
+            }
         }
+
+        cancelButton.addActionListener(e -> gameController.showConfigScreen());
 
         rotateButton.addActionListener(e -> {
             // Change l'orientation globale
@@ -86,7 +84,7 @@ public class PlacementScreen extends JPanel {
             // Parcours tous les ShipView du panel et applique la nouvelle orientation
             for (Component comp : _shipPanel.getComponents()) {
                 if (comp instanceof ShipView shipView) {
-                    controller.rotateShip(shipView.getShip());
+                    placementController.rotateShip(shipView.getShip());
                     shipView.setOrientation(_currentOrientation);
                 }
             }
