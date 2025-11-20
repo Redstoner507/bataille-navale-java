@@ -14,7 +14,6 @@ public class ConfigScreen extends JPanel {
     private final JLabel _occupiedCellsLabel;
 
     public ConfigScreen(GameController gameController, ConfigController configController) {
-        _gameController = gameController;
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
@@ -63,7 +62,7 @@ public class ConfigScreen extends JPanel {
         backButton.addActionListener(e -> gameController.showStartScreen());
 
         JButton startPlacementButton = new JButton("Confirm");
-        startPlacementButton.addActionListener(e -> gameController.startPlacementScreen(getShipConfig(), getGridSize()));
+        startPlacementButton.addActionListener(e -> gameController.startPlacementScreen());
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(backButton);

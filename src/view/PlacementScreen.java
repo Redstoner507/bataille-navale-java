@@ -29,6 +29,7 @@ public class PlacementScreen extends JPanel {
         JButton randomPlacementButton = new JButton("Random placement");
         JButton startGameButton = new JButton("Start game");
         JButton cancelButton = new JButton("Cancel");
+        cancelButton.addActionListener(e -> gameController.showConfigScreen());
 
         buttonPanel.add(rotateButton);
         buttonPanel.add(fixedPlacementButton);
@@ -73,8 +74,6 @@ public class PlacementScreen extends JPanel {
                 _shipPanel.add(Box.createRigidArea(new Dimension(0, 10))); // espacement vertical
             }
         }
-
-        cancelButton.addActionListener(e -> gameController.showConfigScreen());
 
         rotateButton.addActionListener(e -> {
             // Change l'orientation globale

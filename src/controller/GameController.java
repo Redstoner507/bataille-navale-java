@@ -20,10 +20,12 @@ public class GameController {
     private final MainFrame _frame;
 
     public GameController() {
+        _configController = new ConfigController();
+
         _frame = new MainFrame();
 
         _frame.addScreen(MainFrame.START, new StartScreen(this));
-        _frame.addScreen(MainFrame.CONFIG, new ConfigScreen(this));
+        _frame.addScreen(MainFrame.CONFIG, new ConfigScreen(this, _configController));
 
         _frame.setVisible(true);
         showStartScreen();
@@ -37,7 +39,7 @@ public class GameController {
         _frame.showScreen(MainFrame.CONFIG);
     }
 
-    public void startPlacementScreen(Dictionary<String, Integer> shipConfig, int gridSize) {
+    public void startPlacementScreen() {
         PlacementController placementController = new PlacementController();
         GameConfig config = _configController.getGameConfig();
         PlacementScreen placement = new PlacementScreen(this, config.getGridSize(), _configController.getShipConfig(), CELL_SIZE, placementController);
