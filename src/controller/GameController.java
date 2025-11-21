@@ -1,21 +1,15 @@
 package controller;
 
-import java.util.ArrayList;
-
-import model.ship.Ship;
 import model.GameConfig;
 import view.ConfigScreen;
 import view.MainFrame;
 import view.PlacementScreen;
 import view.StartScreen;
 
-import java.util.Dictionary;
-
 public class GameController {
     //Variables
     private static final int CELL_SIZE = 50;
-    private ConfigController _configController;
-    ArrayList <Ship> _ships;
+    private final ConfigController _configController;
     //Screens
     private final MainFrame _frame;
 

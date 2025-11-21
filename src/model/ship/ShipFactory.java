@@ -8,8 +8,8 @@ public class ShipFactory {
         return new Carrier();
     }
 
-    public Ship createBattleShip() {
-        return new BattleShip();
+    public Ship createBattleship() {
+        return new Battleship();
     }
 
     public Ship createCruiser() {

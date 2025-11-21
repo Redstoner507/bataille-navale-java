@@ -3,12 +3,15 @@ package controller;
 import model.GameConfig;
 import model.ship.Ship;
 import model.ship.ShipFactory;
+import model.ship.ShipType;
+
 import java.util.ArrayList;
 import java.util.Map;
 
 
 public class ConfigController {
     GameConfig _gameConfig;
+
     public ConfigController() {
         _gameConfig = new GameConfig();
     }
@@ -17,17 +20,21 @@ public class ConfigController {
         _gameConfig.setGridSize(gridSize);
     }
 
+    public void setShipNumber(ShipType shipType, int number) {
+        _gameConfig.setShipNumber(shipType, number);
+    }
+
     public GameConfig getGameConfig() {
         return _gameConfig;
     }
 
     public ArrayList<Ship> getShipConfig() { 
-        Map<String, Integer> config = _gameConfig.getShipConfig();
-        int carriers    = config.get("carrier");
-        int battleShips = config.get("battleShip");
-        int cruisers    = config.get("cruiser");
-        int submarines  = config.get("submarine");
-        int destroyers  = config.get("destroyer");
+        Map<ShipType, Integer> config = _gameConfig.getShipConfig();
+        int carriers    = config.get(ShipType.CARRIER);
+        int battleShips = config.get(ShipType.BATTLESHIP);
+        int cruisers    = config.get(ShipType.CRUISER);
+        int submarines  = config.get(ShipType.SUBMARINE);
+        int destroyers  = config.get(ShipType.DESTROYER);
 
         return getShipConfig(carriers, battleShips, cruisers, submarines, destroyers);
     }
@@ -39,7 +46,7 @@ public class ConfigController {
             ships.add(factory.createCarrier());
         }
         for (int i=0; i<batteShips; i++) {
-            ships.add(factory.createBattleShip());
+            ships.add(factory.createBattleship());
         }
         for (int i=0; i<cruisers; i++) {
             ships.add(factory.createCruiser());

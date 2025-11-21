@@ -4,6 +4,7 @@ import javax.swing.*;
 
 import controller.ConfigController;
 import controller.GameController;
+import model.ship.ShipType;
 
 import java.awt.*;
 
@@ -40,11 +41,11 @@ public class ConfigScreen extends JPanel {
         _occupiedCellsLabel.setAlignmentX(CENTER_ALIGNMENT);
         add(_occupiedCellsLabel);
 
-        _carrierSpinner = createShipSpinner("Carrier (5 cells) : ");
-        _battleshipSpinner = createShipSpinner("Battleship (4 cells) : ");
-        _cruiserSpinner = createShipSpinner("Cruiser (3 cells) : ");
-        _submarineSpinner = createShipSpinner("Submarine (3 cells) : ");
-        _destroyerSpinner = createShipSpinner("Destroyer (2 cells) : ");
+        _carrierSpinner = createShipSpinner(configController, ShipType.CARRIER, "Carrier (5 cells) : ");
+        _battleshipSpinner = createShipSpinner(configController, ShipType.BATTLESHIP, "Battleship (4 cells) : ");
+        _cruiserSpinner = createShipSpinner(configController, ShipType.CRUISER, "Cruiser (3 cells) : ");
+        _submarineSpinner = createShipSpinner(configController, ShipType.SUBMARINE, "Submarine (3 cells) : ");
+        _destroyerSpinner = createShipSpinner(configController, ShipType.DESTROYER, "Destroyer (2 cells) : ");
 
         updateOccupiedCellsLabel(getOccupiedCellsCount());
 
@@ -71,7 +72,7 @@ public class ConfigScreen extends JPanel {
         add(buttonPanel);
     }
 
-    private JSpinner createShipSpinner(String label) {
+    private JSpinner createShipSpinner(ConfigController configController, ShipType shipType, String label) {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panel.add(new JLabel(label));
         JSpinner spinner = new JSpinner(new SpinnerNumberModel(1, 1, 3, 1));
@@ -80,6 +81,9 @@ public class ConfigScreen extends JPanel {
             updateOccupiedCellsLabel(occupiedCells);
             if (occupiedCells > MAX_OCCUPIABLE_CELLS) {
                 spinner.setValue(spinner.getPreviousValue());
+            }
+            else {
+                configController.setShipNumber(shipType, (int) spinner.getValue());
             }
         });
         panel.add(spinner);
