@@ -45,7 +45,6 @@ public class PlacementScreen extends JPanel {
         // Grille joueur
         LabeledGridView playerGrid = new LabeledGridView("Place your ships in the grid", gridSize, cellSize, false);
         playerGrid.setOpaque(true);
-        playerGrid.setBackground(Color.CYAN);
         playerGrid.setBounds(SHIP_PANEL_WIDTH, 0, width - SHIP_PANEL_WIDTH, height);
         layeredPane.add(playerGrid, JLayeredPane.DEFAULT_LAYER);
 
