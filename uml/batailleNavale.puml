@@ -15,14 +15,22 @@ class Main {
 
 package model {
 
+    class GameConfig {
+        - _gridSize : Integer
+        - _islandsEnabled : Boolean
+        - _shipConfig : Map<ShipType, Integer>
+        + <<Create>> GameConfig()
+        + getGridSize() : Integer
+        + setGridSize(gridSize: Integer)
+        + isIslandsEnabled() : Boolean
+        + setIslandsEnabled(islandsEnabled: Boolean)
+        + getShipConfig() : Map<ShipType, Integer>
+        + setShipNumber(shipType: ShipType, number: Integer)
+    }
+
     enum Orientation {
         HORIZONTAL
         VERTICAL
-    }
-
-    enum CellType {
-        WATER
-        ISLAND
     }
 
     class Grid {
@@ -35,40 +43,6 @@ package model {
         + getSize() : Integer
         + getCell(row: Integer, col: Integer) : Cell
         + getShips() : Ship[*]
-    }
-
-    abstract class Cell {
-        - _isHit : Boolean
-        + {abstract} <<Create>> Cell()
-        + {abstract} hit() : void
-        + isHit() : Boolean
-        + getType() : CellType
-    }
-
-    class WaterCell extends Cell {
-        - _isHit : Boolean
-        - _hasShip : Boolean
-        - _isSunk : Boolean
-        _ _ship : Ship
-        + <<Create>> WaterCell()
-        + isHit() : Boolean
-        + hasShip() : Boolean
-        + getShip() : Ship
-        + isSunk() : Boolean
-        + hit() : void
-        + placeShip(newShip: Ship) : void
-    }
-
-    class IslandCell extends Cell {
-        - _isHit : Boolean
-        - _hasWeapon : Boolean
-        _ _weapon : Weapon
-        + <<Create>> IslandCell()
-        + isHit() : Boolean
-        + hasWeapon() : Boolean
-        + getWeapon() : Weapon
-        + hit() : void
-        + placeWeapon(newWeapon: Weapon) : void
     }
 
     abstract class Weapon {
@@ -91,9 +65,58 @@ package model {
         + getCoordinates() : Point[*]
     }
 
+    package cell {
+        abstract class Cell {
+            - _isHit : Boolean
+            + {abstract} <<Create>> Cell()
+            + {abstract} hit() : void
+            + isHit() : Boolean
+            + getType() : CellType
+        }
+
+        enum CellType {
+            WATER
+            ISLAND
+        }
+
+        class WaterCell extends Cell {
+            - _isHit : Boolean
+            - _hasShip : Boolean
+            - _isSunk : Boolean
+            _ _ship : Ship
+            + <<Create>> WaterCell()
+            + isHit() : Boolean
+            + hasShip() : Boolean
+            + getShip() : Ship
+            + isSunk() : Boolean
+            + hit() : void
+            + placeShip(newShip: Ship) : void
+        }
+
+        class IslandCell extends Cell {
+            - _isHit : Boolean
+            - _hasWeapon : Boolean
+            _ _weapon : Weapon
+            + <<Create>> IslandCell()
+            + isHit() : Boolean
+            + hasWeapon() : Boolean
+            + getWeapon() : Weapon
+            + hit() : void
+            + placeWeapon(newWeapon: Weapon) : void
+        }
+    }
+
     package ship {
         class Ship extends model.Placeable{
             + <<Create>> Ship(size: Integer, name: String)
+        }
+
+        enum ShipType {
+            CARRIER
+            BATTLESHIP
+            CRUISER
+            SUBMARINE
+            DESTROYER
         }
 
         class ShipFactory {
@@ -174,11 +197,10 @@ package view {
 
     class ConfigScreen {
         - {static} MAX_OCCUPIABLE_CELLS : Integer
-        + <<Create>> ConfigScreen(gameController: GameController)
+        + <<Create>> ConfigScreen(gameController: GameController, configController: ConfigController)
         - getOccupiedCellsCount() : Integer
         - updateOccupiedCellsLabel(occupiedCells: Integer)
         + getGridSize() : Integer
-        + getShipConfig() : Dictionary<String, Integer>
     }
 
     class PlacementScreen {
@@ -248,6 +270,9 @@ package controller {
         + <<Create>> ConfigController()
         + getShipConfig(config: Dictionary<String, Integer>) : Ship[*]
         + getShipConfig(carriers : Integer, batteShips : Integer, cruisers : Integer, submarines : Integer, destroyer : Integer) : Ship[*]
+        + setGridSize(gridSize: Integer)
+        + setShipNumber(shipType: ShipType, number: Integer)
+        + getGameConfig() : GameConfig
     }
 }
 
@@ -267,14 +292,18 @@ package util {
 Main .> GameController : Instancie >
 
 GameController "1" *-> "1" MainFrame : Gère l'affichage de >
+GameController "1" *-> "1" ConfigController : Partage la configuration >
 GameController .> MainFrame : Instancie >
 GameController .> ConfigScreen : Instancie >
+GameController .> ConfigController : Instancie >
 GameController .> StartScreen : Instancie >
 GameController .> PlacementScreen : Instancie >
 GameController .> PlacementController : Instancie >
 
 GridController --> Grid
 
+ConfigController "1" *-> "1" GameConfig : Contrôle >
+ConfigController .> GameConfig : Instancie >
 ConfigController .> ShipFactory : Instancie >
 
 Cell "1" *-> "1" CellType : est de type >
