@@ -5,6 +5,8 @@ import model.ship.Ship;
 import utils.ShipImageProvider;
 
 import javax.swing.*;
+import javax.swing.border.LineBorder;
+
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -57,6 +59,7 @@ public class ShipView extends JPanel {
             seg.setPreferredSize(new Dimension(_cellSize, _cellSize));
             seg.setMinimumSize(new Dimension(_cellSize, _cellSize));
             seg.setMaximumSize(new Dimension(_cellSize, _cellSize));
+            seg.setBorder(new LineBorder(Color.BLACK));
             seg.setAlignmentX(Component.CENTER_ALIGNMENT);
             seg.setAlignmentY(Component.CENTER_ALIGNMENT);
             _segmentPanel.add(seg);

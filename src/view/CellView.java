@@ -16,7 +16,6 @@ public class CellView extends JPanel {
         _cellPosition = cellPosition;
         _cellSize = cellSize;
         setPreferredSize(new Dimension(cellSize, cellSize));
-        setBackground(Color.CYAN);
     }
 
     /**

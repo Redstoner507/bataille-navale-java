@@ -25,14 +25,12 @@ public class PlacementScreen extends JPanel {
         // Panneau boutons
         JPanel buttonPanel = new JPanel(new FlowLayout());
         JButton rotateButton = new JButton("Orientation");
-        JButton fixedPlacementButton = new JButton("Fixed placement");
         JButton randomPlacementButton = new JButton("Random placement");
         JButton startGameButton = new JButton("Start game");
         JButton cancelButton = new JButton("Cancel");
         cancelButton.addActionListener(e -> gameController.showConfigScreen());
 
         buttonPanel.add(rotateButton);
-        buttonPanel.add(fixedPlacementButton);
         buttonPanel.add(randomPlacementButton);
         buttonPanel.add(startGameButton);
         buttonPanel.add(cancelButton);
