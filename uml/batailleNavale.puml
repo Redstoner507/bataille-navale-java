@@ -19,7 +19,7 @@ package model {
         - _gridSize : Integer
         - _islandsEnabled : Boolean
         - _shipConfig : Map<ShipType, Integer>
-        + <<Create>> GameConfig()
+        + <<create>> GameConfig()
         + getGridSize() : Integer
         + setGridSize(gridSize: Integer)
         + isIslandsEnabled() : Boolean
@@ -37,7 +37,7 @@ package model {
         - {static} MIN_SIZE : Integer
         - {static} MAX_SIZE : Integer
         - _size : Integer
-        + <<Create>> Grid(size: Integer)
+        + <<create>> Grid(size: Integer)
         + canPlaceShip(ship: Ship, startRow: Integer, startCol: Integer) : Boolean
         + placeShip(ship: Ship, startRow: Integer, startCol: Integer) : Boolean
         + getSize() : Integer
@@ -54,7 +54,7 @@ package model {
         - _size : Integer
         - _startRow : Integer
         - _startCol : Integer
-        + <<Create>> Placeable(size: Integer, defaultOrientation: Orientation, name: String, placementCellType: CellType)
+        + <<create>> Placeable(size: Integer, defaultOrientation: Orientation, name: String, placementCellType: CellType)
         + getSize() : Integer
         + setOrientation(orientation: Orientation)
         + getOrientation() : Orientation
@@ -74,31 +74,31 @@ package model {
         }
 
         class WeaponFactory {
-            + <<Create>> WeaponFactory()
+            + <<create>> WeaponFactory()
             + createMissile() : Weapon
             + createBomb() : Weapon
             + createSonar() : Weapon
         }
 
         abstract class Weapon <<abstract>> extends model.Placeable {
-            + <<Create>> Weapon(type: WeaponType)
+            + <<create>> Weapon(type: WeaponType)
             + {abstract} apply(grid: Grid, row: Integer, col: Integer)
             + getType() : WeaponType
         }
 
         class Missile extends Weapon {
-            + <<Create>> Missile()
+            + <<create>> Missile()
             + apply(grid: Grid, row: Integer, col: Integer)
         }
 
         class Bomb extends Weapon {
-            + <<Create>> Bomb()
+            + <<create>> Bomb()
             + apply(grid: Grid, row: Integer, col: Integer)
         }
 
         class Sonar extends Weapon {
             - {static} RADIUS : Integer
-            + <<Create>> Sonar()
+            + <<create>> Sonar()
             + apply(grid: Grid, row: Integer, col: Integer)
         }
     }
@@ -110,24 +110,24 @@ package model {
         }
 
         class TrapFactory {
-            + <<Create>> TrapFactory()
+            + <<create>> TrapFactory()
             + createBlackHole() : Trap
             + createTornado() : Trap
         }
 
         abstract class Trap <<abstract>> extends model.Placeable {
-            + <<Create>> Trap(type: TrapType, name: String)
+            + <<create>> Trap(type: TrapType, name: String)
             + {abstract} activate(grid: Grid, row: Integer, col: Integer)
             + getType() : TrapType
         }
 
         class BlackHole extends Trap {
-            + <<Create>> BlackHole()
+            + <<create>> BlackHole()
             + activate(grid: Grid, row: Integer, col: Integer)
         }
 
         class Tornado extends Trap {
-            + <<Create>> Tornado()
+            + <<create>> Tornado()
             + activate(grid: Grid, row: Integer, col: Integer)
         }
     }
@@ -135,7 +135,7 @@ package model {
     package cell {
         abstract class Cell <<abstract>> {
             - _isHit : Boolean
-            + <<Create>> Cell(cellType: CellType)
+            + <<create>> Cell(cellType: CellType)
             + {abstract} hit()
             + isHit() : Boolean
             + isEmpty() : Boolean
@@ -150,12 +150,12 @@ package model {
         }
 
         class WaterCell extends Cell {
-            + <<Create>> WaterCell()
+            + <<create>> WaterCell()
             + hit() : void
         }
 
         class IslandCell extends Cell {
-            + <<Create>> IslandCell()
+            + <<create>> IslandCell()
             + hit() : void
         }
     }
@@ -163,7 +163,7 @@ package model {
     package ship {
         abstract class Ship <<abstract>> extends model.Placeable{
             - _cellsRemaining : Integer
-            + <<Create>> Ship(type: ShipType, size: Integer, name: String)
+            + <<create>> Ship(type: ShipType, size: Integer, name: String)
             + hit()
             + isSunk() : Boolean
             + getType() : ShipType
@@ -178,7 +178,7 @@ package model {
         }
 
         class ShipFactory {
-            + <<Create>> ShipFactory()
+            + <<create>> ShipFactory()
             + createCarrier() : Ship
             + createBatteShip() : Ship
             + createCruiser() : Ship
@@ -187,19 +187,19 @@ package model {
         }
 
         class Carrier extends Ship {
-            + <<Create>> Carrier()
+            + <<create>> Carrier()
         }
         class BattleShip extends Ship {
-            + <<Create>> BattleShip()
+            + <<create>> BattleShip()
         }
         class Cruiser extends Ship {
-            + <<Create>> Cruiser()
+            + <<create>> Cruiser()
         }
         class Submarine extends Ship {
-            + <<Create>> Submarine()
+            + <<create>> Submarine()
         }
         class Destroyer extends Ship {
-            + <<Create>> Destroyer()
+            + <<create>> Destroyer()
         }
     }
 
@@ -212,13 +212,13 @@ package model {
         }
 
         class Player {
-            + <<Create>> Player()
+            + <<create>> Player()
             + setStrategy(strategy: PlayerStrategy)
             + play()
         }
 
         class PlayerStrategyFactory {
-            + <<Create>> PlayerStrategyFactory()
+            + <<create>> PlayerStrategyFactory()
             + createHumanStrategy() : PlayerStrategy
             + createComputerEasyStrategy() : PlayerStrategy
             + createComputerMediumStrategy() : PlayerStrategy
@@ -230,22 +230,22 @@ package model {
         }
 
         class HumanStrategy implements PlayerStrategy {
-            + <<Create>> HumanStrategy()
+            + <<create>> HumanStrategy()
             + playTurn()
         }
 
         class ComputerEasyStrategy implements PlayerStrategy {
-            + <<Create>> ComputerEasyStrategy()
+            + <<create>> ComputerEasyStrategy()
             + playTurn()
         }
 
         class ComputerMediumStrategy implements PlayerStrategy {
-            + <<Create>> ComputerMediumStrategy()
+            + <<create>> ComputerMediumStrategy()
             + playTurn()
         }
 
         class ComputerHardStrategy implements PlayerStrategy {
-            + <<Create>> ComputerHardStrategy()
+            + <<create>> ComputerHardStrategy()
             + playTurn()
         }
     }
@@ -253,15 +253,15 @@ package model {
 
 package view {
     class GameView {
-        + <<Create>> GameView(gridSize : Integer, cellSize : Integer)
+        + <<create>> GameView(gridSize : Integer, cellSize : Integer)
         + getPlayerGridView() : LabeledGridView
         + getComputerGridView() : LabeledGridView
         + setStatus(text: String)
     }
 
     class LabeledGridView {
-        + <<Create>> LabeledGridView(title: String, gridSize: Integer, cellSize: Integer)
-        + <<Create>> LabeledGridView(title: String, gridSize: Integer, cellSize: Integer, locked: Boolean)
+        + <<create>> LabeledGridView(title: String, gridSize: Integer, cellSize: Integer)
+        + <<create>> LabeledGridView(title: String, gridSize: Integer, cellSize: Integer, locked: Boolean)
         - setupComponents()
         + getGridView() : GridView
         + setTitle(title: String)
@@ -270,7 +270,7 @@ package view {
     class GridView {
         - _gridSize : Integer
         - _locked : Boolean
-        + <<Create>> GridView(gridSize: Integer, cellSize: Integer)
+        + <<create>> GridView(gridSize: Integer, cellSize: Integer)
         + setLocked(locked: Boolean)
         + setCellEnabled(row: Integer, col: Integer, enabled: Boolean)
         + addCellClickListener(listener: ActionListener)
@@ -287,7 +287,7 @@ package view {
         - _isClickable : Boolean
         - _cellPosition : Point
         - _cellSize : Integer
-        + <<Create>> CellView(cellPosition: Point, cellSize: Integer)
+        + <<create>> CellView(cellPosition: Point, cellSize: Integer)
         + setSegmentImage()
         # paintComponent(g: Graphics)
         + addMouseListener(l: MouseListener)
@@ -297,12 +297,12 @@ package view {
     }
 
     class ShipView {
-        + <<Create>> ShipView(ship: Ship)
+        + <<create>> ShipView(ship: Ship)
     }
 
     class ConfigScreen {
         - {static} MAX_OCCUPIABLE_CELLS : Integer
-        + <<Create>> ConfigScreen(gameController: GameController, configController: ConfigController)
+        + <<create>> ConfigScreen(gameController: GameController, configController: ConfigController)
         - getOccupiedCellsCount() : Integer
         - updateOccupiedCellsLabel(occupiedCells: Integer)
         + getGridSize() : Integer
@@ -311,11 +311,11 @@ package view {
     class PlacementScreen {
         - {static} SHIP_PANEL_WIDTH : Integer
         - {static} LABEL_HEIGHT : Integer
-        + <<Create>> PlacementScreen(gameController: GameController, gridSize: Integer, ships: Ships[*], cellSize: Integer, PlacementController placementController)
+        + <<create>> PlacementScreen(gameController: GameController, gridSize: Integer, ships: Ships[*], cellSize: Integer, PlacementController placementController)
     }
 
     class StartScreen {
-        + <<Create>> StartScreen(gameController: GameController)
+        + <<create>> StartScreen(gameController: GameController)
     }
 
     class EndScreen
@@ -326,7 +326,7 @@ package view {
         - {static} START : String
         - {static} CONFIG : String
         - {static} PLACEMENT : String
-        + <<Create>> MainFrame()
+        + <<create>> MainFrame()
         + addScreen(name: String, screen: JPanel)
         + showScreen(name: String)
     }
@@ -338,7 +338,7 @@ package view {
         - _dragging : Boolean
         - _dragOffset : Point
         - _segmentPanel : JPanel
-        + <<Create>> ShipView(ship: ShipView, grid: LabeledGridView, topLayer: JLayeredPane, originalPanel: JPanel, cellSize: Integer)
+        + <<create>> ShipView(ship: ShipView, grid: LabeledGridView, topLayer: JLayeredPane, originalPanel: JPanel, cellSize: Integer)
         - loadSegments()
         - updateSize()
         + setOrientation(orientation: Orientation)
@@ -354,7 +354,7 @@ package controller {
 
     class GameController {
         - {static} CELL_SIZE : Integer
-        + <<Create>> GameController()
+        + <<create>> GameController()
         + showStartScreen()
         + showConfigScreen()
         + startPlacementScreen(shipConfig: Dictionary<String, Integer>, gridSize: Integer)
@@ -362,7 +362,7 @@ package controller {
     }
 
     class PlacementController {
-        + <<Create>> PlacementController()
+        + <<create>> PlacementController()
         + placeShip(modelGrid: Grid, viewGrid: GridView, ship: Ship, row: Integer, col: Integer) : Boolean
         + rotateShip(ship: Ship)
     }
@@ -372,7 +372,7 @@ package controller {
     }
 
     class ConfigController {
-        + <<Create>> ConfigController()
+        + <<create>> ConfigController()
         + getShipConfig(config: Dictionary<String, Integer>) : Ship[*]
         + getShipConfig(carriers : Integer, batteShips : Integer, cruisers : Integer, submarines : Integer, destroyer : Integer) : Ship[*]
         + setGridSize(gridSize: Integer)
@@ -403,6 +403,7 @@ Main ..> GameController : Instantiates >
 'Model
 Player "1" *--> "*\n-_inventory" Placeable : Can place >
 Player "1" *--> "1\n-_grid" Grid : Has >
+Player ..> PlayerStrategy : Calls >
 
 Cell "1" *--> "1\n-_cellType" CellType : Is of type >
 Cell "1" *--> "0,1\n-_object" Placeable : Can contain >
