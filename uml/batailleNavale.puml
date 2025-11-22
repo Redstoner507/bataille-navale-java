@@ -80,9 +80,10 @@ package model {
             + createSonar() : Weapon
         }
 
-        abstract class Weapon {
-            + <<Create>> Weapon()
+        abstract class Weapon extends model.Placeable{
+            + <<Create>> Weapon(type: WeaponType)
             + {abstract} apply(grid: Grid, row: Integer, col: Integer)
+            + getType() : WeaponType
         }
 
         class Missile extends Weapon {
@@ -115,8 +116,9 @@ package model {
         }
 
         abstract class Trap extends model.Placeable {
-            + <<Create>> Trap(name: String)
+            + <<Create>> Trap(type: TrapType, name: String)
             + {abstract} activate(grid: Grid, row: Integer, col: Integer)
+            + getType() : TrapType
         }
 
         class BlackHole implements Trap {
@@ -159,11 +161,12 @@ package model {
     }
 
     package ship {
-        class Ship extends model.Placeable{
+        abstract class Ship extends model.Placeable{
             - _cellsRemaining : Integer
-            + <<Create>> Ship(size: Integer, name: String)
+            + <<Create>> Ship(type: ShipType, size: Integer, name: String)
             + hit()
             + isSunk() : Boolean
+            + getType() : ShipType
         }
 
         enum ShipType {
@@ -395,64 +398,69 @@ package util {
 }
 
 ' Relationships
-Main ..> GameController : Instancie >
+Main ..> GameController : Instantiates >
 
 'Model
-Player "1" *--> "*\n-_inventory" Placeable : dispose de >
-Player "1" *--> "1\n-_grid" Grid : possède >
+Player "1" *--> "*\n-_inventory" Placeable : Can place >
+Player "1" *--> "1\n-_grid" Grid : Has >
 
-Cell "1" *--> "1\n-_cellType" CellType : est de type >
-Cell "1" *--> "0,1\n-_object" Placeable : peut contenir >
+Cell "1" *--> "1\n-_cellType" CellType : Is of type >
+Cell "1" *--> "0,1\n-_object" Placeable : Can contain >
 
-Grid "1" *--> "*\n-_cells" Cell : contient >
-Grid "1" *--> "*\n-_ships" Ship : contient >
+Grid "1" *--> "*\n-_cells" Cell : Contains >
+Grid "1" *--> "*\n-_ships" Ship : Contains >
 
-Placeable "1" *--> "1\n-_orientation" Orientation : est orienté >
-Placeable "1" *--> "1\n-_cellType" CellType : peut être placé sur une cellule de type >
+Placeable "1" *--> "1\n-_orientation" Orientation : Is oriented >
+Placeable "1" *--> "1\n-_cellType" CellType : Can be placed on a cell of type >
 
-PlayerStrategyFactory ..> PlayerStrategy : Instancie >
+Ship "1" *--> "1\n-_shipType" ShipType : Is of type >
+Trap "1" *--> "1\n-_trapType" TrapType : Is of type >
+Weapon "1" *--> "1\n-_weaponType" WeaponType : Is of type >
 
-ShipFactory ..> Ship : Instancie >
 
-WeaponFactory ..> Weapon : Instancie >
+PlayerStrategyFactory ..> PlayerStrategy : Instantiates >
 
-TrapFactory ..> Trap : Instancie >
+ShipFactory ..> Ship : Instantiates >
+
+WeaponFactory ..> Weapon : Instantiates >
+
+TrapFactory ..> Trap : Instantiates >
 
 'Controller
-GameController "1" *--> "1\n-_frame" MainFrame : Gère l'affichage de >
-GameController "1" *--> "1\n-_configController" ConfigController : Partage la configuration >
-GameController ..> MainFrame : Instancie >
-GameController ..> ConfigScreen : Instancie >
-GameController ..> ConfigController : Instancie >
-GameController ..> StartScreen : Instancie >
-GameController ..> PlacementScreen : Instancie >
-GameController ..> PlacementController : Instancie >
+GameController "1" *--> "1\n-_frame" MainFrame : Displays >
+GameController "1" *--> "1\n-_configController" ConfigController : Shares the configuration >
+GameController ..> MainFrame : Instantiates >
+GameController ..> ConfigScreen : Instantiates >
+GameController ..> ConfigController : Instantiates >
+GameController ..> StartScreen : Instantiates >
+GameController ..> PlacementScreen : Instantiates >
+GameController ..> PlacementController : Instantiates >
 
 GridController ..> Grid
 
-ConfigController "1" *--> "1\n-_gameConfig" GameConfig : Contrôle >
-ConfigController ..> GameConfig : Instancie >
-ConfigController ..> ShipFactory : Instancie >
+ConfigController "1" *--> "1\n-_gameConfig" GameConfig : Controls >
+ConfigController ..> GameConfig : Instantiates >
+ConfigController ..> ShipFactory : Instantiates >
 
-PlayerController "1" *--> "1\n-_strategy" PlayerStrategy : Sélectionne la stratégie >
+PlayerController "1" *--> "1\n-_strategy" PlayerStrategy : Selects the strategy >
 
 'View
-PlacementScreen "1" *--> "1\n-_currentOrientation" Orientation : est orienté >
-PlacementScreen ..> PlacementController : demande le placement des bateaux >
+PlacementScreen "1" *--> "1\n-_currentOrientation" Orientation : Is oriented >
+PlacementScreen ..> PlacementController : Requests the ship placement >
 
-LabeledGridView "1" *--> "1\n-_gridView" GridView : contient >
+LabeledGridView "1" *--> "1\n-_gridView" GridView : Contains >
 
-GridView "1" *--> "*\n-_cells" CellView : contient >
-GridView "1" o--> "1\n-_grid" Grid : représente >
-GridView "1" o--> "1\n-_listener" GridActionListener : est écouté par >
+GridView "1" *--> "*\n-_cells" CellView : Contains >
+GridView "1" o--> "1\n-_grid" Grid : Represents >
+GridView "1" o--> "1\n-_listener" GridActionListener : Is listened to by >
 
-CellView ..> ShipImageProvider : demande l'image >
+CellView ..> ShipImageProvider : Requests the image to display >
 
-ShipView "1" o--> "1\n-_ship" Ship : représente >
-ShipView "1" o--> "1\n-_grid" LabeledGridView : peut être déplacé dans >
-ShipView "1" *--> "1\n-_orientation" Orientation : est orienté >
-ShipView ..> ShipImageProvider : demande l'image >
+ShipView "1" o--> "1\n-_ship" Ship : Represents >
+ShipView "1" o--> "1\n-_grid" LabeledGridView : Can be placed inside >
+ShipView "1" *--> "1\n-_orientation" Orientation : Is oriented >
+ShipView ..> ShipImageProvider : Requests the image to display >
 
-GameView "1" *--> "2\n-_grid" LabeledGridView : affiche >
+GameView "1" *--> "2\n-_grid" LabeledGridView : Displays >
 
 @enduml
