@@ -10,7 +10,7 @@ hide enum methods
 hide interface attributes
 
 class Main {
-    +main(args: String[]): void
+    + {static} main(args: String[*]): void
 }
 
 package model {
@@ -28,7 +28,7 @@ package model {
         + setShipNumber(shipType: ShipType, number: Integer)
     }
 
-    enum Orientation {
+    enum Orientation <<enumerate>> {
         HORIZONTAL
         VERTICAL
     }
@@ -49,7 +49,7 @@ package model {
         + revealArea(startRow: Integer, startCol: Integer, size: Integer)
     }
 
-    abstract class Placeable {
+    abstract class Placeable <<abstract>>{
         - _name : String
         - _size : Integer
         - _startRow : Integer
@@ -67,7 +67,7 @@ package model {
     }
 
     package weapon {
-        enum WeaponType {
+        enum WeaponType <<enumerate>> {
             MISSILE
             BOMB
             SONAR
@@ -80,7 +80,7 @@ package model {
             + createSonar() : Weapon
         }
 
-        abstract class Weapon extends model.Placeable{
+        abstract class Weapon <<abstract>> extends model.Placeable {
             + <<Create>> Weapon(type: WeaponType)
             + {abstract} apply(grid: Grid, row: Integer, col: Integer)
             + getType() : WeaponType
@@ -104,7 +104,7 @@ package model {
     }
 
     package trap {
-        enum TrapType {
+        enum TrapType <<enumerate>> {
             BLACKHOLE
             TORNADO
         }
@@ -115,27 +115,27 @@ package model {
             + createTornado() : Trap
         }
 
-        abstract class Trap extends model.Placeable {
+        abstract class Trap <<abstract>> extends model.Placeable {
             + <<Create>> Trap(type: TrapType, name: String)
             + {abstract} activate(grid: Grid, row: Integer, col: Integer)
             + getType() : TrapType
         }
 
-        class BlackHole implements Trap {
+        class BlackHole extends Trap {
             + <<Create>> BlackHole()
             + activate(grid: Grid, row: Integer, col: Integer)
         }
 
-        class Tornado implements Trap {
+        class Tornado extends Trap {
             + <<Create>> Tornado()
             + activate(grid: Grid, row: Integer, col: Integer)
         }
     }
 
     package cell {
-        abstract class Cell {
+        abstract class Cell <<abstract>> {
             - _isHit : Boolean
-            + <<Create>> Cell()
+            + <<Create>> Cell(cellType: CellType)
             + {abstract} hit()
             + isHit() : Boolean
             + isEmpty() : Boolean
@@ -144,7 +144,7 @@ package model {
             + getObject() : Placeable
         }
 
-        enum CellType {
+        enum CellType <<enumerate>> {
             WATER
             ISLAND
         }
@@ -161,7 +161,7 @@ package model {
     }
 
     package ship {
-        abstract class Ship extends model.Placeable{
+        abstract class Ship <<abstract>> extends model.Placeable{
             - _cellsRemaining : Integer
             + <<Create>> Ship(type: ShipType, size: Integer, name: String)
             + hit()
@@ -169,7 +169,7 @@ package model {
             + getType() : ShipType
         }
 
-        enum ShipType {
+        enum ShipType <<enumerate>> {
             CARRIER
             BATTLESHIP
             CRUISER
@@ -204,7 +204,7 @@ package model {
     }
 
     package player {
-        enum PlayerStrategies {
+        enum PlayerStrategies <<enumerate>> {
             HUMAN
             COMPUTER_EASY
             COMPUTER_MEDIUM
@@ -225,26 +225,26 @@ package model {
             + createComputerHardStrategy() : PlayerStrategy
         }
 
-        interface PlayerStrategy {
+        interface PlayerStrategy <<interface>> {
             + playTurn()
         }
 
-        class HumanStrategy implements PlayerStrategy{
+        class HumanStrategy implements PlayerStrategy {
             + <<Create>> HumanStrategy()
             + playTurn()
         }
 
-        class ComputerEasyStrategy implements PlayerStrategy{
+        class ComputerEasyStrategy implements PlayerStrategy {
             + <<Create>> ComputerEasyStrategy()
             + playTurn()
         }
 
-        class ComputerMediumStrategy implements PlayerStrategy{
+        class ComputerMediumStrategy implements PlayerStrategy {
             + <<Create>> ComputerMediumStrategy()
             + playTurn()
         }
 
-        class ComputerHardStrategy implements PlayerStrategy{
+        class ComputerHardStrategy implements PlayerStrategy {
             + <<Create>> ComputerHardStrategy()
             + playTurn()
         }
