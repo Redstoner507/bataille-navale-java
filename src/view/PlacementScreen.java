@@ -50,7 +50,7 @@ public class PlacementScreen extends JPanel {
 
         // Panel gauche : bateaux à drag
         _shipPanel = new JPanel();
-        _shipPanel.setLayout(new BoxLayout(_shipPanel, BoxLayout.Y_AXIS));
+        _shipPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
         _shipPanel.setBorder(BorderFactory.createTitledBorder("Your ships"));
         _shipPanel.setOpaque(true);
         _shipPanel.setBackground(Color.LIGHT_GRAY);
@@ -68,7 +68,7 @@ public class PlacementScreen extends JPanel {
                 ShipView shipView = new ShipView(ship, playerGrid, layeredPane, _shipPanel, cellSize);
                 shipView.setAlignmentX(Component.CENTER_ALIGNMENT);
                 _shipPanel.add(shipView);
-                _shipPanel.add(Box.createRigidArea(new Dimension(0, 10))); // espacement vertical
+                //_shipPanel.add(Box.createRigidArea(new Dimension(0, 10))); // espacement vertical
             }
         }
 
