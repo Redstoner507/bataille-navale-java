@@ -1,27 +1,467 @@
-@startuml
+@startuml BatailleNavale
 'https://plantuml.com/class-diagram
 
+skinparam linetype ortho
+'skinparam linetype polyline
 skinparam style strictuml
 skinparam classAttributeIconSize 0
 skinparam classFontStyle Bold
 hide enum methods
 hide interface attributes
 
+class Main {
+    + {static} main(args: String[*]): void
+}
 
 package model {
-    class Grid
+
+    class GameConfig {
+        - _gridSize : Integer
+        - _islandsEnabled : Boolean
+        - _shipConfig : Map<ShipType, Integer>
+        + <<create>> GameConfig()
+        + getGridSize() : Integer
+        + setGridSize(gridSize: Integer)
+        + isIslandsEnabled() : Boolean
+        + setIslandsEnabled(islandsEnabled: Boolean)
+        + getShipConfig() : Map<ShipType, Integer>
+        + setShipNumber(shipType: ShipType, number: Integer)
+    }
+
+    enum Orientation <<enumerate>> {
+        HORIZONTAL
+        VERTICAL
+    }
+
+    class Grid {
+        - {static} MIN_SIZE : Integer
+        - {static} MAX_SIZE : Integer
+        - _size : Integer
+        + <<create>> Grid(size: Integer)
+        + canPlaceShip(ship: Ship, startRow: Integer, startCol: Integer) : Boolean
+        + placeShip(ship: Ship, startRow: Integer, startCol: Integer) : Boolean
+        + getSize() : Integer
+        + getCell(row: Integer, col: Integer) : Cell
+        + getShips() : Ship[*]
+        + allShipsSunk() : Boolean
+        + hit(row: Integer, col: Integer)
+        + bomb(row: Integer, col: Integer)
+        + revealArea(startRow: Integer, startCol: Integer, size: Integer)
+    }
+
+    abstract class Placeable <<abstract>>{
+        - _name : String
+        - _size : Integer
+        - _startRow : Integer
+        - _startCol : Integer
+        + <<create>> Placeable(size: Integer, defaultOrientation: Orientation, name: String, placementCellType: CellType)
+        + getSize() : Integer
+        + setOrientation(orientation: Orientation)
+        + getOrientation() : Orientation
+        + getName() : String
+        + setStartPosition(row: Integer, col: Integer)
+        + getStartRow() : Integer
+        + getStartCol() : Integer
+        + getCoordinates() : Point[*]
+        + getPlacementCellType() : CellType
+    }
+
+    package weapon {
+        enum WeaponType <<enumerate>> {
+            MISSILE
+            BOMB
+            SONAR
+        }
+
+        class WeaponFactory {
+            + <<create>> WeaponFactory()
+            + createMissile() : Weapon
+            + createBomb() : Weapon
+            + createSonar() : Weapon
+        }
+
+        abstract class Weapon <<abstract>> extends model.Placeable {
+            + <<create>> Weapon(type: WeaponType)
+            + {abstract} apply(grid: Grid, row: Integer, col: Integer)
+            + getType() : WeaponType
+        }
+
+        class Missile extends Weapon {
+            + <<create>> Missile()
+            + apply(grid: Grid, row: Integer, col: Integer)
+        }
+
+        class Bomb extends Weapon {
+            + <<create>> Bomb()
+            + apply(grid: Grid, row: Integer, col: Integer)
+        }
+
+        class Sonar extends Weapon {
+            - {static} RADIUS : Integer
+            + <<create>> Sonar()
+            + apply(grid: Grid, row: Integer, col: Integer)
+        }
+    }
+
+    package trap {
+        enum TrapType <<enumerate>> {
+            BLACKHOLE
+            TORNADO
+        }
+
+        class TrapFactory {
+            + <<create>> TrapFactory()
+            + createBlackHole() : Trap
+            + createTornado() : Trap
+        }
+
+        abstract class Trap <<abstract>> extends model.Placeable {
+            + <<create>> Trap(type: TrapType, name: String)
+            + {abstract} activate(grid: Grid, row: Integer, col: Integer)
+            + getType() : TrapType
+        }
+
+        class BlackHole extends Trap {
+            + <<create>> BlackHole()
+            + activate(grid: Grid, row: Integer, col: Integer)
+        }
+
+        class Tornado extends Trap {
+            + <<create>> Tornado()
+            + activate(grid: Grid, row: Integer, col: Integer)
+        }
+    }
+
+    package cell {
+        abstract class Cell <<abstract>> {
+            - _isHit : Boolean
+            + <<create>> Cell(cellType: CellType)
+            + {abstract} hit()
+            + isHit() : Boolean
+            + isEmpty() : Boolean
+            + getType() : CellType
+            + placeObject(object: Placeable)
+            + getObject() : Placeable
+        }
+
+        enum CellType <<enumerate>> {
+            WATER
+            ISLAND
+        }
+
+        class WaterCell extends Cell {
+            + <<create>> WaterCell()
+            + hit() : void
+        }
+
+        class IslandCell extends Cell {
+            + <<create>> IslandCell()
+            + hit() : void
+        }
+    }
+
+    package ship {
+        abstract class Ship <<abstract>> extends model.Placeable{
+            - _cellsRemaining : Integer
+            + <<create>> Ship(type: ShipType, size: Integer, name: String)
+            + hit()
+            + isSunk() : Boolean
+            + getType() : ShipType
+        }
+
+        enum ShipType <<enumerate>> {
+            CARRIER
+            BATTLESHIP
+            CRUISER
+            SUBMARINE
+            DESTROYER
+        }
+
+        class ShipFactory {
+            + <<create>> ShipFactory()
+            + createCarrier() : Ship
+            + createBatteShip() : Ship
+            + createCruiser() : Ship
+            + createSubmarine() : Ship
+            + createDestroyer() : Ship
+        }
+
+        class Carrier extends Ship {
+            + <<create>> Carrier()
+        }
+        class BattleShip extends Ship {
+            + <<create>> BattleShip()
+        }
+        class Cruiser extends Ship {
+            + <<create>> Cruiser()
+        }
+        class Submarine extends Ship {
+            + <<create>> Submarine()
+        }
+        class Destroyer extends Ship {
+            + <<create>> Destroyer()
+        }
+    }
+
+    package player {
+        enum PlayerStrategies <<enumerate>> {
+            HUMAN
+            COMPUTER_EASY
+            COMPUTER_MEDIUM
+            COMPUTER_HARD
+        }
+
+        class Player {
+            + <<create>> Player()
+            + setStrategy(strategy: PlayerStrategy)
+            + play()
+        }
+
+        class PlayerStrategyFactory {
+            + <<create>> PlayerStrategyFactory()
+            + createHumanStrategy() : PlayerStrategy
+            + createComputerEasyStrategy() : PlayerStrategy
+            + createComputerMediumStrategy() : PlayerStrategy
+            + createComputerHardStrategy() : PlayerStrategy
+        }
+
+        interface PlayerStrategy <<interface>> {
+            + playTurn()
+        }
+
+        class HumanStrategy implements PlayerStrategy {
+            + <<create>> HumanStrategy()
+            + playTurn()
+        }
+
+        class ComputerEasyStrategy implements PlayerStrategy {
+            + <<create>> ComputerEasyStrategy()
+            + playTurn()
+        }
+
+        class ComputerMediumStrategy implements PlayerStrategy {
+            + <<create>> ComputerMediumStrategy()
+            + playTurn()
+        }
+
+        class ComputerHardStrategy implements PlayerStrategy {
+            + <<create>> ComputerHardStrategy()
+            + playTurn()
+        }
+    }
 }
 
 package view {
-    class ConfigPanel
-    class PlacementScreen
-    class MainScreen
+    class GameView {
+        + <<create>> GameView(gridSize : Integer, cellSize : Integer)
+        + getPlayerGridView() : LabeledGridView
+        + getComputerGridView() : LabeledGridView
+        + setStatus(text: String)
+    }
+
+    class LabeledGridView {
+        + <<create>> LabeledGridView(title: String, gridSize: Integer, cellSize: Integer)
+        + <<create>> LabeledGridView(title: String, gridSize: Integer, cellSize: Integer, locked: Boolean)
+        - setupComponents()
+        + getGridView() : GridView
+        + setTitle(title: String)
+    }
+
+    class GridView {
+        - _gridSize : Integer
+        - _locked : Boolean
+        + <<create>> GridView(gridSize: Integer, cellSize: Integer)
+        + setLocked(locked: Boolean)
+        + setCellEnabled(row: Integer, col: Integer, enabled: Boolean)
+        + addCellClickListener(listener: ActionListener)
+        + setGridActionListener(listener: GridActionListener)
+        + notifyShipDropped(shipView: ShipView, row: Integer, col: Integer) : Boolean
+        + getCell(row: Integer, col: Integer) : CellView
+        + getGridSize() : Integer
+        + isLocked() : Boolean
+        + getGrid() : Grid
+    }
+
+    class CellView {
+        - _segmentImage : Image
+        - _isClickable : Boolean
+        - _cellPosition : Point
+        - _cellSize : Integer
+        + <<create>> CellView(cellPosition: Point, cellSize: Integer)
+        + setSegmentImage()
+        # paintComponent(g: Graphics)
+        + addMouseListener(l: MouseListener)
+        + setClickable(clickable: Boolean)
+        + isClickable() : Boolean
+        + getCellPosition() : Point
+    }
+
+    class ShipView {
+        + <<create>> ShipView(ship: Ship)
+    }
+
+    class ConfigScreen {
+        - {static} MAX_OCCUPIABLE_CELLS : Integer
+        + <<create>> ConfigScreen(gameController: GameController, configController: ConfigController)
+        - getOccupiedCellsCount() : Integer
+        - updateOccupiedCellsLabel(occupiedCells: Integer)
+        + getGridSize() : Integer
+    }
+
+    class PlacementScreen {
+        - {static} SHIP_PANEL_WIDTH : Integer
+        - {static} LABEL_HEIGHT : Integer
+        + <<create>> PlacementScreen(gameController: GameController, gridSize: Integer, ships: Ships[*], cellSize: Integer, PlacementController placementController)
+    }
+
+    class StartScreen {
+        + <<create>> StartScreen(gameController: GameController)
+    }
+
     class EndScreen
+
     class TerminalOutput
+
+    class MainFrame {
+        - {static} START : String
+        - {static} CONFIG : String
+        - {static} PLACEMENT : String
+        + <<create>> MainFrame()
+        + addScreen(name: String, screen: JPanel)
+        + showScreen(name: String)
+    }
+
+    class ShipView {
+        - _topLayer : JLayeredPane
+        - _originalPanel : JPanel
+        - _cellSize : Integer
+        - _dragging : Boolean
+        - _dragOffset : Point
+        - _segmentPanel : JPanel
+        + <<create>> ShipView(ship: ShipView, grid: LabeledGridView, topLayer: JLayeredPane, originalPanel: JPanel, cellSize: Integer)
+        - loadSegments()
+        - updateSize()
+        + setOrientation(orientation: Orientation)
+        - initDragAndDrop()
+        + getShip() : Ship
+    }
 }
 
 package controller {
-    class GridController
+    class GridController {
+        +placeShip(ship: Ship, position: Position, orientation: Orientation): Boolean
+    }
+
+    class GameController {
+        - {static} CELL_SIZE : Integer
+        + <<create>> GameController()
+        + showStartScreen()
+        + showConfigScreen()
+        + startPlacementScreen(shipConfig: Dictionary<String, Integer>, gridSize: Integer)
+        + quit()
+    }
+
+    class PlacementController {
+        + <<create>> PlacementController()
+        + placeShip(modelGrid: Grid, viewGrid: GridView, ship: Ship, row: Integer, col: Integer) : Boolean
+        + rotateShip(ship: Ship)
+    }
+
+    interface GridActionListener {
+        shipDropped(shipView: ShipView, row: Integer, col: Integer) : Boolean
+    }
+
+    class ConfigController {
+        + <<create>> ConfigController()
+        + getShipConfig(config: Dictionary<String, Integer>) : Ship[*]
+        + getShipConfig(carriers : Integer, batteShips : Integer, cruisers : Integer, submarines : Integer, destroyer : Integer) : Ship[*]
+        + setGridSize(gridSize: Integer)
+        + setShipNumber(shipType: ShipType, number: Integer)
+        + getGameConfig() : GameConfig
+    }
+
+    class PlayerController {
+        + changeStrategy(newStrategy: PlayerStrategy)
+    }
 }
+
+package util {
+    class RandomUtil {
+
+    }
+
+    class ShipImageProvider {
+        - {static} BASE_PATH : String
+        - {static} _segmentBase : Image
+        + {static} getShipSegment(cellSize: Integer) : Image
+    }
+}
+
+' Relationships
+Main ..> GameController : Instantiates >
+
+'Model
+Player "1" *--> "*\n-_inventory" Placeable : Can place >
+Player "1" *--> "1\n-_grid" Grid : Has >
+Player ..> PlayerStrategy : Calls >
+
+Cell "1" *--> "1\n-_cellType" CellType : Is of type >
+Cell "1" *--> "0,1\n-_object" Placeable : Can contain >
+
+Grid "1" *--> "*\n-_cells" Cell : Contains >
+Grid "1" *--> "*\n-_ships" Ship : Contains >
+
+Placeable "1" *--> "1\n-_orientation" Orientation : Is oriented >
+Placeable "1" *--> "1\n-_cellType" CellType : Can be placed on a cell of type >
+
+Ship "1" *--> "1\n-_shipType" ShipType : Is of type >
+Trap "1" *--> "1\n-_trapType" TrapType : Is of type >
+Weapon "1" *--> "1\n-_weaponType" WeaponType : Is of type >
+
+
+PlayerStrategyFactory ..> PlayerStrategy : Instantiates >
+
+ShipFactory ..> Ship : Instantiates >
+
+WeaponFactory ..> Weapon : Instantiates >
+
+TrapFactory ..> Trap : Instantiates >
+
+'Controller
+GameController "1" *--> "1\n-_frame" MainFrame : Displays >
+GameController "1" *--> "1\n-_configController" ConfigController : Shares the configuration >
+GameController ..> MainFrame : Instantiates >
+GameController ..> ConfigScreen : Instantiates >
+GameController ..> ConfigController : Instantiates >
+GameController ..> StartScreen : Instantiates >
+GameController ..> PlacementScreen : Instantiates >
+GameController ..> PlacementController : Instantiates >
+
+GridController ..> Grid
+
+ConfigController "1" *--> "1\n-_gameConfig" GameConfig : Controls >
+ConfigController ..> GameConfig : Instantiates >
+ConfigController ..> ShipFactory : Instantiates >
+
+PlayerController "1" *--> "1\n-_strategy" PlayerStrategy : Selects the strategy >
+
+'View
+PlacementScreen "1" *--> "1\n-_currentOrientation" Orientation : Is oriented >
+PlacementScreen ..> PlacementController : Requests the ship placement >
+
+LabeledGridView "1" *--> "1\n-_gridView" GridView : Contains >
+
+GridView "1" *--> "*\n-_cells" CellView : Contains >
+GridView "1" o--> "1\n-_grid" Grid : Represents >
+GridView "1" o--> "1\n-_listener" GridActionListener : Is listened to by >
+
+CellView ..> ShipImageProvider : Requests the image to display >
+
+ShipView "1" o--> "1\n-_ship" Ship : Represents >
+ShipView "1" o--> "1\n-_grid" LabeledGridView : Can be placed inside >
+ShipView "1" *--> "1\n-_orientation" Orientation : Is oriented >
+ShipView ..> ShipImageProvider : Requests the image to display >
+
+GameView "1" *--> "2\n-_grid" LabeledGridView : Displays >
 
 @enduml
