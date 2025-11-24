@@ -59,7 +59,7 @@ public class PlacementScreen extends JPanel {
 
         // PlacementController
         playerGrid.getGridView().setGridActionListener((shipView, row, col) ->
-                placementController.placeShip(playerGrid.getGridView().getGrid(), playerGrid.getGridView(), shipView.getShip(), row, col)
+                placementController.placeShip(gameController.getPlayerGrid(), playerGrid.getGridView(), shipView.getShip(), row, col)
         );
 
         // Ajouter les ShipView
@@ -85,5 +85,7 @@ public class PlacementScreen extends JPanel {
                 }
             }
         });
+
+        randomPlacementButton.addActionListener(e -> placementController.randomShipsPlacement(gameController.getPlayerGrid(), playerGrid.getGridView(), ships));
     }
 }

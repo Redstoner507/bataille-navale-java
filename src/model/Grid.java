@@ -81,4 +81,13 @@ public class Grid {
     public ArrayList<Ship> getShips() {
         return _ships;
     }
+
+    public void clearGrid() {
+        for (int r = 0; r < _size; r++) {
+            for (int c = 0; c < _size; c++) {
+                _cells[r][c] = new WaterCell();
+            }
+        }
+        _ships.clear();
+    }
 }

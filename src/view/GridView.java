@@ -1,7 +1,6 @@
 package view;
 
 import controller.GridActionListener;
-import model.Grid;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -12,13 +11,11 @@ public class GridView extends JPanel {
     private final int _gridSize;        // Taille de la grille
     private final CellView[][] _cells;  // Cases de la grille
     private boolean _locked = false;    // Etat verrouillé
-    private final Grid _grid;           // Grille concrète
     private GridActionListener _listener;
 
     public GridView(int gridSize, int cellSize) {
         this._gridSize = gridSize;
         this._cells = new CellView[gridSize][gridSize];
-        this._grid = new Grid(gridSize);
 
         setLayout(new BorderLayout());
         add(createGridPanel(cellSize), BorderLayout.CENTER);
@@ -122,9 +119,5 @@ public class GridView extends JPanel {
 
     public boolean isLocked() {
         return _locked;
-    }
-
-    public Grid getGrid() {
-        return _grid;
     }
 }
