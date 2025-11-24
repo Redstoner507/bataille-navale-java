@@ -1,7 +1,5 @@
 package view;
 
-import model.Grid;
-
 import javax.swing.*;
 import java.awt.*;
 
@@ -18,12 +16,6 @@ public class LabeledGridView extends JPanel {
     public LabeledGridView(String title, int gridSize, int cellSize, boolean locked) {
         this(title, gridSize, cellSize);
         _gridView.setLocked(locked);
-    }
-
-    public LabeledGridView(Grid grid, String title, int cellSize) {
-        _titleLabel = new JLabel(title, SwingConstants.CENTER);
-        _gridView = new GridView(grid, cellSize);
-        setupComponents();
     }
 
     /**

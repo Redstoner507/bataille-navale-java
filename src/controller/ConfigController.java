@@ -1,18 +1,18 @@
 package controller;
 
 import model.GameConfig;
-import model.Grid;
 import model.ship.Ship;
 import model.ship.ShipFactory;
 import model.ship.ShipType;
+import view.LabeledGridView;
 
 import java.util.ArrayList;
 import java.util.Map;
 
 
 public class ConfigController {
-    GameConfig _gameConfig;
-    Grid _playerGrid;
+    private final GameConfig _gameConfig;
+    private LabeledGridView _playerGrid;
 
     public ConfigController() {
         _gameConfig = new GameConfig();
@@ -62,11 +62,11 @@ public class ConfigController {
         return ships;
     }
 
-    public void setPlayerGrid(Grid playerGrid) {
+    public void setPlayerGrid(LabeledGridView playerGrid) {
         _playerGrid = playerGrid;
     }
 
-    public Grid getPlayerGrid() {
+    public LabeledGridView getPlayerGrid() {
         return _playerGrid;
     }
     

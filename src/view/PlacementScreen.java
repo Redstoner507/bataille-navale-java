@@ -88,8 +88,7 @@ public class PlacementScreen extends JPanel {
 
         startGameButton.addActionListener(e -> {
             if (_shipPanel.getComponentCount() == 0) {
-                GridView gridView = playerGrid.getGridView();
-                configController.setPlayerGrid(gridView.getGrid());
+                configController.setPlayerGrid(playerGrid);
                 gameController.showGameScreen();
             }
         });

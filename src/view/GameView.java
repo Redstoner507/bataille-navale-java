@@ -1,7 +1,5 @@
 package view;
 
-import model.Grid;
-
 import javax.swing.*;
 import java.awt.*;
 
@@ -10,7 +8,7 @@ public class GameView extends JPanel {
     private final LabeledGridView _computerGrid;    // Grille de l'ordinateur
     private final JLabel _statusLabel;              // Status du jeu
 
-    public GameView(Grid playerGrid, int gridSize, int cellSize) {
+    public GameView(LabeledGridView playerGrid, int gridSize, int cellSize) {
         setLayout(new BorderLayout(10, 10));
 
         // Titre principal
@@ -22,7 +20,10 @@ public class GameView extends JPanel {
         JPanel gridsPanel = new JPanel(new GridLayout(1, 2, 30, 0));
         gridsPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
-        _playerGrid = new LabeledGridView(playerGrid, "Your ships", cellSize);
+        _playerGrid = playerGrid;
+        _playerGrid.setTitle("Your ships");
+        GridView playerGridView = _playerGrid.getGridView();
+        playerGridView.setLocked(true);
         _computerGrid = new LabeledGridView("Enemy ships", gridSize, cellSize);
 
         gridsPanel.add(_playerGrid);

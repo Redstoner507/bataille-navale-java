@@ -15,18 +15,13 @@ public class GridView extends JPanel {
     private final Grid _grid;           // Grille concrète
     private GridActionListener _listener;
 
-    public GridView(Grid grid, int cellSize) {
-        this._grid = grid;
-        int size = this._grid.getSize();
-        this._gridSize = size;
-        this._cells = new CellView[size][size];
+    public GridView(int gridSize, int cellSize) {
+        this._grid = new Grid(gridSize);
+        this._gridSize = gridSize;
+        this._cells = new CellView[gridSize][gridSize];
 
         setLayout(new BorderLayout());
         add(createGridPanel(cellSize), BorderLayout.CENTER);
-    }
-
-    public GridView(int gridSize, int cellSize) {
-        this(new Grid(gridSize), cellSize);
     }
 
     /**
