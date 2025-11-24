@@ -7,10 +7,6 @@ public class MainFrame extends JFrame {
     private final CardLayout _cardLayout;
     private final JPanel _container;
 
-    public static final String START = "start";
-    public static final String CONFIG = "config";
-    public static final String PLACEMENT = "placement";
-
     public MainFrame() {
         setTitle("Bataille Navale");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

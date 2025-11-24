@@ -1,5 +1,6 @@
 package view;
 
+import controller.ConfigController;
 import controller.GameController;
 import controller.PlacementController;
 import model.Orientation;
@@ -15,7 +16,7 @@ public class PlacementScreen extends JPanel {
     private final JPanel _shipPanel;
     private Orientation _currentOrientation = Orientation.HORIZONTAL;
 
-    public PlacementScreen(GameController gameController, int gridSize, ArrayList<Ship> ships, int cellSize, PlacementController placementController) {
+    public PlacementScreen(GameController gameController, int gridSize, ArrayList<Ship> ships, int cellSize, PlacementController placementController, ConfigController configController) {
         
         setLayout(new BorderLayout(10, 10));
 
@@ -59,7 +60,7 @@ public class PlacementScreen extends JPanel {
 
         // PlacementController
         playerGrid.getGridView().setGridActionListener((shipView, row, col) ->
-                placementController.placeShip(playerGrid.getGridView().getGrid(), playerGrid.getGridView(), shipView.getShip(), row, col)
+            placementController.placeShip(playerGrid.getGridView().getGrid(), playerGrid.getGridView(), shipView.getShip(), row, col)
         );
 
         // Ajouter les ShipView
@@ -68,7 +69,6 @@ public class PlacementScreen extends JPanel {
                 ShipView shipView = new ShipView(ship, playerGrid, layeredPane, _shipPanel, cellSize);
                 shipView.setAlignmentX(Component.CENTER_ALIGNMENT);
                 _shipPanel.add(shipView);
-                //_shipPanel.add(Box.createRigidArea(new Dimension(0, 10))); // espacement vertical
             }
         }
 
@@ -83,6 +83,14 @@ public class PlacementScreen extends JPanel {
                     placementController.rotateShip(shipView.getShip());
                     shipView.setOrientation(_currentOrientation);
                 }
+            }
+        });
+
+        startGameButton.addActionListener(e -> {
+            if (_shipPanel.getComponentCount() == 0) {
+                GridView gridView = playerGrid.getGridView();
+                configController.setPlayerGrid(gridView.getGrid());
+                gameController.showGameScreen();
             }
         });
     }

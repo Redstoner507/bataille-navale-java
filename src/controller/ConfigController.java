@@ -1,6 +1,7 @@
 package controller;
 
 import model.GameConfig;
+import model.Grid;
 import model.ship.Ship;
 import model.ship.ShipFactory;
 import model.ship.ShipType;
@@ -11,6 +12,7 @@ import java.util.Map;
 
 public class ConfigController {
     GameConfig _gameConfig;
+    Grid _playerGrid;
 
     public ConfigController() {
         _gameConfig = new GameConfig();
@@ -58,6 +60,14 @@ public class ConfigController {
             ships.add(factory.createDestroyer());
         }
         return ships;
+    }
+
+    public void setPlayerGrid(Grid playerGrid) {
+        _playerGrid = playerGrid;
+    }
+
+    public Grid getPlayerGrid() {
+        return _playerGrid;
     }
     
 }
