@@ -2,7 +2,6 @@ package view;
 
 import model.Orientation;
 import model.ship.Ship;
-import utils.ShipImageProvider;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -52,10 +51,10 @@ public class ShipView extends JPanel {
         _segmentPanel.removeAll();
         _segmentPanel.setLayout(new BoxLayout(_segmentPanel,
                 _orientation == Orientation.HORIZONTAL ? BoxLayout.X_AXIS : BoxLayout.Y_AXIS));
-
+        // A modifier pour éviter de recharger l'image deux fois
+        Icon img = new ImageIcon(CellView.class.getResource("/images/ship.png"));
         for (int i = 0; i < _ship.getSize(); i++) {
-            Image img = ShipImageProvider.getShipSegment(_cellSize);
-            JLabel seg = new JLabel(new ImageIcon(img));
+            JLabel seg = new JLabel(img);
             seg.setPreferredSize(new Dimension(_cellSize, _cellSize));
             seg.setMinimumSize(new Dimension(_cellSize, _cellSize));
             seg.setMaximumSize(new Dimension(_cellSize, _cellSize));
