@@ -70,13 +70,6 @@ public class ShipView extends JPanel {
     }
 
     private void updateSize() {
-        int width = _orientation == Orientation.HORIZONTAL ? _cellSize * _ship.getSize() : _cellSize;
-        int height = _orientation == Orientation.HORIZONTAL ? _cellSize : _cellSize * _ship.getSize();
-
-        _segmentPanel.setPreferredSize(new Dimension(width, height));
-        _segmentPanel.setMaximumSize(new Dimension(width, height));
-        _segmentPanel.setMinimumSize(new Dimension(width, height));
-
         revalidate();
         repaint();
     }
@@ -168,6 +161,23 @@ public class ShipView extends JPanel {
 
         addMouseListener(ma);
         addMouseMotionListener(ma);
+    }
+
+    @Override public Dimension getPreferredSize() {
+        int segW = _orientation == Orientation.HORIZONTAL ? _cellSize * _ship.getSize() : _cellSize;
+        int segH = _orientation == Orientation.HORIZONTAL ? _cellSize : _cellSize * _ship.getSize();
+
+        // Taille du titre
+        Component title = getComponent(0); // le JLabel
+        Dimension titleSize = title.getPreferredSize();
+
+        // Largeur totale : max entre segment et titre
+        int totalW = Math.max(segW, titleSize.width); //85
+
+        // Hauteur totale : titre + segments + marge
+        int totalH = titleSize.height + segH + 5;
+
+        return new Dimension(totalW, totalH);
     }
 
     public Ship getShip() {

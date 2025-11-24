@@ -14,6 +14,7 @@ public class GridView extends JPanel {
     private GridActionListener _listener;
 
     public GridView(int gridSize, int cellSize) {
+        this._grid = new Grid(gridSize);
         this._gridSize = gridSize;
         this._cells = new CellView[gridSize][gridSize];
 

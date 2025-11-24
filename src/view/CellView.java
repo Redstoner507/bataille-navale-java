@@ -6,7 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseListener;
 
-public class CellView extends JPanel {
+public class CellView extends JLabel {
     private Image _segmentImage;
     private boolean _isClickable = true;
     private final Point _cellPosition;
@@ -23,6 +23,7 @@ public class CellView extends JPanel {
      */
     public void setSegmentImage() {
         this._segmentImage = ShipImageProvider.getShipSegment(_cellSize);
+        setIcon(new ImageIcon(_segmentImage));
         revalidate();
         repaint();
     }
@@ -30,9 +31,7 @@ public class CellView extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        if (_segmentImage != null) {
-            g.drawImage(_segmentImage, 0, 0, getWidth(), getHeight(), null);
-        } else {
+        if (_segmentImage == null) {
             g.setColor(Color.CYAN);
             g.fillRect(0, 0, getWidth(), getHeight());
         }

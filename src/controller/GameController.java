@@ -2,10 +2,7 @@ package controller;
 
 import model.GameConfig;
 import model.Grid;
-import view.ConfigScreen;
-import view.MainFrame;
-import view.PlacementScreen;
-import view.StartScreen;
+import view.*;
 
 
 public class GameController {
@@ -17,6 +14,10 @@ public class GameController {
     //Grids
     private Grid _PlayerGrid;
     private Grid _BotGrid;
+    private static final String START = "start";
+    private static final String CONFIG = "config";
+    private static final String PLACEMENT = "placement";
+    private static final String GAME = "game";
 
     public GameController() {
         _configController = new ConfigController();
@@ -25,29 +26,36 @@ public class GameController {
 
         _frame = new MainFrame();
 
-        _frame.addScreen(MainFrame.START, new StartScreen(this));
-        _frame.addScreen(MainFrame.CONFIG, new ConfigScreen(this, _configController));
+        _frame.addScreen(START, new StartScreen(this));
+        _frame.addScreen(CONFIG, new ConfigScreen(this, _configController));
 
         _frame.setVisible(true);
         showStartScreen();
     }
 
     public void showStartScreen() {
-        _frame.showScreen(MainFrame.START);
+        _frame.showScreen(START);
     }
 
     public void showConfigScreen() {
-        _frame.showScreen(MainFrame.CONFIG);
+        _frame.showScreen(CONFIG);
     }
 
-    public void startPlacementScreen() {
+    public void showPlacementScreen() {
         PlacementController placementController = new PlacementController();
         GameConfig config = _configController.getGameConfig();
-        PlacementScreen placement = new PlacementScreen(this, config.getGridSize(), _configController.getShipConfig(), CELL_SIZE, placementController);
         _PlayerGrid = new Grid(config.getGridSize());
         _BotGrid = new Grid(config.getGridSize());
-        _frame.addScreen(MainFrame.PLACEMENT, placement);
-        _frame.showScreen(MainFrame.PLACEMENT);
+        PlacementScreen placement = new PlacementScreen(this, config.getGridSize(), _configController.getShipConfig(), CELL_SIZE, placementController, _configController);
+        _frame.addScreen(PLACEMENT, placement);
+        _frame.showScreen(PLACEMENT);
+    }
+
+    public void showGameScreen() {
+        GameConfig config = _configController.getGameConfig();
+        GameView game = new GameView(_configController.getPlayerGrid(),config.getGridSize(), CELL_SIZE);
+        _frame.addScreen(GAME, game);
+        _frame.showScreen(GAME);
     }
 
     public Grid getPlayerGrid() {

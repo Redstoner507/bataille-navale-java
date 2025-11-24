@@ -4,13 +4,15 @@ import model.GameConfig;
 import model.ship.Ship;
 import model.ship.ShipFactory;
 import model.ship.ShipType;
+import view.LabeledGridView;
 
 import java.util.ArrayList;
 import java.util.Map;
 
 
 public class ConfigController {
-    GameConfig _gameConfig;
+    private final GameConfig _gameConfig;
+    private LabeledGridView _playerGrid;
 
     public ConfigController() {
         _gameConfig = new GameConfig();
@@ -58,6 +60,14 @@ public class ConfigController {
             ships.add(factory.createDestroyer());
         }
         return ships;
+    }
+
+    public void setPlayerGrid(LabeledGridView playerGrid) {
+        _playerGrid = playerGrid;
+    }
+
+    public LabeledGridView getPlayerGrid() {
+        return _playerGrid;
     }
     
 }
