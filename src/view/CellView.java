@@ -1,20 +1,27 @@
 package view;
 
-import utils.ShipImageProvider;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseListener;
 
-public class CellView extends JLabel {
-    private Image _segmentImage;
+public class CellView extends JLabel {  
+    private static final ImageIcon IMG_SHIP =
+        new ImageIcon(CellView.class.getResource("/images/ship.png")); 
+    private static final ImageIcon IMG_HIT =
+            new ImageIcon(CellView.class.getResource("/images/hit.png"));
+    private static final ImageIcon IMG_MISS =
+            new ImageIcon(CellView.class.getResource("/images/miss.png"));
+    private static final ImageIcon IMG_SUNK =
+            new ImageIcon(CellView.class.getResource("/images/sunk.png"));
+    private static final ImageIcon IMG_WATER =
+            new ImageIcon(CellView.class.getResource("/images/water.png"));
+
     private boolean _isClickable = true;
     private final Point _cellPosition;
-    private final int _cellSize;
 
     public CellView(Point cellPosition, int cellSize) {
         _cellPosition = cellPosition;
-        _cellSize = cellSize;
+        //_cellSize = cellSize;
         setPreferredSize(new Dimension(cellSize, cellSize));
     }
 
@@ -22,8 +29,8 @@ public class CellView extends JLabel {
      * Defines the segment of the ship to display.
      */
     public void setSegmentImage() {
-        this._segmentImage = ShipImageProvider.getShipSegment(_cellSize);
-        setIcon(new ImageIcon(_segmentImage));
+        //this._segmentImage = ShipImageProvider.getShipSegment(_cellSize);
+        setIcon(IMG_SHIP);
         revalidate();
         repaint();
     }
@@ -31,10 +38,6 @@ public class CellView extends JLabel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        if (_segmentImage == null) {
-            g.setColor(Color.CYAN);
-            g.fillRect(0, 0, getWidth(), getHeight());
-        }
         // bordure
         g.setColor(Color.BLACK);
         g.drawRect(0, 0, getWidth()-1, getHeight()-1);
