@@ -19,6 +19,10 @@ public class CellView extends JLabel {
             new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/sunk.png"))).getImage();
     private static final Image IMG_WATER =
             new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/water.png"))).getImage();
+    private static final Image IMG_ISLAND =
+            new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/island.png"))).getImage();
+    private static final Image IMG_ISLAND_HIT =
+            new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/island_hit.png"))).getImage();
 
     private Image _currentImage = IMG_WATER;
     private boolean _isClickable = true;
@@ -35,10 +39,12 @@ public class CellView extends JLabel {
     public void setCellIcon(CellState state) {
         switch (state) {
             case SHIP -> _currentImage = IMG_SHIP;
-            //case WATER -> _currentImage = IMG_WATER;
+            case WATER -> _currentImage = IMG_WATER;
             case MISS -> _currentImage = IMG_MISS;
             case HIT -> _currentImage = IMG_HIT;
             case SUNK -> _currentImage = IMG_SUNK;
+            case ISLAND -> _currentImage = IMG_ISLAND;
+            case ISLAND_HIT -> _currentImage = IMG_ISLAND_HIT;
             default -> _currentImage = IMG_WATER;
         }
         revalidate();
