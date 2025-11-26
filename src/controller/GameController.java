@@ -9,11 +9,13 @@ public class GameController {
     //Variables
     private static final int CELL_SIZE = 50;
     private final ConfigController _configController;
+    private final PlacementController _placementController;
     //Screens
     private final MainFrame _frame;
     //Grids
-    private Grid _PlayerGrid;
-    private Grid _BotGrid;
+    private Grid _playerGrid;
+    private Grid _botGrid;
+    private LabeledGridView _playerGridView;
     private static final String START = "start";
     private static final String CONFIG = "config";
     private static final String PLACEMENT = "placement";
@@ -21,8 +23,9 @@ public class GameController {
 
     public GameController() {
         _configController = new ConfigController();
-        _PlayerGrid = null;
-        _BotGrid = null;
+        _placementController = new PlacementController();
+        _playerGrid = null;
+        _botGrid = null;
 
         _frame = new MainFrame();
 
@@ -42,28 +45,35 @@ public class GameController {
     }
 
     public void showPlacementScreen() {
-        PlacementController placementController = new PlacementController();
         GameConfig config = _configController.getGameConfig();
-        _PlayerGrid = new Grid(config.getGridSize());
-        _BotGrid = new Grid(config.getGridSize());
-        PlacementScreen placement = new PlacementScreen(this, config.getGridSize(), _configController.getShipConfig(), CELL_SIZE, placementController, _configController);
+        _playerGrid = new Grid(config.getGridSize());
+        _botGrid = new Grid(config.getGridSize());
+        PlacementScreen placement = new PlacementScreen(this, config.getGridSize(), CELL_SIZE, _placementController, _configController);
         _frame.addScreen(PLACEMENT, placement);
         _frame.showScreen(PLACEMENT);
     }
 
     public void showGameScreen() {
         GameConfig config = _configController.getGameConfig();
-        GameView game = new GameView(_configController.getPlayerGrid(),config.getGridSize(), CELL_SIZE);
+        GameView game = new GameView(_playerGridView, config.getGridSize(), CELL_SIZE, _placementController, _botGrid, _configController);
         _frame.addScreen(GAME, game);
         _frame.showScreen(GAME);
     }
 
     public Grid getPlayerGrid() {
-        return _PlayerGrid;
+        return _playerGrid;
     }
 
     public Grid getBotGrid() {
-        return _BotGrid;
+        return _botGrid;
+    }
+
+    public void setPlayerGridView(LabeledGridView playerGridView) {
+        this._playerGridView = playerGridView;
+    }
+
+    public LabeledGridView getPlayerGridView() {
+        return _playerGridView;
     }
     
     public void quit() {
