@@ -1,6 +1,9 @@
 package view;
 
 import javax.swing.*;
+
+import model.cell.CellState;
+
 import java.awt.*;
 import java.awt.event.MouseListener;
 
@@ -21,20 +24,41 @@ public class CellView extends JLabel {
 
     public CellView(Point cellPosition, int cellSize) {
         _cellPosition = cellPosition;
-        //_cellSize = cellSize;
+        setIcon(IMG_WATER);
         setPreferredSize(new Dimension(cellSize, cellSize));
     }
 
     /**
-     * Defines the segment of the ship to display.
+     * Sets the icon of the cell according to its state.
      */
-    public void setSegmentImage() {
-        //this._segmentImage = ShipImageProvider.getShipSegment(_cellSize);
-        setIcon(IMG_SHIP);
+    public void setCellIcon(CellState state) {
+        switch (state) {
+            case SHIP:
+                setIcon(IMG_SHIP);
+                break;
+            case WATER:
+                setIcon(IMG_WATER);
+                break;
+            case MISS:
+                setIcon(IMG_MISS);
+                break;
+            case HIT:
+                setIcon(IMG_HIT);
+                break;
+            case SUNK:
+                setIcon(IMG_SUNK);
+                break;
+            default:
+                setIcon(IMG_WATER);
+                break;
+        }
         revalidate();
         repaint();
     }
 
+    /** 
+     * Paints the border of the cell.
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);

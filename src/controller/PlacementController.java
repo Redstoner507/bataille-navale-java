@@ -2,9 +2,11 @@ package controller;
 
 import model.Grid;
 import model.Orientation;
+import model.cell.CellState;
 import model.ship.Ship;
 import view.CellView;
 import view.GridView;
+import view.PlacementScreen;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -23,7 +25,7 @@ public class PlacementController {
         for (Point p : ship.getCoordinates()) {
             CellView cell = viewGrid.getCell(p.x, p.y);
             if (cell != null) {
-                cell.setSegmentImage();
+                cell.setCellIcon(CellState.SHIP);;
             }
         }
 
@@ -33,8 +35,10 @@ public class PlacementController {
     /**
      * Randomly places all ships in the grid.
      */
-    public void randomShipsPlacement(Grid modelGrid, GridView viewGrid, ArrayList<Ship> ships) {
+    public void randomShipsPlacement(PlacementScreen placementScreen, Grid modelGrid, GridView viewGrid, ArrayList<Ship> ships) {
         clearGrid(modelGrid, viewGrid);
+        placementScreen.clearShipViews();
+
         Random rand = new Random();
 
         for (Ship ship : ships) {
@@ -66,6 +70,6 @@ public class PlacementController {
 
     public void clearGrid(Grid modelGrid, GridView viewGrid) {
         modelGrid.clearGrid();
-        //viewGrid.refreshGrid();
+        viewGrid.clearGrid();
     }
 }
