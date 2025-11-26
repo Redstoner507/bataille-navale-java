@@ -135,6 +135,8 @@ package model {
     package cell {
         abstract class Cell <<abstract>> {
             - _isHit : Boolean
+            - _type : CellType
+            - _state : CellState
             + <<create>> Cell(cellType: CellType)
             + {abstract} hit()
             + isHit() : Boolean
@@ -147,6 +149,16 @@ package model {
         enum CellType <<enumerate>> {
             WATER
             ISLAND
+        }
+
+        enum CellState <<enumerate>> {
+            WATER
+            SHIP
+            HIT
+            MISS
+            SUNK
+            ISLAND
+            ISLAND_HIT
         }
 
         class WaterCell extends Cell {

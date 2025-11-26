@@ -1,7 +1,7 @@
 package model;
 
 import model.cell.Cell;
-import model.cell.CellType;
+import model.cell.CellState;
 import model.cell.WaterCell;
 import model.ship.Ship;
 
@@ -39,15 +39,8 @@ public class Grid {
 
             if (r < 0 || r >= _size || c < 0 || c >= _size) return false;
 
-            if (_cells[r][c].getType() == CellType.WATER) {
-                try {
-                    if (_cells[r][c].hasShip()) return false;
-                }
-                catch (Exception e) {
-                    System.out.println(e);
-                }
-            }
-            else return false;
+            if (_cells[r][c].getState() != CellState.WATER) return false;
+
         }
         return true;
     }
@@ -64,7 +57,7 @@ public class Grid {
 
         for (Point p : ship.getCoordinates()) {
             try {
-                _cells[p.x][p.y].placeShip(ship);
+                _cells[p.x][p.y].setState(CellState.SHIP);;
             }
             catch (Exception e) {
                 System.out.println(e);

@@ -5,5 +5,7 @@ public enum CellState {
     HIT,
     MISS,
     SUNK,
-    WATER
+    WATER,
+    ISLAND,
+    ISLAND_HIT
 }
