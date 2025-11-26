@@ -1,6 +1,7 @@
 package view;
 
 import controller.GridActionListener;
+import model.cell.CellState;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -119,5 +120,13 @@ public class GridView extends JPanel {
 
     public boolean isLocked() {
         return _locked;
+    }
+
+    public void clearGrid() {
+        for (int r = 0; r < _gridSize; r++) {
+            for (int c = 0; c < _gridSize; c++) {
+                _cells[r][c].setCellIcon(CellState.WATER);
+            }
+        }
     }
 }
