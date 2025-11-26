@@ -1,5 +1,7 @@
 package model;
 
+import model.cell.CellType;
+
 import java.awt.*;
 import java.util.ArrayList;
 
@@ -9,11 +11,13 @@ public abstract class Placeable {
     private int _startRow = -1;
     private int _startCol = -1;
     private Orientation _orientation;
+    private final CellType _cellType;
 
-    public Placeable(int size, Orientation defaultOrientation, String name) {
+    public Placeable(int size, Orientation defaultOrientation, String name, CellType placementCellType) {
         _size = size;
         _orientation = defaultOrientation;
         _name = name;
+        _cellType = placementCellType;
     }
 
     public int getSize() {
