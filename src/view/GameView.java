@@ -28,6 +28,7 @@ public class GameView extends JPanel {
         LabeledGridView computerLabeledGridView = new LabeledGridView("Enemy ships", gridSize, cellSize);
         GridView computerGridView = computerLabeledGridView.getGridView();
         placementController.randomShipsPlacement(computerGrid, computerGridView, configController.getShipConfig());
+        computerGridView.clearGrid();
 
         gridsPanel.add(playerGrid);
         gridsPanel.add(computerLabeledGridView);
