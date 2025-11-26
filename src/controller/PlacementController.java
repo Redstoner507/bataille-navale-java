@@ -2,6 +2,7 @@ package controller;
 
 import model.Grid;
 import model.Orientation;
+import model.cell.CellState;
 import model.ship.Ship;
 import view.CellView;
 import view.GridView;
@@ -23,7 +24,7 @@ public class PlacementController {
         for (Point p : ship.getCoordinates()) {
             CellView cell = viewGrid.getCell(p.x, p.y);
             if (cell != null) {
-                cell.setSegmentImage();
+                cell.setCellIcon(CellState.SHIP);;
             }
         }
 
