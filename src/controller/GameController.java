@@ -2,6 +2,7 @@ package controller;
 
 import model.GameConfig;
 import model.Grid;
+import player.Player;
 import view.*;
 
 
@@ -13,8 +14,8 @@ public class GameController {
     //Screens
     private final MainFrame _frame;
     //Grids
-    private Grid _playerGrid;
-    private Grid _botGrid;
+    private Player _player;
+    private Player _bot;
     private LabeledGridView _playerGridView;
     private static final String START = "start";
     private static final String CONFIG = "config";
@@ -24,8 +25,8 @@ public class GameController {
     public GameController() {
         _configController = new ConfigController();
         _placementController = new PlacementController();
-        _playerGrid = null;
-        _botGrid = null;
+        _player = null;
+        _bot = null;
 
         _frame = new MainFrame();
 
@@ -46,8 +47,8 @@ public class GameController {
 
     public void showPlacementScreen() {
         GameConfig config = _configController.getGameConfig();
-        _playerGrid = new Grid(config.getGridSize());
-        _botGrid = new Grid(config.getGridSize());
+        _player = new Player(config.getGridSize());
+        _bot = new Player(config.getGridSize());
         PlacementScreen placement = new PlacementScreen(this, config.getGridSize(), CELL_SIZE, _placementController, _configController);
         _frame.addScreen(PLACEMENT, placement);
         _frame.showScreen(PLACEMENT);
@@ -55,17 +56,17 @@ public class GameController {
 
     public void showGameScreen() {
         GameConfig config = _configController.getGameConfig();
-        GameView game = new GameView(_playerGridView, config.getGridSize(), CELL_SIZE, _placementController, _botGrid, _configController);
+        GameView game = new GameView(_playerGridView, config.getGridSize(), CELL_SIZE, _placementController, _bot.getGrid(), _configController);
         _frame.addScreen(GAME, game);
         _frame.showScreen(GAME);
     }
 
     public Grid getPlayerGrid() {
-        return _playerGrid;
+        return _player.getGrid();
     }
 
     public Grid getBotGrid() {
-        return _botGrid;
+        return _bot.getGrid();
     }
 
     public void setPlayerGridView(LabeledGridView playerGridView) {
