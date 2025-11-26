@@ -54,7 +54,7 @@ public class GridView extends JPanel {
                 CellView cell = new CellView(new Point(row, col), cellSize);
                 cell.setPreferredSize(new Dimension(50, 50)); // taille carrée
                 cell.setBorder(new LineBorder(Color.BLACK)); // quadrillage
-                cell.setEnabled(false); // désactivée par défaut
+                cell.setFocusable(false); // désactivée par défaut
                 _cells[row][col] = cell;
                 panel.add(cell);
             }
@@ -70,7 +70,7 @@ public class GridView extends JPanel {
         _locked = locked;
         for (int row = 0; row < _gridSize; row++) {
             for (int col = 0; col < _gridSize; col++) {
-                _cells[row][col].setEnabled(!locked);
+                _cells[row][col].setFocusable(!locked);
             }
         }
     }
@@ -82,7 +82,7 @@ public class GridView extends JPanel {
         if (row < 0 || row >= _gridSize || col < 0 || col >= _gridSize) {
             return;
         }
-        _cells[row][col].setEnabled(enabled);
+        _cells[row][col].setFocusable(enabled);
     }
 
     /**

@@ -16,7 +16,7 @@ public class PlacementScreen extends JPanel {
     private final JPanel _shipPanel;
     private Orientation _currentOrientation = Orientation.HORIZONTAL;
 
-    public PlacementScreen(GameController gameController, int gridSize, ArrayList<Ship> ships, int cellSize, PlacementController placementController, ConfigController configController) {
+    public PlacementScreen(GameController gameController, int gridSize, int cellSize, PlacementController placementController, ConfigController configController) {
         
         setLayout(new BorderLayout(10, 10));
 
@@ -64,6 +64,7 @@ public class PlacementScreen extends JPanel {
         );
 
         // Ajouter les ShipView
+        ArrayList<Ship> ships = configController.getShipConfig();
         if (ships != null && !ships.isEmpty()) {
             for (Ship ship : ships) {
                 ShipView shipView = new ShipView(ship, playerGrid, layeredPane, _shipPanel, cellSize);
@@ -86,11 +87,14 @@ public class PlacementScreen extends JPanel {
             }
         });
 
-        randomPlacementButton.addActionListener(e -> placementController.randomShipsPlacement(this, gameController.getPlayerGrid(), playerGrid.getGridView(), ships));
+        randomPlacementButton.addActionListener(e -> {
+            placementController.randomShipsPlacement(gameController.getPlayerGrid(), playerGrid.getGridView(), ships);
+            clearShipViews();
+        });
         
         startGameButton.addActionListener(e -> {
             if (_shipPanel.getComponentCount() == 0) {
-                configController.setPlayerGrid(playerGrid);
+                gameController.setPlayerGridView(playerGrid);
                 gameController.showGameScreen();
             }
         });

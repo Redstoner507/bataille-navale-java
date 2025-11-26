@@ -6,25 +6,26 @@ import model.cell.CellState;
 
 import java.awt.*;
 import java.awt.event.MouseListener;
+import java.util.Objects;
 
 public class CellView extends JLabel {  
-    private static final ImageIcon IMG_SHIP =
-        new ImageIcon(CellView.class.getResource("/images/ship.png")); 
-    private static final ImageIcon IMG_HIT =
-            new ImageIcon(CellView.class.getResource("/images/hit.png"));
-    private static final ImageIcon IMG_MISS =
-            new ImageIcon(CellView.class.getResource("/images/miss.png"));
-    private static final ImageIcon IMG_SUNK =
-            new ImageIcon(CellView.class.getResource("/images/sunk.png"));
-    private static final ImageIcon IMG_WATER =
-            new ImageIcon(CellView.class.getResource("/images/water.png"));
+    private static final Image IMG_SHIP =
+        new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/ship.png"))).getImage();
+    private static final Image IMG_HIT =
+            new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/hit.png"))).getImage();
+    private static final Image IMG_MISS =
+            new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/miss.png"))).getImage();
+    private static final Image IMG_SUNK =
+            new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/sunk.png"))).getImage();
+    private static final Image IMG_WATER =
+            new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/water.png"))).getImage();
 
+    private Image _currentImage = IMG_WATER;
     private boolean _isClickable = true;
     private final Point _cellPosition;
 
     public CellView(Point cellPosition, int cellSize) {
         _cellPosition = cellPosition;
-        setIcon(IMG_WATER);
         setPreferredSize(new Dimension(cellSize, cellSize));
     }
 
@@ -33,35 +34,27 @@ public class CellView extends JLabel {
      */
     public void setCellIcon(CellState state) {
         switch (state) {
-            case SHIP:
-                setIcon(IMG_SHIP);
-                break;
-            case WATER:
-                setIcon(IMG_WATER);
-                break;
-            case MISS:
-                setIcon(IMG_MISS);
-                break;
-            case HIT:
-                setIcon(IMG_HIT);
-                break;
-            case SUNK:
-                setIcon(IMG_SUNK);
-                break;
-            default:
-                setIcon(IMG_WATER);
-                break;
+            case SHIP -> _currentImage = IMG_SHIP;
+            //case WATER -> _currentImage = IMG_WATER;
+            case MISS -> _currentImage = IMG_MISS;
+            case HIT -> _currentImage = IMG_HIT;
+            case SUNK -> _currentImage = IMG_SUNK;
+            default -> _currentImage = IMG_WATER;
         }
         revalidate();
         repaint();
     }
 
     /** 
-     * Paints the border of the cell.
+     * Paints the cell and scales the image to fill the label.
      */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+
+        // Dessiner l'image redimensionnée pour remplir le JLabel
+        g.drawImage(_currentImage, 0, 0, getWidth(), getHeight(), this);
+
         // bordure
         g.setColor(Color.BLACK);
         g.drawRect(0, 0, getWidth()-1, getHeight()-1);
