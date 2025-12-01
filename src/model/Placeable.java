@@ -12,12 +12,14 @@ public abstract class Placeable {
     private int _startCol = -1;
     private Orientation _orientation;
     private final CellType _cellType;
+    private final PlaceableType _placeableType;
 
-    public Placeable(int size, Orientation defaultOrientation, String name, CellType placementCellType) {
+    public Placeable(int size, Orientation defaultOrientation, String name, CellType placementCellType, PlaceableType placeableType) {
         _size = size;
         _orientation = defaultOrientation;
         _name = name;
         _cellType = placementCellType;
+        _placeableType = placeableType;
     }
 
     public int getSize() {
@@ -26,6 +28,10 @@ public abstract class Placeable {
 
     public void setOrientation(Orientation orientation) {
         this._orientation = orientation;
+    }
+
+    public PlaceableType getPlaceableType() {
+        return _placeableType;
     }
 
     public Orientation getOrientation() {

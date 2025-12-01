@@ -2,6 +2,6 @@ package controller;
 
 import view.ShipView;
 
-public interface GridActionListener {
+public interface ShipPlacementListener {
     boolean shipDropped(ShipView shipView, int row, int col);
 }

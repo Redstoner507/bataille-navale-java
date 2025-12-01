@@ -59,7 +59,7 @@ public class PlacementScreen extends JPanel {
         layeredPane.add(_shipPanel, JLayeredPane.DEFAULT_LAYER);
 
         // PlacementController
-        playerGrid.getGridView().setGridActionListener((shipView, row, col) ->
+        playerGrid.getGridView().setShipPlacementListener((shipView, row, col) ->
             placementController.placeShip(gameController.getPlayerGrid(), playerGrid.getGridView(), shipView.getShip(), row, col)
         );
 

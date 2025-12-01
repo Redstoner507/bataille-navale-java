@@ -60,7 +60,7 @@ public class CellView extends JLabel {
 
         // Dessiner l'image redimensionnée pour remplir le JLabel
         g.drawImage(_currentImage, 0, 0, getWidth(), getHeight(), this);
-
+        setBackground(Color.CYAN);
         // bordure
         g.setColor(Color.BLACK);
         g.drawRect(0, 0, getWidth()-1, getHeight()-1);

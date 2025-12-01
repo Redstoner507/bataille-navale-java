@@ -3,13 +3,14 @@ package model.weapon;
 import model.Grid;
 import model.Orientation;
 import model.Placeable;
+import model.PlaceableType;
 import model.cell.CellType;
 
 public abstract class Weapon extends Placeable {
     private final WeaponType _weaponType;
 
     public Weapon(WeaponType type) {
-        super(1, Orientation.HORIZONTAL, type.name().toLowerCase(), CellType.ISLAND);
+        super(1, Orientation.HORIZONTAL, type.name().toLowerCase(), CellType.ISLAND, PlaceableType.WEAPON);
         _weaponType = type;
     }
 
