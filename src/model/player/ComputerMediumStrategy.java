@@ -1,8 +1,10 @@
 package model.player;
 
+import model.Attack;
+
 public class ComputerMediumStrategy implements PlayerStrategy {
     @Override
-    public void playTurn() {
-
+    public Attack getAttack() {
+        return null;
     }
 }
