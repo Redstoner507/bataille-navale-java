@@ -1,6 +1,7 @@
 package view;
 
 import controller.ConfigController;
+import controller.GameController;
 import controller.PlacementController;
 import model.Grid;
 
@@ -9,8 +10,9 @@ import java.awt.*;
 
 public class GameView extends JPanel {
     private final JLabel _statusLabel; // Status du jeu
+    private final GridView _computerGridView;
 
-    public GameView(LabeledGridView playerGrid, int gridSize, int cellSize, PlacementController placementController, Grid computerGrid, ConfigController configController) {
+    public GameView(LabeledGridView playerGrid, int gridSize, int cellSize, PlacementController placementController, Grid computerGrid, ConfigController configController, GameController gameController) {
         setLayout(new BorderLayout(10, 10));
 
         // Titre principal
@@ -25,10 +27,11 @@ public class GameView extends JPanel {
         playerGrid.setTitle("Your ships");
         GridView playerGridView = playerGrid.getGridView();
         playerGridView.setLocked(true);
-        LabeledGridView computerLabeledGridView = new LabeledGridView("Enemy ships", gridSize, cellSize);
-        GridView computerGridView = computerLabeledGridView.getGridView();
-        placementController.randomShipsPlacement(computerGrid, computerGridView, configController.getShipConfig());
-        computerGridView.clearGrid();
+        LabeledGridView computerLabeledGridView = new LabeledGridView("Enemy ships", gridSize, cellSize, false);
+        _computerGridView = computerLabeledGridView.getGridView();
+        _computerGridView.setAttackListener(gameController::handlePlayerAttack);
+        placementController.randomShipsPlacement(computerGrid, _computerGridView, configController.getShipConfig());
+        _computerGridView.clearGrid();
 
         gridsPanel.add(playerGrid);
         gridsPanel.add(computerLabeledGridView);
@@ -43,5 +46,9 @@ public class GameView extends JPanel {
 
     public void setStatus(String text) {
         _statusLabel.setText(text);
+    }
+
+    public GridView getComputerGridView() {
+        return _computerGridView;
     }
 }

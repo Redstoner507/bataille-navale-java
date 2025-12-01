@@ -1,4 +1,4 @@
-package player;
+package model.player;
 
 public class HumanStrategy implements PlayerStrategy {
     @Override

@@ -1,18 +1,23 @@
 package view;
 
-import controller.GridActionListener;
+import controller.AttackListener;
+import controller.ShipPlacementListener;
+import model.AttackStatus;
 import model.cell.CellState;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 public class GridView extends JPanel {
     private final int _gridSize;        // Taille de la grille
     private final CellView[][] _cells;  // Cases de la grille
     private boolean _locked = false;    // Etat verrouillé
-    private GridActionListener _listener;
+    private ShipPlacementListener _placementListener;
+    private AttackListener _attackListener;
 
     public GridView(int gridSize, int cellSize) {
         this._gridSize = gridSize;
@@ -51,16 +56,76 @@ public class GridView extends JPanel {
 
             // Cases de la grille
             for (int col = 0; col < _gridSize; col++) {
-                CellView cell = new CellView(new Point(row, col), cellSize);
-                cell.setPreferredSize(new Dimension(50, 50)); // taille carrée
-                cell.setBorder(new LineBorder(Color.BLACK)); // quadrillage
-                cell.setFocusable(false); // désactivée par défaut
+                CellView cell = getCellView(cellSize, row, col);
                 _cells[row][col] = cell;
                 panel.add(cell);
             }
         }
 
         return panel;
+    }
+
+    private CellView getCellView(int cellSize, int row, int col) {
+        CellView cell = new CellView(new Point(row, col), cellSize);
+        cell.setPreferredSize(new Dimension(50, 50)); // taille carrée
+        cell.setBorder(new LineBorder(Color.BLACK)); // quadrillage
+        cell.setOpaque(true);
+        cell.setFocusable(false); // désactivée par défaut
+        final int cellRow = row;
+        final int cellCol = col;
+        cell.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // 1. Vérifier si la grille n'est pas verrouillée et si la case est cliquable (focus/enabled)
+                if (!_locked && cell.isFocusable() && e.getButton() == MouseEvent.BUTTON1) {
+                    // 2. Appeler la méthode de la GridView pour informer le Contrôleur
+                      notifyCellAttacked(cellRow, cellCol);
+                }
+            }
+        });
+        return cell;
+    }
+
+    /**
+     * Updates the appearance of a cell according to the result of an attack.
+     * @param row Line of the cell to update.
+     * @param col Column of the cell to update.
+     * @param status The status of the attack (HIT, MISS, SUNK, etc...).
+     */
+    public void updateCellDisplay(int row, int col, AttackStatus status) {
+        if (row < 0 || row >= _gridSize || col < 0 || col >= _gridSize) {
+            return;
+        }
+
+        CellView cell = _cells[row][col];
+
+        // La cellule n'est plus cliquable après avoir été attaquée.
+        cell.setFocusable(false);
+
+        switch (status) {
+            case HIT:
+                cell.setCellIcon(CellState.HIT);
+                break;
+
+            case SUNK:
+                cell.setCellIcon(CellState.SUNK);
+                break;
+
+            case MISS:
+            case ALREADY_VISITED:
+                cell.setCellIcon(CellState.MISS);
+                break;
+
+            case SONAR_RESULT:
+                // Le Sonar ne change pas l'état visuel de la grille des tirs,
+                // le résultat est affiché uniquement dans la zone de statut.
+                // On peut marquer légèrement la zone si l'on veut.
+                // cell.setCellIcon(CellState.SONAR_USED);
+                break;
+
+            default:
+                break;
+        }
     }
 
     /**
@@ -96,18 +161,28 @@ public class GridView extends JPanel {
         }
     }
 
-    public void setGridActionListener(GridActionListener listener) {
-        this._listener = listener;
+    public void setShipPlacementListener(ShipPlacementListener listener) {
+        this._placementListener = listener;
     }
 
     /**
      * Called by ShipView when a ship is dropped.
      */
     public boolean notifyShipDropped(ShipView shipView, int row, int col) {
-        if (_listener != null) {
-            return _listener.shipDropped(shipView, row, col);
+        if (_placementListener != null) {
+            return _placementListener.shipDropped(shipView, row, col);
         }
         return false;
+    }
+
+    public void setAttackListener(AttackListener listener) {
+        this._attackListener = listener;
+    }
+
+    public void notifyCellAttacked(int row, int col) {
+        if (_attackListener != null) {
+            _attackListener.onCellAttacked(row, col);
+        }
     }
 
     public CellView getCell(int row, int col) {

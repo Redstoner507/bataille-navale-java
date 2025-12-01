@@ -1,4 +1,4 @@
-package player;
+package model.player;
 
 public class ComputerMediumStrategy implements PlayerStrategy {
     @Override

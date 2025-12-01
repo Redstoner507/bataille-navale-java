@@ -1,4 +1,4 @@
-package player;
+package model.player;
 
 public interface PlayerStrategy {
     void playTurn();

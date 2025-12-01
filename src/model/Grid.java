@@ -4,6 +4,7 @@ import model.cell.Cell;
 import model.cell.CellState;
 import model.cell.WaterCell;
 import model.ship.Ship;
+import model.trap.Trap;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -57,7 +58,8 @@ public class Grid {
 
         for (Point p : ship.getCoordinates()) {
             try {
-                _cells[p.x][p.y].setState(CellState.SHIP);;
+                _cells[p.x][p.y].setState(CellState.SHIP);
+                _cells[p.x][p.y].setObject(ship);
             }
             catch (Exception e) {
                 System.out.println(e);
@@ -65,6 +67,73 @@ public class Grid {
         }
 
         return true;
+    }
+
+    /**
+     * Applies the attack to the grid.
+     * @param attack The Attack object that contains the element and the target.
+     * @return AttackResult The result of the attack.
+     */
+    public AttackResult applyAttack(Attack attack) {
+        // Pour l'attaque de base (Missile), nous utilisons les coordonnées réelles
+        // (qui sont les mêmes que les coordonnées ciblées, sauf si la Tornade les a modifiées).
+        int row = attack.getRealRow();
+        int col = attack.getRealCol();
+
+        // 1. Vérification de la validité de la cible (hors limites ou déjà touchée)
+        if (row < 0 || row >= _size || col < 0 || col >= _size) {
+            return new AttackResult(AttackStatus.MISS, "Shot beyond the limits !");
+        }
+
+        Cell targetCell = _cells[row][col];
+
+        if (targetCell.getState() == CellState.HIT) {
+            return new AttackResult(AttackStatus.ALREADY_VISITED, "Already hit.");
+        }
+
+        // Si c'est un Sonar, la logique serait différente (ne fait pas targetCell.hit())
+        if (attack.getWeapon().getName().equals("Sonar")) {
+            // Logique du Sonar : compter les bateaux dans la zone 3x3 et retourner SONAR_RESULT
+            // ... (à implémenter plus tard)
+            return new AttackResult(AttackStatus.SONAR_RESULT, "Sonar scan completed.");
+        }
+
+        // 2. Marquer la case comme touchée (Modèle)
+        targetCell.hit();
+        Placeable element = targetCell.getObject(); // Element sur la case (Ship, Trap, null)
+
+        // 3. Traitement de l'élément touché
+        if (element == null) {
+            // Case VIDE / EAU
+            return new AttackResult(AttackStatus.MISS, "You missed !");
+
+        } else if (element.getPlaceableType() == PlaceableType.SHIP) {
+            // BATEAU TOUCHÉ
+            Ship ship = (Ship) element;
+            ship.hit();
+
+            if (ship.isSunk()) {
+                return new AttackResult(AttackStatus.SUNK, "Hit ! The " + ship.getName() + " was sunk !", ship);
+            } else {
+                return new AttackResult(AttackStatus.HIT, "Hit !", ship);
+            }
+
+        } else if (element.getPlaceableType() == PlaceableType.TRAP) {
+            // On active le piège (ex: Trou Noir, Tornade)
+            Trap trap = (Trap) element;
+            targetCell.removeObject();
+            trap.activate(attack.getAttackingPlayer().getGrid(), row, col);
+            return new AttackResult(AttackStatus.TRAP_ACTIVATED, "A trap was triggered !", trap);
+
+        } else if (element.getPlaceableType() == PlaceableType.WEAPON) {
+            // Récupérer l'arme
+            targetCell.removeObject();
+            attack.getAttackingPlayer().addObjectToInventory(element);
+            return new AttackResult(AttackStatus.ITEM_FOUND, "You found an item : " + element.getName(), element);
+
+        } else {
+            return new AttackResult(AttackStatus.MISS, "Shot without effect.");
+        }
     }
 
     public int getSize() {
