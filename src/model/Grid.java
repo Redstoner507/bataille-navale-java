@@ -80,7 +80,7 @@ public class Grid {
         int row = attack.getRealRow();
         int col = attack.getRealCol();
 
-        // 1. Vérification de la validité de la cible (hors limites ou déjà touchée)
+        // Vérification de la validité de la cible (hors limites ou déjà touchée)
         if (row < 0 || row >= _size || col < 0 || col >= _size) {
             return new AttackResult(AttackStatus.MISS, "Shot beyond the limits !");
         }
@@ -94,21 +94,20 @@ public class Grid {
         // Si c'est un Sonar, la logique serait différente (ne fait pas targetCell.hit())
         if (attack.getWeapon().getName().equals("Sonar")) {
             // Logique du Sonar : compter les bateaux dans la zone 3x3 et retourner SONAR_RESULT
-            // ... (à implémenter plus tard)
             return new AttackResult(AttackStatus.SONAR_RESULT, "Sonar scan completed.");
         }
 
-        // 2. Marquer la case comme touchée (Modèle)
+        // Marquer la case comme touchée
         targetCell.hit();
         Placeable element = targetCell.getObject(); // Element sur la case (Ship, Trap, null)
 
-        // 3. Traitement de l'élément touché
+        // Traitement de l'élément touché
         if (element == null) {
-            // Case VIDE / EAU
+            // Case vide / eau
             return new AttackResult(AttackStatus.MISS, "You missed !");
 
         } else if (element.getPlaceableType() == PlaceableType.SHIP) {
-            // BATEAU TOUCHÉ
+            // Bateau touché
             Ship ship = (Ship) element;
             ship.hit();
 
@@ -119,7 +118,7 @@ public class Grid {
             }
 
         } else if (element.getPlaceableType() == PlaceableType.TRAP) {
-            // On active le piège (ex: Trou Noir, Tornade)
+            // On active le piège
             Trap trap = (Trap) element;
             targetCell.removeObject();
             trap.activate(attack.getAttackingPlayer().getGrid(), row, col);

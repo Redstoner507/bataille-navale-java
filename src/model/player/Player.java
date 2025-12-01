@@ -2,7 +2,8 @@ package model.player;
 
 import model.*;
 import model.ship.Ship;
-import model.trap.BlackHole;
+import model.trap.Trap;
+import model.trap.TrapType;
 
 import java.util.ArrayList;
 
@@ -56,11 +57,16 @@ public class Player {
         // Si la case touchée est un Trou Noir (TRAP_ACTIVATED),
         // l'attaque doit être relancée sur la grille de l'ATTAQUANT.
 
-        if (result.getStatus() == AttackStatus.TRAP_ACTIVATED && result.getElementHit() instanceof BlackHole) {
+        if (result.getStatus() != AttackStatus.TRAP_ACTIVATED) return result;
+        Placeable object = result.getElementHit();
+        if (object == null || object.getPlaceableType() != PlaceableType.TRAP) return result;
+        Trap trap = (Trap) object;
+        if (trap.getTrapType() == TrapType.BLACKHOLE) {
             // Le Contrôleur (GameController) devra gérer la relance de l'attaque sur la grille de l'attaquant.
             // Ici, on retourne le résultat du Trou Noir au Contrôleur pour qu'il orchestre la relance.
             result.setMessage("Trap triggered : BlackHole ! The shot is returned to the sender !");
         }
+
         // --- Mise à jour des statistiques internes (Nombre de bateaux coulés, etc.) ---
         // Si result.getStatus() est SUNK, mettre à jour le compteur du joueur.
 
