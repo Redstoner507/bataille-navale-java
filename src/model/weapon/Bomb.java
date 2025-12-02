@@ -1,5 +1,7 @@
 package model.weapon;
 
+import model.Attack;
+import model.AttackResult;
 import model.Grid;
 
 public class Bomb extends Weapon{
@@ -9,7 +11,7 @@ public class Bomb extends Weapon{
     }
 
     @Override
-    public void apply(Grid grid, int row, int col) {
-
+    public AttackResult applyAttack(Grid grid, Attack attack) {
+        return null;
     }
 }

@@ -4,6 +4,7 @@ import model.*;
 import model.ship.Ship;
 import model.trap.Trap;
 import model.trap.TrapType;
+import model.weapon.Weapon;
 import view.GridView;
 
 import java.util.ArrayList;
@@ -53,7 +54,9 @@ public class Player {
         // Pour l'instant, nous déléguons directement à la grille.
 
         // getGrid() est la grille de défense de ce joueur.
-        AttackResult result = _grid.applyAttack(attack);
+        Weapon weapon = attack.getWeapon();
+        AttackResult result = weapon.applyAttack(_grid, attack);
+        _grid.applyAttack(attack, result);
 
         // --- Logique du Trou Noir (C3) ---
         // Si la case touchée est un Trou Noir (TRAP_ACTIVATED),

@@ -5,7 +5,7 @@ package model;
  */
 public enum AttackStatus {
     MISS,               // Tirs manqués (dans l'eau ou case vide)
-    HIT,                // Bateau/Piège touché mais pas coulé/activé
+    HIT,                // Bateau touché mais pas coulé
     SUNK,               // Bateau coulé
     TRAP_ACTIVATED,     // Piège (Trou Noir/Tornade) touché et activé
     ITEM_FOUND,         // Arme/Piège trouvé sur l'Île

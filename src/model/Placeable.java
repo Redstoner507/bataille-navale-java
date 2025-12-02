@@ -70,4 +70,6 @@ public abstract class Placeable {
         }
         return coordinates;
     }
+
+    public abstract AttackResult hit();
 }

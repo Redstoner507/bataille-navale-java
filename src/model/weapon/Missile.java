@@ -1,6 +1,9 @@
 package model.weapon;
 
+import model.Attack;
+import model.AttackResult;
 import model.Grid;
+import model.cell.Cell;
 
 public class Missile extends Weapon{
 
@@ -9,7 +12,10 @@ public class Missile extends Weapon{
     }
 
     @Override
-    public void apply(Grid grid, int row, int col) {
-
+    public AttackResult applyAttack(Grid grid, Attack attack) {
+        int row = attack.getTargetRow();
+        int col = attack.getTargetCol();
+        Cell cell = grid.getCell(row, col);
+        return cell.hit();
     }
 }

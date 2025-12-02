@@ -1,9 +1,6 @@
 package model.trap;
 
-import model.Grid;
-import model.Orientation;
-import model.Placeable;
-import model.PlaceableType;
+import model.*;
 import model.cell.CellType;
 
 public abstract class Trap extends Placeable {
@@ -18,5 +15,10 @@ public abstract class Trap extends Placeable {
 
     public TrapType getTrapType() {
         return _trapType;
+    }
+
+    @Override
+    public AttackResult hit() {
+        return new AttackResult(AttackStatus.TRAP_ACTIVATED, "You triggered a " + getName() + " !");
     }
 }
