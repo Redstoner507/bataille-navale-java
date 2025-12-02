@@ -16,6 +16,6 @@ public class ComputerEasyStrategy implements PlayerStrategy {
         int row = rand.nextInt(10);
         int col = rand.nextInt(10);
         Weapon selectedWeapon = new WeaponFactory().createMissile(); // Assuming a default constructor for Weapon
-        return new Attack(null, selectedWeapon, row, col); // Player will be set later
+        return new Attack(null, null, selectedWeapon, row, col); // Player will be set later
     }
 }

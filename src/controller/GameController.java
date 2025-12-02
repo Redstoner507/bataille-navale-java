@@ -1,6 +1,7 @@
 package controller;
 
 import model.*;
+import model.player.PlayerStrategyFactory;
 import model.weapon.Weapon;
 import model.player.Player;
 import model.weapon.WeaponFactory;
@@ -56,6 +57,11 @@ public class GameController {
         GameConfig config = _configController.getGameConfig();
         _player = new Player(config.getGridSize(), CELL_SIZE, "Player");
         _bot = new Player(config.getGridSize(), CELL_SIZE, "Computer");
+
+        PlayerStrategyFactory playerStrategyFactory = new PlayerStrategyFactory();
+        _player.setStrategy(playerStrategyFactory.createHumanStrategy());
+        _bot.setStrategy(playerStrategyFactory.createComputerEasyStrategy());
+
         PlacementScreen placement = new PlacementScreen(this, config.getGridSize(), CELL_SIZE, _placementController, _configController);
         _frame.addScreen(PLACEMENT, placement);
         _frame.showScreen(PLACEMENT);
@@ -73,13 +79,20 @@ public class GameController {
 
     public void handlePlayerAttack(int row, int col, Weapon selectedWeapon) {
         if (_gameState != GameState.HUMAN_TURN && _gameState != GameState.COMPUTER_TURN) return;
-        Player defender = _currentPlayer == _player ? _player : _bot;
+        Player defender = _currentPlayer == _player ? _bot : _player;
 
-        Attack attack = new Attack(_currentPlayer, defender, selectedWeapon, row, col);
+        Attack attack = _currentPlayer.play();
+        if (_currentPlayer == _player) {
+            attack = new Attack(_currentPlayer, defender, selectedWeapon, row, col);
+        }
+        else {
+            attack.setAttackingPlayer(_currentPlayer);
+            attack.setTargetPlayer(defender);
+        }
 
         AttackResult result = defender.receiveAttack(attack);
 
-        updateGameView(result, defender.getGrid(), row, col); // Afficher le résultat du coup
+        updateGameView(result, attack.getTargetPlayer().getGridView(), attack.getRealRow(), attack.getRealCol()); // Afficher le résultat du coup
 
         if (checkGameOver()) {
             _gameView.setStatus("Game Over !");
@@ -88,13 +101,12 @@ public class GameController {
         changeTurn();
     }
 
-    private void updateGameView(AttackResult result, Grid targetGrid, int row, int col) {
-        // 1. Mettre à jour la grille d'attaque du joueur (visuelle)
-        // Nécessite une méthode dans GridView pour mettre à jour l'icône de la case
-        _gameView.getComputerGridView().updateCellDisplay(row, col, result.getStatus());
+    private void updateGameView(AttackResult result, GridView targetGridView, int row, int col) {
+        // 1. Mettre à jour la grille visuelle
+        targetGridView.updateCellDisplay(row, col, result.getStatus());
 
         // Mettre à jour le statut
-        _gameView.setStatus(_player.getName() + " shot at coordinates " + (char)('A' + col) + (row + 1) + ". Result : " + result.getMessage());
+        _gameView.setStatus(_currentPlayer.getName() + " shot at coordinates " + (char)('A' + col) + (row + 1) + ". Result : " + result.getMessage());
 
         // Mettre à jour les statistiques (E3)
     }
@@ -107,16 +119,15 @@ public class GameController {
             _gameView.getComputerGridView().setLocked(true); // Verrouiller la grille d'attaque
 
             // Simuler le tour de l'ordinateur après un petit délai
-            _gameView.setStatus(_bot.getName() + "'s turn...");
-            _bot.play();
+            //_gameView.setStatus(_bot.getName() + "'s turn...");
+            handlePlayerAttack(-1, -1, null);
         } else {
             // Repasser à l'humain
             _currentPlayer = _player;
             _gameState = GameState.HUMAN_TURN;
             _gameView.getComputerGridView().setLocked(false);
             _turnNumber++;
-            _gameView.setStatus("It's your turn !");
-            _player.play();
+            //_gameView.setStatus("It's your turn !");
         }
     }
 

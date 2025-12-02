@@ -47,7 +47,7 @@ public class GameView extends JPanel {
         _computerGridView.setAttackListener(gameController::handlePlayerAttack, gameController.getSelectedWeapon());
 
         // Logique de placement aléatoire de l'ordinateur
-        placementController.randomShipsPlacement(computerGrid, _computerGridView, configController.getShipConfig());
+        placementController.randomShipsPlacement(computerGrid, _computerGridView, configController.getShipConfig(), true);
         _computerGridView.clearGrid(); // Cache les bateaux
 
         // Ajouter le Panneau de Contrôle du Joueur à gauche

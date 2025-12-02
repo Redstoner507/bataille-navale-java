@@ -9,12 +9,12 @@ import java.awt.Point;
  * Represents the different elements that form the attack, including the weapon used and the targeted coordinates.
  */
 public class Attack {
-    private final Player _attackingPlayer; // Le joueur qui lance l'attaque
-    private final Player _targetPlayer;    // Le joueur qui reçoit l'attaque
-    private final Weapon _weapon;          // L'arme utilisée (Missile, Bombe, Sonar)
+    private Player _attackingPlayer; // Le joueur qui lance l'attaque
+    private Player _targetPlayer;    // Le joueur qui reçoit l'attaque
+    private Weapon _weapon;          // L'arme utilisée (Missile, Bombe, Sonar)
     // Coordonnées initiales (ce que le joueur a cliqué)
-    private final int _targetRow;
-    private final int _targetCol;
+    private int _targetRow;
+    private int _targetCol;
     // Coordonnées réelles après modification par des pièges (si applicables)
     private Point _realCoordinates;
 
@@ -27,20 +27,40 @@ public class Attack {
         this._realCoordinates = new Point(targetRow, targetCol);
     }
 
+    public void setAttackingPlayer(Player attackingPlayer) {
+        this._attackingPlayer = attackingPlayer;
+    }
+
     public Player getAttackingPlayer() {
         return _attackingPlayer;
+    }
+
+    public void setTargetPlayer(Player targetPlayer) {
+        this._targetPlayer = targetPlayer;
     }
 
     public Player getTargetPlayer() {
         return _targetPlayer;
     }
 
+    public void setWeapon(Weapon selectedWeapon) {
+        this._weapon = selectedWeapon;
+    }
+
     public Weapon getWeapon() {
         return _weapon;
     }
 
+    public void setTargetRow(int targetRow) {
+        this._targetRow = targetRow;
+    }
+
     public int getTargetRow() {
         return _targetRow;
+    }
+
+    public void setTargetCol(int targetCol) {
+        this._targetCol = targetCol;
     }
 
     public int getTargetCol() {

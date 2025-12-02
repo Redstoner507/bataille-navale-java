@@ -88,7 +88,7 @@ public class PlacementScreen extends JPanel {
         });
 
         randomPlacementButton.addActionListener(e -> {
-            placementController.randomShipsPlacement(gameController.getPlayerGrid(), playerGrid.getGridView(), ships);
+            placementController.randomShipsPlacement(gameController.getPlayerGrid(), playerGrid.getGridView(), ships, false);
             clearShipViews();
         });
         

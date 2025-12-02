@@ -34,7 +34,7 @@ public class PlacementController {
     /**
      * Randomly places all ships in the grid.
      */
-    public void randomShipsPlacement(Grid modelGrid, GridView viewGrid, ArrayList<Ship> ships) {
+    public void randomShipsPlacement(Grid modelGrid, GridView viewGrid, ArrayList<Ship> ships, boolean withCopy) {
         clearGrid(modelGrid, viewGrid);
 
         Random rand = new Random();
@@ -51,8 +51,15 @@ public class PlacementController {
                 int row = rand.nextInt(modelGrid.getSize());
                 int col = rand.nextInt(modelGrid.getSize());
 
+                Ship placedShip;
+                if (withCopy) {
+                    placedShip = new Ship(ship);
+                }
+                else {
+                    placedShip = ship;
+                }
                 // Use controller logic
-                placed = placeShip(modelGrid, viewGrid, ship, row, col);
+                placed = placeShip(modelGrid, viewGrid, placedShip, row, col);
             } while (!placed);
         }
     }
