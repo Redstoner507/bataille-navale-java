@@ -47,7 +47,7 @@ public class GameView extends JPanel {
         _computerGridView.setAttackListener(gameController::handlePlayerAttack, gameController.getSelectedWeapon());
 
         // Logique de placement aléatoire de l'ordinateur
-        placementController.randomShipsPlacement(computerGrid, _computerGridView, configController.getShipConfig(), true);
+        placementController.randomShipsPlacement(computerGrid, _computerGridView, configController.getShipConfig());
         _computerGridView.clearGrid(); // Cache les bateaux
 
         // Ajouter le Panneau de Contrôle du Joueur à gauche
@@ -80,9 +80,7 @@ public class GameView extends JPanel {
 
             // Attacher l'écouteur du Contrôleur pour gérer la sélection
             // Le Contrôleur doit stocker l'arme sélectionnée.
-            button.addActionListener(e -> {
-                gameController.setSelectedWeapon(WeaponType.valueOf(e.getActionCommand()));
-            });
+            button.addActionListener(e -> gameController.setSelectedWeapon(WeaponType.valueOf(e.getActionCommand())));
 
             buttonGroup.add(button);
             panel.add(button);

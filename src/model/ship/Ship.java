@@ -5,7 +5,7 @@ import model.Placeable;
 import model.PlaceableType;
 import model.cell.CellType;
 
-public class Ship extends Placeable {
+public abstract class Ship extends Placeable {
     private int _cellsRemaining;
 
     public Ship(int size, String name) {
