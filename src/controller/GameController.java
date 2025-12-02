@@ -85,7 +85,7 @@ public class GameController {
         AttackResult result = new AttackResult(AttackStatus.ALREADY_VISITED, "");
 
         while (result.getStatus() == AttackStatus.ALREADY_VISITED) {
-            attack = _currentPlayer.play();
+            attack = _currentPlayer.play(result);
             if (_currentPlayer == _player) {
                 attack = new Attack(_currentPlayer, defender, selectedWeapon, row, col);
             }
