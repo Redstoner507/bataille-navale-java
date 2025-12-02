@@ -15,7 +15,6 @@ public class GameController {
     private final ConfigController _configController;
     private final PlacementController _placementController;
     private GameState _gameState;
-    private Player _currentPlayer;
     private Player _player;
     private Player _bot;
     private Weapon _selectedWeapon;
@@ -73,7 +72,6 @@ public class GameController {
         _frame.addScreen(GAME, _gameView);
         _frame.showScreen(GAME);
         this._gameState = GameState.HUMAN_TURN;
-        this._currentPlayer = _player;
         _gameView.setStatus("It's your turn !");
     }
 
