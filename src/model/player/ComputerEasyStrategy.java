@@ -17,13 +17,15 @@ public class ComputerEasyStrategy extends PlayerStrategy {
      */
     @Override
     public Attack getAttack(AttackResult previousAttackResult) {
-        if (previousAttackResult.getStatus() == AttackStatus.HIT) { // If the last attack was a hit, try the same coordinates again
+         // If the previous attack was a hit, add adjacent coordinates to priority list
+        if (previousAttackResult.getStatus() == AttackStatus.HIT && lastAttackCoords != null) {
             addAdjacentCoords(lastAttackCoords[0], lastAttackCoords[1]);
         }
         
-        if (priorityCoords.size() > 0) { // If there are priority coordinates (Adjacent case of a hit), attack them first
+        if (!priorityCoords.isEmpty()) { // If there are priority coordinates (Adjacent case of a hit), attack them first
             int[] coords = priorityCoords.remove(0);
             lastAttackCoords = coords;
+
             Weapon selectedWeapon = new WeaponFactory().createMissile(); // Assuming a default constructor for Weapon
             return new Attack(null, null, selectedWeapon, coords[0], coords[1]);
         }
@@ -31,6 +33,7 @@ public class ComputerEasyStrategy extends PlayerStrategy {
         // If the last attack was a miss, pick new random coordinates
         int[] coords = super.getRandomCoordinates();
         lastAttackCoords = coords;
+
         Weapon selectedWeapon = new WeaponFactory().createMissile(); // Assuming a default constructor for Weapon
         return new Attack(null, null, selectedWeapon, coords[0], coords[1]);
     }
@@ -38,13 +41,24 @@ public class ComputerEasyStrategy extends PlayerStrategy {
     /*
     * Adds adjacent coordinates to the priority list after a hit
      */
-    private void addAdjacentCoords(int row, int col) { 
-        int[][] directions = { { -1, 0 }, { 1, 0 }, { 0, -1 }, { 0, 1 } }; // Up, Down, Left, Right
+    private void addAdjacentCoords(int row, int col) {
+        System.out.println("Adding adjacent coords for: " + row + ", " + col);
+        int[][] directions = { {-1,0}, {1,0}, {0,-1}, {0,1} };
+
         for (int[] dir : directions) {
             int newRow = row + dir[0];
             int newCol = col + dir[1];
+
+            // On reste dans la grille
             if (newRow >= 0 && newRow < 10 && newCol >= 0 && newCol < 10) {
-                priorityCoords.add(new int[] { newRow, newCol });
+
+                // Optionnel : éviter d'ajouter une coordonnée déjà présente
+                boolean alreadyIn = priorityCoords.stream()
+                        .anyMatch(c -> c[0] == newRow && c[1] == newCol);
+
+                if (!alreadyIn) {
+                    priorityCoords.add(new int[] { newRow, newCol });
+                }
             }
         }
     }
