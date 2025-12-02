@@ -6,8 +6,12 @@ public class PlayerStrategyFactory {
         return new HumanStrategy();
     }
 
-    public PlayerStrategy createComputerEasyStrategy() {
+    public PlayerStrategy createComputerVeryEasyStrategy() {
         return new ComputerVeryEasyStrategy();
+    }
+
+    public PlayerStrategy createComputerEasyStrategy() {
+        return new ComputerEasyStrategy();
     }
 
     public PlayerStrategy createComputerMediumStrategy() {
@@ -16,5 +20,9 @@ public class PlayerStrategyFactory {
 
     public PlayerStrategy createComputerHardStrategy() {
         return new ComputerHardStrategy();
+    }
+
+    public PlayerStrategy createComputerVeryHardStrategy() {
+        return new ComputerVeryHardStrategy();
     }
 }

@@ -90,7 +90,7 @@ public class GameController {
         Attack attack = null;
         AttackResult result = new AttackResult(AttackStatus.ALREADY_VISITED, "");
         while (result.getStatus() == AttackStatus.ALREADY_VISITED) {
-            attack = _bot.play();
+            attack = _bot.play(result);
             attack.setAttackingPlayer(_bot);
             attack.setTargetPlayer(_player);
             result = _player.receiveAttack(attack);

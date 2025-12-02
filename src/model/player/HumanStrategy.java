@@ -1,10 +1,11 @@
 package model.player;
 
 import model.Attack;
+import model.AttackResult;
 
-public class HumanStrategy implements PlayerStrategy {
+public class HumanStrategy extends PlayerStrategy {
     @Override
-    public Attack getAttack() {
+    public Attack getAttack(AttackResult previousAttackResult) {
         return null;
     }
 }
