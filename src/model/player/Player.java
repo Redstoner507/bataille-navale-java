@@ -4,17 +4,20 @@ import model.*;
 import model.ship.Ship;
 import model.trap.Trap;
 import model.trap.TrapType;
+import view.GridView;
 
 import java.util.ArrayList;
 
 public class Player {
     private final String _name;
     private final Grid _grid;
+    private final GridView _gridView;
     private ArrayList<Placeable> _inventory;
     private PlayerStrategy _strategy;
 
-    public Player(int gridSize, String playerName) {
+    public Player(int gridSize, int cellSize, String playerName) {
         _grid = new Grid(gridSize);
+        _gridView = new GridView(gridSize, cellSize);
         _name = playerName;
     }
 
@@ -75,6 +78,10 @@ public class Player {
 
     public Grid getGrid() {
         return _grid;
+    }
+
+    public GridView getGridView() {
+        return _gridView;
     }
 
     public String getName() {

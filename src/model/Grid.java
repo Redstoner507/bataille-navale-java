@@ -112,6 +112,9 @@ public class Grid {
             ship.hit();
 
             if (ship.isSunk()) {
+                for (Point p : ship.getCoordinates()) {
+                    attack.getTargetPlayer().getGridView().updateCellDisplay(p.x, p.y, AttackStatus.SUNK);
+                }
                 return new AttackResult(AttackStatus.SUNK, "Hit ! The " + ship.getName() + " was sunk !", ship);
             } else {
                 return new AttackResult(AttackStatus.HIT, "Hit !", ship);

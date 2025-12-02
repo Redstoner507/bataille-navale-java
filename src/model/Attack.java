@@ -10,6 +10,7 @@ import java.awt.Point;
  */
 public class Attack {
     private final Player _attackingPlayer; // Le joueur qui lance l'attaque
+    private final Player _targetPlayer;    // Le joueur qui reçoit l'attaque
     private final Weapon _weapon;          // L'arme utilisée (Missile, Bombe, Sonar)
     // Coordonnées initiales (ce que le joueur a cliqué)
     private final int _targetRow;
@@ -17,8 +18,9 @@ public class Attack {
     // Coordonnées réelles après modification par des pièges (si applicables)
     private Point _realCoordinates;
 
-    public Attack(Player attackingPlayer, Weapon weapon, int targetRow, int targetCol) {
+    public Attack(Player attackingPlayer, Player targetPlayer, Weapon weapon, int targetRow, int targetCol) {
         this._attackingPlayer = attackingPlayer;
+        this._targetPlayer = targetPlayer;
         this._weapon = weapon;
         this._targetRow = targetRow;
         this._targetCol = targetCol;
@@ -27,6 +29,10 @@ public class Attack {
 
     public Player getAttackingPlayer() {
         return _attackingPlayer;
+    }
+
+    public Player getTargetPlayer() {
+        return _targetPlayer;
     }
 
     public Weapon getWeapon() {

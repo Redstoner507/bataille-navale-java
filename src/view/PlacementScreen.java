@@ -44,7 +44,7 @@ public class PlacementScreen extends JPanel {
         add(layeredPane, BorderLayout.CENTER);
 
         // Grille joueur
-        LabeledGridView playerGrid = new LabeledGridView("Place your ships in the grid", gridSize, cellSize, false);
+        LabeledGridView playerGrid = new LabeledGridView("Place your ships in the grid", gameController.getPlayerGridView(), false);
         playerGrid.setOpaque(true);
         playerGrid.setBounds(SHIP_PANEL_WIDTH, 0, width - SHIP_PANEL_WIDTH, height);
         layeredPane.add(playerGrid, JLayeredPane.DEFAULT_LAYER);
@@ -94,7 +94,6 @@ public class PlacementScreen extends JPanel {
         
         startGameButton.addActionListener(e -> {
             if (_shipPanel.getComponentCount() == 0) {
-                gameController.setPlayerGridView(playerGrid);
                 gameController.showGameScreen();
             }
         });

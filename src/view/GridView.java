@@ -4,6 +4,7 @@ import controller.AttackListener;
 import controller.ShipPlacementListener;
 import model.AttackStatus;
 import model.cell.CellState;
+import model.weapon.Weapon;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -18,6 +19,7 @@ public class GridView extends JPanel {
     private boolean _locked = false;    // Etat verrouillé
     private ShipPlacementListener _placementListener;
     private AttackListener _attackListener;
+    private Weapon _selectedWeapon;
 
     public GridView(int gridSize, int cellSize) {
         this._gridSize = gridSize;
@@ -79,7 +81,7 @@ public class GridView extends JPanel {
                 // 1. Vérifier si la grille n'est pas verrouillée et si la case est cliquable (focus/enabled)
                 if (!_locked && cell.isFocusable() && e.getButton() == MouseEvent.BUTTON1) {
                     // 2. Appeler la méthode de la GridView pour informer le Contrôleur
-                      notifyCellAttacked(cellRow, cellCol);
+                      notifyCellAttacked(cellRow, cellCol, _selectedWeapon);
                 }
             }
         });
@@ -175,13 +177,14 @@ public class GridView extends JPanel {
         return false;
     }
 
-    public void setAttackListener(AttackListener listener) {
+    public void setAttackListener(AttackListener listener, Weapon selectedWeapon) {
         this._attackListener = listener;
+        this._selectedWeapon = selectedWeapon;
     }
 
-    public void notifyCellAttacked(int row, int col) {
+    public void notifyCellAttacked(int row, int col, Weapon selectedWeapon) {
         if (_attackListener != null) {
-            _attackListener.onCellAttacked(row, col);
+            _attackListener.onCellAttacked(row, col, selectedWeapon);
         }
     }
 
