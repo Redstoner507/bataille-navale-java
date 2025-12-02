@@ -1,5 +1,7 @@
 package model.player;
 
+import model.Attack;
+
 public interface PlayerStrategy {
-    void playTurn();
+    Attack getAttack();
 }

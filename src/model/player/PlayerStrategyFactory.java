@@ -7,7 +7,7 @@ public class PlayerStrategyFactory {
     }
 
     public PlayerStrategy createComputerEasyStrategy() {
-        return new ComputerEasyStrategy();
+        return new ComputerVeryEasyStrategy();
     }
 
     public PlayerStrategy createComputerMediumStrategy() {

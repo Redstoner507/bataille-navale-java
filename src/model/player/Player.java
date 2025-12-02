@@ -27,7 +27,7 @@ public class Player {
 
     public void play() {
         if (_strategy != null) {
-            _strategy.playTurn();
+            _strategy.getAttack();
         }
     }
 
