@@ -103,6 +103,9 @@ public class GridView extends JPanel {
 
         // La cellule n'est plus cliquable après avoir été attaquée.
         cell.setFocusable(false);
+        for (MouseListener listener : cell.getMouseListeners()) {
+            cell.removeMouseListener(listener);
+        }
 
         switch (status) {
             case HIT:

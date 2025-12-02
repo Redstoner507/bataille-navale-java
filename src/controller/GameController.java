@@ -81,16 +81,22 @@ public class GameController {
         if (_gameState != GameState.HUMAN_TURN && _gameState != GameState.COMPUTER_TURN) return;
         Player defender = _currentPlayer == _player ? _bot : _player;
 
-        Attack attack = _currentPlayer.play();
-        if (_currentPlayer == _player) {
-            attack = new Attack(_currentPlayer, defender, selectedWeapon, row, col);
-        }
-        else {
-            attack.setAttackingPlayer(_currentPlayer);
-            attack.setTargetPlayer(defender);
+        Attack attack = null;
+        AttackResult result = new AttackResult(AttackStatus.ALREADY_VISITED, "");
+
+        while (result.getStatus() == AttackStatus.ALREADY_VISITED) {
+            attack = _currentPlayer.play();
+            if (_currentPlayer == _player) {
+                attack = new Attack(_currentPlayer, defender, selectedWeapon, row, col);
+            }
+            else {
+                attack.setAttackingPlayer(_currentPlayer);
+                attack.setTargetPlayer(defender);
+            }
+            result = defender.receiveAttack(attack);
         }
 
-        AttackResult result = defender.receiveAttack(attack);
+        if (attack == null) return;
 
         updateGameView(result, attack.getTargetPlayer().getGridView(), attack.getRealRow(), attack.getRealCol()); // Afficher le résultat du coup
 

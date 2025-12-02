@@ -87,7 +87,9 @@ public class Grid {
 
         Cell targetCell = _cells[row][col];
 
-        if (targetCell.getState() == CellState.HIT) {
+        if (targetCell.getState() != CellState.WATER
+                && targetCell.getState() != CellState.ISLAND
+                && targetCell.getState() != CellState.SHIP) {
             return new AttackResult(AttackStatus.ALREADY_VISITED, "Already hit.");
         }
 
@@ -104,6 +106,7 @@ public class Grid {
         // Traitement de l'élément touché
         if (element == null) {
             // Case vide / eau
+            targetCell.setState(CellState.MISS);
             return new AttackResult(AttackStatus.MISS, "You missed !");
 
         } else if (element.getPlaceableType() == PlaceableType.SHIP) {
@@ -115,8 +118,10 @@ public class Grid {
                 for (Point p : ship.getCoordinates()) {
                     attack.getTargetPlayer().getGridView().updateCellDisplay(p.x, p.y, AttackStatus.SUNK);
                 }
+                targetCell.setState(CellState.SUNK);
                 return new AttackResult(AttackStatus.SUNK, "Hit ! The " + ship.getName() + " was sunk !", ship);
             } else {
+                targetCell.setState(CellState.HIT);
                 return new AttackResult(AttackStatus.HIT, "Hit !", ship);
             }
 
@@ -125,15 +130,18 @@ public class Grid {
             Trap trap = (Trap) element;
             targetCell.removeObject();
             trap.activate(attack.getAttackingPlayer().getGrid(), row, col);
+            targetCell.setState(CellState.HIT);
             return new AttackResult(AttackStatus.TRAP_ACTIVATED, "A trap was triggered !", trap);
 
         } else if (element.getPlaceableType() == PlaceableType.WEAPON) {
             // Récupérer l'arme
             targetCell.removeObject();
             attack.getAttackingPlayer().addObjectToInventory(element);
+            targetCell.setState(CellState.ISLAND_HIT);
             return new AttackResult(AttackStatus.ITEM_FOUND, "You found an item : " + element.getName(), element);
 
         } else {
+            targetCell.setState(CellState.MISS);
             return new AttackResult(AttackStatus.MISS, "Shot without effect.");
         }
     }
