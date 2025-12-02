@@ -44,7 +44,7 @@ public class GameView extends JPanel {
         // Grille de l'ordinateur (Attaque)
         LabeledGridView computerLabeledGridView = new LabeledGridView("Enemy ships", computerGridView, false);
         _computerGridView = computerLabeledGridView.getGridView();
-        _computerGridView.setAttackListener(gameController::handlePlayerAttack, gameController.getSelectedWeapon());
+        _computerGridView.setAttackListener(gameController::handleHumanAttack, gameController.getSelectedWeapon());
 
         // Logique de placement aléatoire de l'ordinateur
         placementController.randomShipsPlacement(computerGrid, _computerGridView, configController.getShipConfig());

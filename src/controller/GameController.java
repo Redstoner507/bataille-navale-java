@@ -15,7 +15,6 @@ public class GameController {
     private final ConfigController _configController;
     private final PlacementController _placementController;
     private GameState _gameState;
-    private Player _currentPlayer;
     private Player _player;
     private Player _bot;
     private Weapon _selectedWeapon;
@@ -73,32 +72,40 @@ public class GameController {
         _frame.addScreen(GAME, _gameView);
         _frame.showScreen(GAME);
         this._gameState = GameState.HUMAN_TURN;
-        this._currentPlayer = _player;
         _gameView.setStatus("It's your turn !");
     }
 
-    public void handlePlayerAttack(int row, int col, Weapon selectedWeapon) {
-        if (_gameState != GameState.HUMAN_TURN && _gameState != GameState.COMPUTER_TURN) return;
-        Player defender = _currentPlayer == _player ? _bot : _player;
+    public void handleHumanAttack(int row, int col, Weapon selectedWeapon) {
+        if (_gameState != GameState.HUMAN_TURN) return;
+
+        Attack attack = new Attack(_player, _bot, selectedWeapon, row, col);
+        AttackResult result = _bot.receiveAttack(attack);
+
+        endTurn(result, attack);
+    }
+
+    public void handleComputerAttack() {
+        if (_gameState != GameState.COMPUTER_TURN) return;
 
         Attack attack = null;
         AttackResult result = new AttackResult(AttackStatus.ALREADY_VISITED, "");
-
         while (result.getStatus() == AttackStatus.ALREADY_VISITED) {
-            attack = _currentPlayer.play(result);
-            if (_currentPlayer == _player) {
-                attack = new Attack(_currentPlayer, defender, selectedWeapon, row, col);
-            }
-            else {
-                attack.setAttackingPlayer(_currentPlayer);
-                attack.setTargetPlayer(defender);
-            }
-            result = defender.receiveAttack(attack);
+            attack = _bot.play(result);
+            attack.setAttackingPlayer(_bot);
+            attack.setTargetPlayer(_player);
+            result = _player.receiveAttack(attack);
         }
 
         if (attack == null) return;
 
-        updateGameView(result, attack.getTargetPlayer().getGridView(), attack.getRealRow(), attack.getRealCol()); // Afficher le résultat du coup
+        endTurn(result, attack);
+    }
+
+    public void endTurn(AttackResult result, Attack attack) {
+        // Afficher le résultat du coup
+        String playerName = attack.getAttackingPlayer().getName();
+        GridView playerGridView = attack.getTargetPlayer().getGridView();
+        updateGameView(result, playerName, playerGridView, attack.getRealRow(), attack.getRealCol());
 
         if (checkGameOver()) {
             _gameView.setStatus("Game Over !");
@@ -107,29 +114,28 @@ public class GameController {
         changeTurn();
     }
 
-    private void updateGameView(AttackResult result, GridView targetGridView, int row, int col) {
+    private void updateGameView(AttackResult result, String playerName, GridView targetGridView, int row, int col) {
         // 1. Mettre à jour la grille visuelle
         targetGridView.updateCellDisplay(row, col, result.getStatus());
 
         // Mettre à jour le statut
-        _gameView.setStatus(_currentPlayer.getName() + " shot at coordinates " + (char)('A' + col) + (row + 1) + ". Result : " + result.getMessage());
+        _gameView.setStatus(playerName + " shot at coordinates " + (char)('A' + col) + (row + 1) + ". Result : " + result.getMessage());
 
         // Mettre à jour les statistiques (E3)
     }
 
     private void changeTurn() {
-        if (_currentPlayer == _player) {
+        if (_gameState == GameState.HUMAN_TURN) {
             // Passer à l'ordinateur
-            _currentPlayer = _bot;
             _gameState = GameState.COMPUTER_TURN;
             _gameView.getComputerGridView().setLocked(true); // Verrouiller la grille d'attaque
 
             // Simuler le tour de l'ordinateur après un petit délai
             //_gameView.setStatus(_bot.getName() + "'s turn...");
-            handlePlayerAttack(-1, -1, null);
-        } else {
+            handleComputerAttack();
+        }
+        else if (_gameState == GameState.COMPUTER_TURN) {
             // Repasser à l'humain
-            _currentPlayer = _player;
             _gameState = GameState.HUMAN_TURN;
             _gameView.getComputerGridView().setLocked(false);
             _turnNumber++;
