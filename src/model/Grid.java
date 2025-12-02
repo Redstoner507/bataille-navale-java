@@ -5,6 +5,8 @@ import model.cell.CellState;
 import model.cell.WaterCell;
 import model.ship.Ship;
 import model.trap.Trap;
+import model.weapon.Weapon;
+import view.GridView;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -71,78 +73,38 @@ public class Grid {
 
     /**
      * Applies the attack to the grid.
-     * @param attack The Attack object that contains the element and the target.
-     * @return AttackResult The result of the attack.
+     * @param attack The Attack context
+     * @param result The AttackResult
      */
-    public AttackResult applyAttack(Attack attack) {
-        // Pour l'attaque de base (Missile), nous utilisons les coordonnées réelles
-        // (qui sont les mêmes que les coordonnées ciblées, sauf si la Tornade les a modifiées).
+    public void applyAttack(Attack attack, AttackResult result) {
         int row = attack.getRealRow();
         int col = attack.getRealCol();
 
-        // Vérification de la validité de la cible (hors limites ou déjà touchée)
-        if (row < 0 || row >= _size || col < 0 || col >= _size) {
-            return new AttackResult(AttackStatus.MISS, "Shot beyond the limits !");
-        }
-
         Cell targetCell = _cells[row][col];
 
-        if (targetCell.getState() != CellState.WATER
-                && targetCell.getState() != CellState.ISLAND
-                && targetCell.getState() != CellState.SHIP) {
-            return new AttackResult(AttackStatus.ALREADY_VISITED, "Already hit.");
-        }
-
-        // Si c'est un Sonar, la logique serait différente (ne fait pas targetCell.hit())
-        if (attack.getWeapon().getName().equals("Sonar")) {
-            // Logique du Sonar : compter les bateaux dans la zone 3x3 et retourner SONAR_RESULT
-            return new AttackResult(AttackStatus.SONAR_RESULT, "Sonar scan completed.");
-        }
-
-        // Marquer la case comme touchée
-        targetCell.hit();
-        Placeable element = targetCell.getObject(); // Element sur la case (Ship, Trap, null)
-
-        // Traitement de l'élément touché
-        if (element == null) {
-            // Case vide / eau
-            targetCell.setState(CellState.MISS);
-            return new AttackResult(AttackStatus.MISS, "You missed !");
-
-        } else if (element.getPlaceableType() == PlaceableType.SHIP) {
-            // Bateau touché
-            Ship ship = (Ship) element;
-            ship.hit();
-
-            if (ship.isSunk()) {
-                for (Point p : ship.getCoordinates()) {
-                    attack.getTargetPlayer().getGridView().updateCellDisplay(p.x, p.y, AttackStatus.SUNK);
-                }
+        switch (result.getStatus()) {
+            case MISS -> targetCell.setState(CellState.MISS);
+            case HIT -> targetCell.setState(CellState.HIT);
+            case SUNK -> {
                 targetCell.setState(CellState.SUNK);
-                return new AttackResult(AttackStatus.SUNK, "Hit ! The " + ship.getName() + " was sunk !", ship);
-            } else {
-                targetCell.setState(CellState.HIT);
-                return new AttackResult(AttackStatus.HIT, "Hit !", ship);
+                Ship ship = (Ship) result.getElementHit();
+                GridView playerGridView = attack.getTargetPlayer().getGridView();
+                for (Point p : ship.getCoordinates()) {
+                    playerGridView.updateCellDisplay(p.x, p.y, AttackStatus.SUNK);
+                }
             }
-
-        } else if (element.getPlaceableType() == PlaceableType.TRAP) {
-            // On active le piège
-            Trap trap = (Trap) element;
-            targetCell.removeObject();
-            trap.activate(attack.getAttackingPlayer().getGrid(), row, col);
-            targetCell.setState(CellState.HIT);
-            return new AttackResult(AttackStatus.TRAP_ACTIVATED, "A trap was triggered !", trap);
-
-        } else if (element.getPlaceableType() == PlaceableType.WEAPON) {
-            // Récupérer l'arme
-            targetCell.removeObject();
-            attack.getAttackingPlayer().addObjectToInventory(element);
-            targetCell.setState(CellState.ISLAND_HIT);
-            return new AttackResult(AttackStatus.ITEM_FOUND, "You found an item : " + element.getName(), element);
-
-        } else {
-            targetCell.setState(CellState.MISS);
-            return new AttackResult(AttackStatus.MISS, "Shot without effect.");
+            case TRAP_ACTIVATED -> {
+                targetCell.setState(CellState.MISS);
+                Trap trap = (Trap) result.getElementHit();
+                targetCell.removeObject();
+                trap.activate(attack.getAttackingPlayer().getGrid(), row, col);
+            }
+            case ITEM_FOUND -> {
+                targetCell.setState(CellState.MISS);
+                Placeable object = result.getElementHit();
+                targetCell.removeObject();
+                attack.getAttackingPlayer().addObjectToInventory(object);
+            }
         }
     }
 
@@ -152,6 +114,12 @@ public class Grid {
 
     public ArrayList<Ship> getShips() {
         return _ships;
+    }
+
+    public Cell getCell(int row, int col) {
+        // Vérification de la validité de la cible (hors limites ou déjà touchée)
+        if (row < 0 || row >= _size || col < 0 || col >= _size) return null;
+        return _cells[row][col];
     }
 
     public void clearGrid() {

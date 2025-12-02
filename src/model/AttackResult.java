@@ -10,7 +10,7 @@ public class AttackResult {
     private String _message;             // Message à afficher à l'utilisateur
 
     // Informations optionnelles basées sur le statut
-    private final Placeable _elementHit; // Bateau ou Piège touché/coulé/activé
+    private Placeable _elementHit; // Bateau ou Piège touché/coulé/activé
     private Placeable _gainedItem;       // Arme/Piège trouvé (si mode Île)
     private Integer _sonarCount;         // Résultat du Sonar (nombre d'éléments trouvés dans la zone)
 
@@ -42,6 +42,10 @@ public class AttackResult {
 
     public void setMessage(String message) {
         this._message = message;
+    }
+
+    public void setElementHit(Placeable elementHit) {
+        this._elementHit = elementHit;
     }
 
     public Placeable getElementHit() {

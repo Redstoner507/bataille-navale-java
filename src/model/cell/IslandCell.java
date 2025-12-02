@@ -6,8 +6,4 @@ public class IslandCell extends Cell {
     public IslandCell() {
         super(CellType.ISLAND);
     }
-
-    public void hit() {
-        
-    }
 }

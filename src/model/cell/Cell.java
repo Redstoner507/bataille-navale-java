@@ -1,11 +1,14 @@
 package model.cell;
 
+import model.AttackResult;
+import model.AttackStatus;
 import model.Placeable;
 
 public abstract class Cell {
     private final CellType _type;
     private CellState _state;
     private Placeable _object;
+    private boolean _isHit = false;
     
     public Cell(CellType type) {
         this._type = type;
@@ -36,5 +39,16 @@ public abstract class Cell {
         this._state = state;
     }
 
-    public abstract void hit();
+    public AttackResult hit() {
+        if (_isHit) {
+            return new AttackResult(AttackStatus.ALREADY_VISITED, "This cell is already visited");
+        }
+        _isHit = true;
+        if (_object == null) {
+            return new AttackResult(AttackStatus.MISS, "You missed !");
+        }
+        AttackResult result = _object.hit();
+        result.setElementHit(_object);
+        return result;
+    }
 }

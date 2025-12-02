@@ -1,9 +1,6 @@
 package model.weapon;
 
-import model.Grid;
-import model.Orientation;
-import model.Placeable;
-import model.PlaceableType;
+import model.*;
 import model.cell.CellType;
 
 public abstract class Weapon extends Placeable {
@@ -14,9 +11,14 @@ public abstract class Weapon extends Placeable {
         _weaponType = type;
     }
 
-    public abstract void apply(Grid grid, int row, int col);
+    public abstract AttackResult applyAttack(Grid grid, Attack attack);
 
     public WeaponType getWeaponType() {
         return _weaponType;
+    }
+
+    @Override
+    public AttackResult hit() {
+        return new AttackResult(AttackStatus.ITEM_FOUND, "You found a " + getName() + " !");
     }
 }

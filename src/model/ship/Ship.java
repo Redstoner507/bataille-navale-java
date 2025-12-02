@@ -1,8 +1,6 @@
 package model.ship;
 
-import model.Orientation;
-import model.Placeable;
-import model.PlaceableType;
+import model.*;
 import model.cell.CellType;
 
 public abstract class Ship extends Placeable {
@@ -28,9 +26,14 @@ public abstract class Ship extends Placeable {
         return _cellsRemaining <= 0;
     }
 
-    public void hit() {
+    @Override
+    public AttackResult hit() {
+        _cellsRemaining--;
         if (_cellsRemaining > 0) {
-            _cellsRemaining--;
+            return new AttackResult(AttackStatus.HIT, "You hit a ship !");
+        }
+        else {
+            return new AttackResult(AttackStatus.SUNK, "You sunk a " + getName() + " !");
         }
     }
 }
