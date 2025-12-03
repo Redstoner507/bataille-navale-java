@@ -20,7 +20,7 @@ public abstract class PlayerStrategy {
         }
     }   
 
-    public abstract Attack getAttack(AttackResult previousAttackResult);
+    public abstract Attack getAttack(ArrayList<AttackResult> previousAttackResults);
 
     protected int[] getRandomCoordinates() {
         if (coords.isEmpty()) {

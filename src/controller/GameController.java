@@ -21,6 +21,7 @@ public class GameController {
     private Player _player;
     private Player _bot;
     private Weapon _selectedWeapon;
+    private ArrayList<AttackResult> _previousBotResults = new ArrayList<>();
     private int _turnNumber = 0;
     //Vues
     private final MainFrame _frame;
@@ -91,19 +92,18 @@ public class GameController {
         if (_gameState != GameState.COMPUTER_TURN) return;
 
         Attack attack = null;
-        ArrayList<AttackResult> results = new ArrayList<>();
         AttackResult baseResult = new AttackResult(AttackStatus.ALREADY_VISITED, "");
         while (baseResult.getStatus() == AttackStatus.ALREADY_VISITED) {
-            attack = _bot.play(baseResult);
+            attack = _bot.play(_previousBotResults);
             attack.setAttackingPlayer(_bot);
             attack.setTargetPlayer(_player);
-            results.addAll(_player.receiveAttack(attack));
-            baseResult = results.getFirst();
+            _previousBotResults = _player.receiveAttack(attack);
+            baseResult = _previousBotResults.getFirst();
         }
 
         if (attack == null) return;
 
-        endTurn(results, attack);
+        endTurn(_previousBotResults, attack);
     }
 
     public void endTurn(ArrayList<AttackResult> results, Attack attack) {

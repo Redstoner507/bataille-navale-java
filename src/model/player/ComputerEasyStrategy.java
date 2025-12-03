@@ -1,5 +1,6 @@
 package model.player;
 
+import java.awt.*;
 import java.util.ArrayList;
 
 import model.Attack;
@@ -9,22 +10,23 @@ import model.weapon.Weapon;
 import model.weapon.WeaponFactory;
 
 public class ComputerEasyStrategy extends PlayerStrategy {
-    private final ArrayList<int[]> priorityCoords = new ArrayList<>();
-    private int[] lastAttackCoords = null;
-    
+    private final ArrayList<int[]> _priorityCoords = new ArrayList<>();
+
     /*
     * Generates the next attack based on easy computer strategy
      */
     @Override
-    public Attack getAttack(AttackResult previousAttackResult) {
-         // If the previous attack was a hit, add adjacent coordinates to priority list
-        if (previousAttackResult.getStatus() == AttackStatus.HIT && lastAttackCoords != null) {
-            addAdjacentCoords(lastAttackCoords[0], lastAttackCoords[1]);
+    public Attack getAttack(ArrayList<AttackResult> previousAttackResults) {
+        for (AttackResult previousResult : previousAttackResults) {
+            // If the previous attack was a hit, add adjacent coordinates to priority list
+            if (previousResult.getStatus() == AttackStatus.HIT) {
+                Point hitCoordinates = previousResult.getHitCoordinates();
+                addAdjacentCoords(hitCoordinates.x, hitCoordinates.y);
+            }
         }
-        
-        if (!priorityCoords.isEmpty()) { // If there are priority coordinates (Adjacent case of a hit), attack them first
-            int[] coords = priorityCoords.removeFirst();
-            lastAttackCoords = coords;
+
+        if (!_priorityCoords.isEmpty()) { // If there are priority coordinates (Adjacent case of a hit), attack them first
+            int[] coords = _priorityCoords.removeFirst();
 
             Weapon selectedWeapon = new WeaponFactory().createMissile(); // Assuming a default constructor for Weapon
             return new Attack(null, null, selectedWeapon, coords[0], coords[1]);
@@ -32,7 +34,6 @@ public class ComputerEasyStrategy extends PlayerStrategy {
 
         // If the last attack was a miss, pick new random coordinates
         int[] coords = super.getRandomCoordinates();
-        lastAttackCoords = coords;
 
         Weapon selectedWeapon = new WeaponFactory().createMissile(); // Assuming a default constructor for Weapon
         return new Attack(null, null, selectedWeapon, coords[0], coords[1]);
@@ -42,7 +43,6 @@ public class ComputerEasyStrategy extends PlayerStrategy {
     * Adds adjacent coordinates to the priority list after a hit
      */
     private void addAdjacentCoords(int row, int col) {
-        System.out.println("Adding adjacent coords for: " + row + ", " + col);
         int[][] directions = { {-1,0}, {1,0}, {0,-1}, {0,1} };
 
         for (int[] dir : directions) {
@@ -53,11 +53,11 @@ public class ComputerEasyStrategy extends PlayerStrategy {
             if (newRow >= 0 && newRow < 10 && newCol >= 0 && newCol < 10) {
 
                 // Optionnel : éviter d'ajouter une coordonnée déjà présente
-                boolean alreadyIn = priorityCoords.stream()
+                boolean alreadyIn = _priorityCoords.stream()
                         .anyMatch(c -> c[0] == newRow && c[1] == newCol);
 
                 if (!alreadyIn) {
-                    priorityCoords.add(new int[] { newRow, newCol });
+                    _priorityCoords.add(new int[] { newRow, newCol });
                 }
             }
         }

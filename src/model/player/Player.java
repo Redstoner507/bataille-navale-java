@@ -26,9 +26,9 @@ public class Player {
         this._strategy = strategy;
     }
 
-    public Attack play(AttackResult attackResult) {
+    public Attack play(ArrayList<AttackResult> attackResults) {
         if (_strategy == null) return null;
-        return _strategy.getAttack(attackResult);
+        return _strategy.getAttack(attackResults);
     }
 
     /**
