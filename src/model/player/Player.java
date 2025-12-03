@@ -2,8 +2,6 @@ package model.player;
 
 import model.*;
 import model.ship.Ship;
-import model.trap.Trap;
-import model.trap.TrapType;
 import model.weapon.Weapon;
 import view.GridView;
 

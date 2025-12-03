@@ -3,7 +3,6 @@ package view;
 import controller.AttackListener;
 import controller.ShipPlacementListener;
 import model.AttackResult;
-import model.AttackStatus;
 import model.cell.CellState;
 
 import javax.swing.*;
@@ -89,9 +88,7 @@ public class GridView extends JPanel {
 
     /**
      * Updates the appearance of a cell according to the result of an attack.
-     * @param row Line of the cell to update.
-     * @param col Column of the cell to update.
-     * @param status The status of the attack (HIT, MISS, SUNK, etc...).
+     * @param result The result of the attack, contains the status, and the coordinates of the cell affected by the attack.
      */
     public void updateCellDisplay(AttackResult result) {
         Point hitCoordinates = result.getHitCoordinates();

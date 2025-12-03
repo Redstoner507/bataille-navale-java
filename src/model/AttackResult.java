@@ -1,7 +1,5 @@
 package model;
 
-import model.cell.Cell;
-
 import java.awt.*;
 
 /**
