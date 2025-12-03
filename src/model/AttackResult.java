@@ -1,31 +1,35 @@
 package model;
 
+import model.cell.Cell;
+
+import java.awt.*;
+
 /**
  * Représents the result of an attack after being applied to the grid.
  * It is used to communicate the status (Hit, Sunk, Miss, etc...) to the Controller/View.
  */
 public class AttackResult {
 
-    private final AttackStatus _status;  // Le résultat principal du coup
-    private String _message;             // Message à afficher à l'utilisateur
+    private final AttackStatus _status; // Le résultat principal du coup
+    private String _message;            // Message à afficher à l'utilisateur
 
-    // Informations optionnelles basées sur le statut
-    private Placeable _elementHit; // Bateau ou Piège touché/coulé/activé
-    private Placeable _gainedItem;       // Arme/Piège trouvé (si mode Île)
-    private Integer _sonarCount;         // Résultat du Sonar (nombre d'éléments trouvés dans la zone)
-
-    public AttackResult(AttackStatus status, String message, Placeable elementHit) {
-        this._status = status;
-        this._message = message;
-        this._elementHit = elementHit;
-    }
+    // Informations
+    private int _rowHit;                // La ligne touchée
+    private int _colHit;                // La colonne touchée
+    private Integer _sonarCount;        // Résultat du Sonar (nombre d'éléments trouvés dans la zone)
 
     public AttackResult(AttackStatus status, String message) {
-        this(status, message, null);
+        this._status = status;
+        this._message = message;
     }
 
-    public void setGainedItem(Placeable item) {
-        this._gainedItem = item;
+    public Point getHitCoordinates() {
+        return new Point(_rowHit, _colHit);
+    }
+
+    public void setHitCoordinates(int row, int col) {
+        _rowHit = row;
+        _colHit = col;
     }
 
     public void setSonarCount(int count) {
@@ -42,18 +46,6 @@ public class AttackResult {
 
     public void setMessage(String message) {
         this._message = message;
-    }
-
-    public void setElementHit(Placeable elementHit) {
-        this._elementHit = elementHit;
-    }
-
-    public Placeable getElementHit() {
-        return _elementHit;
-    }
-
-    public Placeable getGainedItem() {
-        return _gainedItem;
     }
 
     public Integer getSonarCount() {

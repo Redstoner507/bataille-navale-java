@@ -3,6 +3,8 @@ package model.weapon;
 import model.*;
 import model.cell.CellType;
 
+import java.util.ArrayList;
+
 public abstract class Weapon extends Placeable {
     private final WeaponType _weaponType;
 
@@ -11,7 +13,7 @@ public abstract class Weapon extends Placeable {
         _weaponType = type;
     }
 
-    public abstract AttackResult applyAttack(Grid grid, Attack attack);
+    public abstract ArrayList<AttackResult> applyAttack(Grid grid, Attack attack);
 
     public WeaponType getWeaponType() {
         return _weaponType;

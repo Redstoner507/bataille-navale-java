@@ -39,6 +39,10 @@ public abstract class Cell {
         this._state = state;
     }
 
+    public boolean isHit() {
+        return _isHit;
+    }
+
     public AttackResult hit() {
         if (_isHit) {
             return new AttackResult(AttackStatus.ALREADY_VISITED, "This cell is already visited");
@@ -47,8 +51,6 @@ public abstract class Cell {
         if (_object == null) {
             return new AttackResult(AttackStatus.MISS, "You missed !");
         }
-        AttackResult result = _object.hit();
-        result.setElementHit(_object);
-        return result;
+        return _object.hit();
     }
 }

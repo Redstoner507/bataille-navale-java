@@ -4,7 +4,6 @@ import controller.AttackListener;
 import controller.ShipPlacementListener;
 import model.AttackStatus;
 import model.cell.CellState;
-import model.weapon.Weapon;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -19,7 +18,6 @@ public class GridView extends JPanel {
     private boolean _locked = false;    // Etat verrouillé
     private ShipPlacementListener _placementListener;
     private AttackListener _attackListener;
-    private Weapon _selectedWeapon;
 
     public GridView(int gridSize, int cellSize) {
         this._gridSize = gridSize;
@@ -81,7 +79,7 @@ public class GridView extends JPanel {
                 // 1. Vérifier si la grille n'est pas verrouillée et si la case est cliquable (focus/enabled)
                 if (!_locked && cell.isFocusable() && e.getButton() == MouseEvent.BUTTON1) {
                     // 2. Appeler la méthode de la GridView pour informer le Contrôleur
-                      notifyCellAttacked(cellRow, cellCol, _selectedWeapon);
+                      notifyCellAttacked(cellRow, cellCol);
                 }
             }
         });
@@ -109,7 +107,7 @@ public class GridView extends JPanel {
 
         switch (status) {
             case HIT:
-                cell.setCellIcon(CellState.HIT);
+                if (cell.getCellState() != CellState.SUNK) cell.setCellIcon(CellState.HIT);
                 break;
 
             case SUNK:
@@ -180,14 +178,13 @@ public class GridView extends JPanel {
         return false;
     }
 
-    public void setAttackListener(AttackListener listener, Weapon selectedWeapon) {
+    public void setAttackListener(AttackListener listener) {
         this._attackListener = listener;
-        this._selectedWeapon = selectedWeapon;
     }
 
-    public void notifyCellAttacked(int row, int col, Weapon selectedWeapon) {
+    public void notifyCellAttacked(int row, int col) {
         if (_attackListener != null) {
-            _attackListener.onCellAttacked(row, col, selectedWeapon);
+            _attackListener.onCellAttacked(row, col);
         }
     }
 

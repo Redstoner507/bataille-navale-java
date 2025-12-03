@@ -27,6 +27,7 @@ public class CellView extends JLabel {
     private Image _currentImage = IMG_WATER;
     private boolean _isClickable = true;
     private final Point _cellPosition;
+    private CellState _cellState;
 
     public CellView(Point cellPosition, int cellSize) {
         _cellPosition = cellPosition;
@@ -47,6 +48,7 @@ public class CellView extends JLabel {
             case ISLAND_HIT -> _currentImage = IMG_ISLAND_HIT;
             default -> _currentImage = IMG_WATER;
         }
+        _cellState = state;
         revalidate();
         repaint();
     }
@@ -73,6 +75,10 @@ public class CellView extends JLabel {
     public void addMouseListener(MouseListener l) {
         if (_isClickable)
             super.addMouseListener(l);
+    }
+
+    public CellState getCellState() {
+        return _cellState;
     }
 
     public void setClickable(boolean clickable) {

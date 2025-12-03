@@ -8,6 +8,9 @@ import model.weapon.WeaponFactory;
 import model.weapon.WeaponType;
 import view.*;
 
+import java.awt.*;
+import java.util.ArrayList;
+
 
 public class GameController {
     //Variables
@@ -75,37 +78,42 @@ public class GameController {
         _gameView.setStatus("It's your turn !");
     }
 
-    public void handleHumanAttack(int row, int col, Weapon selectedWeapon) {
+    public void handleHumanAttack(int row, int col) {
         if (_gameState != GameState.HUMAN_TURN) return;
 
-        Attack attack = new Attack(_player, _bot, selectedWeapon, row, col);
-        AttackResult result = _bot.receiveAttack(attack);
+        Attack attack = new Attack(_player, _bot, _selectedWeapon, row, col);
+        ArrayList<AttackResult> results = _bot.receiveAttack(attack);
 
-        endTurn(result, attack);
+        endTurn(results, attack);
     }
 
     public void handleComputerAttack() {
         if (_gameState != GameState.COMPUTER_TURN) return;
 
         Attack attack = null;
-        AttackResult result = new AttackResult(AttackStatus.ALREADY_VISITED, "");
-        while (result.getStatus() == AttackStatus.ALREADY_VISITED) {
-            attack = _bot.play(result);
+        ArrayList<AttackResult> results = new ArrayList<>();
+        AttackResult baseResult = new AttackResult(AttackStatus.ALREADY_VISITED, "");
+        while (baseResult.getStatus() == AttackStatus.ALREADY_VISITED) {
+            attack = _bot.play(baseResult);
             attack.setAttackingPlayer(_bot);
             attack.setTargetPlayer(_player);
-            result = _player.receiveAttack(attack);
+            results.addAll(_player.receiveAttack(attack));
+            baseResult = results.getFirst();
         }
 
         if (attack == null) return;
 
-        endTurn(result, attack);
+        endTurn(results, attack);
     }
 
-    public void endTurn(AttackResult result, Attack attack) {
+    public void endTurn(ArrayList<AttackResult> results, Attack attack) {
         // Afficher le résultat du coup
         String playerName = attack.getAttackingPlayer().getName();
         GridView playerGridView = attack.getTargetPlayer().getGridView();
-        updateGameView(result, playerName, playerGridView, attack.getRealRow(), attack.getRealCol());
+        for (AttackResult result : results) {
+            Point hitCoordinates = result.getHitCoordinates();
+            updateGameView(result, playerName, playerGridView, hitCoordinates.x, hitCoordinates.y);
+        }
 
         if (checkGameOver()) {
             _gameView.setStatus("Game Over !");

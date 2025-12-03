@@ -49,33 +49,18 @@ public class Player {
      * @param attack The Attack object encapsulating the weapon and the target.
      * @return AttackResult The result of the attack.
      */
-    public AttackResult receiveAttack(Attack attack) {
+    public ArrayList<AttackResult> receiveAttack(Attack attack) {
         // La logique de Piège (Trou Noir, Tornade) devrait être vérifiée ici ou dans applyAttack.
         // Pour l'instant, nous déléguons directement à la grille.
 
         // getGrid() est la grille de défense de ce joueur.
         Weapon weapon = attack.getWeapon();
-        AttackResult result = weapon.applyAttack(_grid, attack);
-        _grid.applyAttack(attack, result);
-
-        // --- Logique du Trou Noir (C3) ---
-        // Si la case touchée est un Trou Noir (TRAP_ACTIVATED),
-        // l'attaque doit être relancée sur la grille de l'ATTAQUANT.
-
-        if (result.getStatus() != AttackStatus.TRAP_ACTIVATED) return result;
-        Placeable object = result.getElementHit();
-        if (object == null || object.getPlaceableType() != PlaceableType.TRAP) return result;
-        Trap trap = (Trap) object;
-        if (trap.getTrapType() == TrapType.BLACKHOLE) {
-            // Le Contrôleur (GameController) devra gérer la relance de l'attaque sur la grille de l'attaquant.
-            // Ici, on retourne le résultat du Trou Noir au Contrôleur pour qu'il orchestre la relance.
-            result.setMessage("Trap triggered : BlackHole ! The shot is returned to the sender !");
+        ArrayList<AttackResult> results = weapon.applyAttack(_grid, attack);
+        for(AttackResult result : results) {
+            _grid.applyAttack(attack, result);
         }
 
-        // --- Mise à jour des statistiques internes (Nombre de bateaux coulés, etc.) ---
-        // Si result.getStatus() est SUNK, mettre à jour le compteur du joueur.
-
-        return result;
+        return results;
     }
 
     public Grid getGrid() {

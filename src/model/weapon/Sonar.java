@@ -4,6 +4,8 @@ import model.Attack;
 import model.AttackResult;
 import model.Grid;
 
+import java.util.ArrayList;
+
 public class Sonar extends Weapon{
 
     public Sonar() {
@@ -11,7 +13,7 @@ public class Sonar extends Weapon{
     }
 
     @Override
-    public AttackResult applyAttack(Grid grid, Attack attack) {
+    public ArrayList<AttackResult> applyAttack(Grid grid, Attack attack) {
         return null;
     }
 }

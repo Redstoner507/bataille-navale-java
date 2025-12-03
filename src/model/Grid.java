@@ -5,7 +5,6 @@ import model.cell.CellState;
 import model.cell.WaterCell;
 import model.ship.Ship;
 import model.trap.Trap;
-import model.weapon.Weapon;
 import view.GridView;
 
 import java.awt.*;
@@ -77,32 +76,33 @@ public class Grid {
      * @param result The AttackResult
      */
     public void applyAttack(Attack attack, AttackResult result) {
-        int row = attack.getRealRow();
-        int col = attack.getRealCol();
+        Point hitCoordinates = result.getHitCoordinates();
 
-        Cell targetCell = _cells[row][col];
+        Cell cellHit = getCell(hitCoordinates.x, hitCoordinates.y);
 
         switch (result.getStatus()) {
-            case MISS -> targetCell.setState(CellState.MISS);
-            case HIT -> targetCell.setState(CellState.HIT);
+            case MISS -> cellHit.setState(CellState.MISS);
+            case HIT -> {
+                if (cellHit.getState() != CellState.SUNK) cellHit.setState(CellState.HIT);
+            }
             case SUNK -> {
-                targetCell.setState(CellState.SUNK);
-                Ship ship = (Ship) result.getElementHit();
+                cellHit.setState(CellState.SUNK);
+                Ship ship = (Ship) cellHit.getObject();
                 GridView playerGridView = attack.getTargetPlayer().getGridView();
                 for (Point p : ship.getCoordinates()) {
                     playerGridView.updateCellDisplay(p.x, p.y, AttackStatus.SUNK);
                 }
             }
             case TRAP_ACTIVATED -> {
-                targetCell.setState(CellState.MISS);
-                Trap trap = (Trap) result.getElementHit();
-                targetCell.removeObject();
-                trap.activate(attack.getAttackingPlayer().getGrid(), row, col);
+                cellHit.setState(CellState.MISS);
+                Trap trap = (Trap) cellHit.getObject();
+                cellHit.removeObject();
+                trap.activate(attack.getAttackingPlayer().getGrid(), hitCoordinates.x, hitCoordinates.y);
             }
             case ITEM_FOUND -> {
-                targetCell.setState(CellState.MISS);
-                Placeable object = result.getElementHit();
-                targetCell.removeObject();
+                cellHit.setState(CellState.MISS);
+                Placeable object = cellHit.getObject();
+                cellHit.removeObject();
                 attack.getAttackingPlayer().addObjectToInventory(object);
             }
         }
@@ -118,7 +118,7 @@ public class Grid {
 
     public Cell getCell(int row, int col) {
         // Vérification de la validité de la cible (hors limites ou déjà touchée)
-        if (row < 0 || row >= _size || col < 0 || col >= _size) return null;
+        if (!isCoordinateValid(row, col)) return null;
         return _cells[row][col];
     }
 
@@ -129,5 +129,9 @@ public class Grid {
             }
         }
         _ships.clear();
+    }
+
+    public boolean isCoordinateValid(int row, int col) {
+        return (row >= 0 & row < _size && col >= 0 && col < _size);
     }
 }

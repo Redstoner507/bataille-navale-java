@@ -9,7 +9,7 @@ import model.weapon.Weapon;
 import model.weapon.WeaponFactory;
 
 public class ComputerEasyStrategy extends PlayerStrategy {
-    private ArrayList<int[]> priorityCoords = new ArrayList<>();
+    private final ArrayList<int[]> priorityCoords = new ArrayList<>();
     private int[] lastAttackCoords = null;
     
     /*
@@ -23,7 +23,7 @@ public class ComputerEasyStrategy extends PlayerStrategy {
         }
         
         if (!priorityCoords.isEmpty()) { // If there are priority coordinates (Adjacent case of a hit), attack them first
-            int[] coords = priorityCoords.remove(0);
+            int[] coords = priorityCoords.removeFirst();
             lastAttackCoords = coords;
 
             Weapon selectedWeapon = new WeaponFactory().createMissile(); // Assuming a default constructor for Weapon
