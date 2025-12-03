@@ -90,7 +90,7 @@ public class Grid {
                 Ship ship = (Ship) cellHit.getObject();
                 GridView playerGridView = attack.getTargetPlayer().getGridView();
                 for (Point p : ship.getCoordinates()) {
-                    playerGridView.updateCellDisplay(p.x, p.y, AttackStatus.SUNK);
+                    playerGridView.updateCellDisplay(result);
                 }
             }
             case TRAP_ACTIVATED -> {
@@ -105,6 +105,7 @@ public class Grid {
                 cellHit.removeObject();
                 attack.getAttackingPlayer().addObjectToInventory(object);
             }
+            case SONAR_RESULT -> cellHit.setHit(false);
         }
     }
 

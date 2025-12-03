@@ -53,6 +53,13 @@ public class CellView extends JLabel {
         repaint();
     }
 
+    public void displaySonarScan(int sonarCount) {
+        add(new JLabel("" + sonarCount));
+        System.out.println("Sonar scan count: " + sonarCount);
+        revalidate();
+        repaint();
+    }
+
     /** 
      * Paints the cell and scales the image to fill the label.
      */

@@ -2,6 +2,7 @@ package view;
 
 import controller.AttackListener;
 import controller.ShipPlacementListener;
+import model.AttackResult;
 import model.AttackStatus;
 import model.cell.CellState;
 
@@ -92,42 +93,27 @@ public class GridView extends JPanel {
      * @param col Column of the cell to update.
      * @param status The status of the attack (HIT, MISS, SUNK, etc...).
      */
-    public void updateCellDisplay(int row, int col, AttackStatus status) {
-        if (row < 0 || row >= _gridSize || col < 0 || col >= _gridSize) {
-            return;
+    public void updateCellDisplay(AttackResult result) {
+        Point hitCoordinates = result.getHitCoordinates();
+        CellView cell = _cells[hitCoordinates.x][hitCoordinates.y];
+
+        switch (result.getStatus()) {
+            case HIT -> {
+                if (cell.getCellState() != CellState.SUNK) cell.setCellIcon(CellState.HIT);
+            }
+            case SUNK -> cell.setCellIcon(CellState.SUNK);
+
+            case MISS, ALREADY_VISITED -> cell.setCellIcon(CellState.MISS);
+
+            case SONAR_RESULT -> {
+                cell.displaySonarScan(result.getSonarCount());
+                return;
+            }
         }
-
-        CellView cell = _cells[row][col];
-
         // La cellule n'est plus cliquable après avoir été attaquée.
         cell.setFocusable(false);
         for (MouseListener listener : cell.getMouseListeners()) {
             cell.removeMouseListener(listener);
-        }
-
-        switch (status) {
-            case HIT:
-                if (cell.getCellState() != CellState.SUNK) cell.setCellIcon(CellState.HIT);
-                break;
-
-            case SUNK:
-                cell.setCellIcon(CellState.SUNK);
-                break;
-
-            case MISS:
-            case ALREADY_VISITED:
-                cell.setCellIcon(CellState.MISS);
-                break;
-
-            case SONAR_RESULT:
-                // Le Sonar ne change pas l'état visuel de la grille des tirs,
-                // le résultat est affiché uniquement dans la zone de statut.
-                // On peut marquer légèrement la zone si l'on veut.
-                // cell.setCellIcon(CellState.SONAR_USED);
-                break;
-
-            default:
-                break;
         }
     }
 

@@ -43,6 +43,10 @@ public abstract class Cell {
         return _isHit;
     }
 
+    public void setHit(boolean hit) {
+        this._isHit = hit;
+    }
+
     public AttackResult hit() {
         if (_isHit) {
             return new AttackResult(AttackStatus.ALREADY_VISITED, "This cell is already visited");
