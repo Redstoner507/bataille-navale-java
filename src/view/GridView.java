@@ -102,7 +102,7 @@ public class GridView extends JPanel {
             }
             case SUNK -> cell.setCellIcon(CellState.SUNK);
 
-            case MISS, ALREADY_VISITED -> cell.setCellIcon(CellState.MISS);
+            case MISS -> cell.setCellIcon(CellState.MISS);
 
             case ITEM_FOUND, ISLAND_MISS -> cell.setCellIcon(CellState.ISLAND_HIT);
 

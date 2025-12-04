@@ -6,6 +6,7 @@ import model.AttackStatus;
 import model.Grid;
 import model.cell.Cell;
 import model.cell.CellState;
+import model.cell.CellType;
 
 import java.util.ArrayList;
 
@@ -23,7 +24,8 @@ public class Sonar extends Weapon{
         int centerCol = attack.getTargetCol();
 
         Cell centerCell = grid.getCell(centerRow, centerCol);
-        if (centerCell.isScanned()) {
+        // Ne pas pouvoir utiliser le sonar sur l'île
+        if (centerCell.getType() == CellType.ISLAND) {
             AttackResult result = new AttackResult(AttackStatus.ALREADY_VISITED, "");
             result.setHitCoordinates(centerRow, centerCol);
             sonarResults.add(result);

@@ -85,6 +85,7 @@ public class GameController {
         Attack attack = new Attack(_player, _bot, _selectedWeapon, row, col);
         ArrayList<AttackResult> results = _bot.receiveAttack(attack);
 
+        if (!results.isEmpty() && results.getFirst().getStatus() == AttackStatus.ALREADY_VISITED) return; //Annuler l'attaque si elle a déjà été faite
         endTurn(results, attack);
     }
 
