@@ -28,6 +28,7 @@ public class CellView extends JLabel {
     private boolean _isClickable = true;
     private final Point _cellPosition;
     private CellState _cellState;
+    private int _sonarCountToDisplay = -1;
 
     public CellView(Point cellPosition, int cellSize) {
         _cellPosition = cellPosition;
@@ -54,8 +55,7 @@ public class CellView extends JLabel {
     }
 
     public void displaySonarScan(int sonarCount) {
-        add(new JLabel("" + sonarCount));
-        System.out.println("Sonar scan count: " + sonarCount);
+        _sonarCountToDisplay = sonarCount;
         revalidate();
         repaint();
     }
@@ -67,12 +67,29 @@ public class CellView extends JLabel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        // Dessiner l'image redimensionnée pour remplir le JLabel
-        g.drawImage(_currentImage, 0, 0, getWidth(), getHeight(), this);
+        Graphics2D g2d = (Graphics2D) g;
+
+        // Dessiner l'image de fond
+        g2d.drawImage(_currentImage, 0, 0, getWidth(), getHeight(), this);
         setBackground(Color.CYAN);
+
+        // --- Dessin du Compteur Sonar ---
+        // Afficher le chiffre si un scan a été effectué (count >= 0)
+        if (_sonarCountToDisplay >= 0) {
+            String text = String.valueOf(_sonarCountToDisplay);
+            // Configuration du texte
+            g2d.setFont(new Font("Arial", Font.BOLD, getHeight() / 2));
+            g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+            // Calcul du centrage
+            FontMetrics fm = g2d.getFontMetrics();
+            int x = (getWidth() - fm.stringWidth(text)) / 2;
+            int y = (getHeight() - fm.getHeight()) / 2 + fm.getAscent();
+            // Dessin du nombre au centre
+            g2d.drawString(text, x, y);
+        }
         // bordure
-        g.setColor(Color.BLACK);
-        g.drawRect(0, 0, getWidth()-1, getHeight()-1);
+        g2d.setColor(Color.BLACK);
+        g2d.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
     }
 
     /**

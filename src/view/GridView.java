@@ -90,9 +90,8 @@ public class GridView extends JPanel {
      * Updates the appearance of a cell according to the result of an attack.
      * @param result The result of the attack, contains the status, and the coordinates of the cell affected by the attack.
      */
-    public void updateCellDisplay(AttackResult result) {
-        Point hitCoordinates = result.getHitCoordinates();
-        CellView cell = _cells[hitCoordinates.x][hitCoordinates.y];
+    public void updateCellDisplay(AttackResult result, int row, int col) {
+        CellView cell = _cells[row][col];
 
         switch (result.getStatus()) {
             case HIT -> {

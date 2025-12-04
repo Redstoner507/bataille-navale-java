@@ -17,12 +17,20 @@ public class Sonar extends Weapon{
 
     @Override
     public ArrayList<AttackResult> applyAttack(Grid grid, Attack attack) {
+        ArrayList<AttackResult> sonarResults = new ArrayList<>();
+
         int centerRow = attack.getTargetRow();
         int centerCol = attack.getTargetCol();
 
-        int detectedShips = 0;
+        Cell centerCell = grid.getCell(centerRow, centerCol);
+        if (centerCell.isScanned()) {
+            AttackResult result = new AttackResult(AttackStatus.ALREADY_VISITED, "");
+            result.setHitCoordinates(centerRow, centerCol);
+            sonarResults.add(result);
+            return sonarResults;
+        }
 
-        ArrayList<AttackResult> sonarResults = new ArrayList<>();
+        int detectedShips = 0;
 
         int[][] offsets = {
                 {-1, -1}, {0, -1}, {1, -1},
@@ -42,6 +50,8 @@ public class Sonar extends Weapon{
                 }
             }
         }
+
+        centerCell.setScanned(true);
 
         AttackResult result = new AttackResult(AttackStatus.SONAR_RESULT, "You detected " + detectedShips + " !");
         result.setHitCoordinates(centerRow, centerCol);

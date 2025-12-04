@@ -124,7 +124,8 @@ public class GameController {
 
     private void updateGameView(AttackResult result, String playerName, GridView targetGridView, int row, int col) {
         // 1. Mettre à jour la grille visuelle
-        targetGridView.updateCellDisplay(result);
+        Point hitCoordinates = result.getHitCoordinates();
+        targetGridView.updateCellDisplay(result, hitCoordinates.x, hitCoordinates.y);
 
         // Mettre à jour le statut
         _gameView.setStatus(playerName + " shot at coordinates " + (char)('A' + col) + (row + 1) + ". Result : " + result.getMessage());
