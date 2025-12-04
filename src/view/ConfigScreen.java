@@ -31,11 +31,6 @@ public class ConfigScreen extends JPanel {
         gridPanel.add(_gridSizeSpinner);
         add(gridPanel);
 
-        _gridSizeSpinner.addChangeListener(e -> {
-            int gridSize = (int) _gridSizeSpinner.getValue();
-            configController.setGridSize(gridSize);
-        });
-
         // Nombre de bateaux
         _occupiedCellsLabel = new JLabel();
         _occupiedCellsLabel.setAlignmentX(CENTER_ALIGNMENT);
@@ -60,16 +55,35 @@ public class ConfigScreen extends JPanel {
 
         // Boutons
         JButton backButton = new JButton("Back");
-        backButton.addActionListener(e -> gameController.showStartScreen());
 
         JButton startPlacementButton = new JButton("Confirm");
-        startPlacementButton.addActionListener(e -> gameController.showPlacementScreen());
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(backButton);
         buttonPanel.add(startPlacementButton);
         
         add(buttonPanel);
+
+        // Listeners
+
+        _gridSizeSpinner.addChangeListener(e -> {
+            int gridSize = (int) _gridSizeSpinner.getValue();
+            configController.setGridSize(gridSize);
+            if (gridSize < 10) {
+                islandCheckBox.setSelected(false);
+            }
+        });
+
+        islandCheckBox.addActionListener(e -> {
+            configController.setIslandModeEnabled(islandCheckBox.isSelected());
+            if (islandCheckBox.isSelected()) {
+                configController.setGridSize(10);
+                _gridSizeSpinner.setValue(10);
+            }
+        });
+
+        backButton.addActionListener(e -> gameController.showStartScreen());
+        startPlacementButton.addActionListener(e -> gameController.showPlacementScreen());
     }
 
     private JSpinner createShipSpinner(ConfigController configController, ShipType shipType, String label) {

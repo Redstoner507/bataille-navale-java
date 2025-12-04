@@ -3,6 +3,7 @@ package view;
 import javax.swing.*;
 
 import model.cell.CellState;
+import model.cell.CellType;
 
 import java.awt.*;
 import java.awt.event.MouseListener;
@@ -24,14 +25,20 @@ public class CellView extends JLabel {
     private static final Image IMG_ISLAND_HIT =
             new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/island_hit.png"))).getImage();
 
-    private Image _currentImage = IMG_WATER;
+    private Image _currentImage;
     private boolean _isClickable = true;
     private final Point _cellPosition;
     private CellState _cellState;
+    private final CellType _cellType;
     private int _sonarCountToDisplay = -1;
 
-    public CellView(Point cellPosition, int cellSize) {
+    public CellView(Point cellPosition, int cellSize, CellType cellType) {
         _cellPosition = cellPosition;
+        _cellType = cellType;
+        switch (cellType) {
+            case WATER -> setCellIcon(CellState.WATER);
+            case ISLAND -> setCellIcon(CellState.ISLAND);
+        }
         setPreferredSize(new Dimension(cellSize, cellSize));
     }
 
@@ -47,7 +54,6 @@ public class CellView extends JLabel {
             case SUNK -> _currentImage = IMG_SUNK;
             case ISLAND -> _currentImage = IMG_ISLAND;
             case ISLAND_HIT -> _currentImage = IMG_ISLAND_HIT;
-            default -> _currentImage = IMG_WATER;
         }
         _cellState = state;
         revalidate();
@@ -71,7 +77,10 @@ public class CellView extends JLabel {
 
         // Dessiner l'image de fond
         g2d.drawImage(_currentImage, 0, 0, getWidth(), getHeight(), this);
-        setBackground(Color.CYAN);
+        switch (_cellType) {
+            case WATER -> setBackground(Color.CYAN);
+            case ISLAND -> setBackground(Color.ORANGE);
+        }
 
         // --- Dessin du Compteur Sonar ---
         // Afficher le chiffre si un scan a été effectué (count >= 0)
@@ -103,6 +112,10 @@ public class CellView extends JLabel {
 
     public CellState getCellState() {
         return _cellState;
+    }
+
+    public CellType getCellType() {
+        return _cellType;
     }
 
     public void setClickable(boolean clickable) {

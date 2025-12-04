@@ -7,12 +7,12 @@ import java.util.Map;
 
 public class GameConfig {
     private int _gridSize;
-    private boolean _islandsEnabled;
+    private boolean _islandModeEnabled;
     private final Map<ShipType, Integer> _shipConfig;
 
     public GameConfig() {
         this._gridSize = 10; // Default grid size
-        this._islandsEnabled = false; // Default islands setting
+        this._islandModeEnabled = false; // Default islands setting
         this. _shipConfig = new HashMap<>(); // Default ship configuration
         _shipConfig.put(ShipType.CARRIER, 1);
         _shipConfig.put(ShipType.BATTLESHIP, 1);
@@ -29,12 +29,12 @@ public class GameConfig {
         this._gridSize = gridSize;
     }
 
-    public boolean isIslandsEnabled() {
-        return _islandsEnabled;
+    public boolean isIslandModeEnabled() {
+        return _islandModeEnabled;
     }
 
-    public void setIslandsEnabled(boolean islandsEnabled) {
-        this._islandsEnabled = islandsEnabled;
+    public void setIslandModeEnabled(boolean islandsEnabled) {
+        this._islandModeEnabled = islandsEnabled;
     }
 
     public Map<ShipType, Integer> getShipConfig() {

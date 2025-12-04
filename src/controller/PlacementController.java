@@ -67,7 +67,7 @@ public class PlacementController {
     }
 
     public void clearGrid(Grid modelGrid, GridView viewGrid) {
-        modelGrid.clearGrid();
-        viewGrid.clearGrid();
+        modelGrid.resetGrid();
+        viewGrid.clearShips();
     }
 }

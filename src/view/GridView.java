@@ -3,6 +3,8 @@ package view;
 import controller.AttackListener;
 import controller.ShipPlacementListener;
 import model.AttackResult;
+import model.Grid;
+import model.cell.Cell;
 import model.cell.CellState;
 
 import javax.swing.*;
@@ -19,19 +21,19 @@ public class GridView extends JPanel {
     private ShipPlacementListener _placementListener;
     private AttackListener _attackListener;
 
-    public GridView(int gridSize, int cellSize) {
+    public GridView(int gridSize, int cellSize, Grid grid) {
         this._gridSize = gridSize;
         this._cells = new CellView[gridSize][gridSize];
 
         setLayout(new BorderLayout());
-        add(createGridPanel(cellSize), BorderLayout.CENTER);
+        add(createGridPanel(cellSize, grid), BorderLayout.CENTER);
     }
 
     /**
      * Creates the main grid panel with column and row headers.
      * @return JPanel
      */
-    private JPanel createGridPanel(int cellSize) {
+    private JPanel createGridPanel(int cellSize, Grid grid) {
         JPanel panel = new JPanel(new GridLayout(_gridSize + 1, _gridSize + 1)); // +1 pour les labels
 
         // Première cellule vide (coin supérieur gauche)
@@ -56,7 +58,7 @@ public class GridView extends JPanel {
 
             // Cases de la grille
             for (int col = 0; col < _gridSize; col++) {
-                CellView cell = getCellView(cellSize, row, col);
+                CellView cell = getCellView(cellSize, row, col, grid);
                 _cells[row][col] = cell;
                 panel.add(cell);
             }
@@ -65,25 +67,26 @@ public class GridView extends JPanel {
         return panel;
     }
 
-    private CellView getCellView(int cellSize, int row, int col) {
-        CellView cell = new CellView(new Point(row, col), cellSize);
-        cell.setPreferredSize(new Dimension(50, 50)); // taille carrée
-        cell.setBorder(new LineBorder(Color.BLACK)); // quadrillage
-        cell.setOpaque(true);
-        cell.setFocusable(false); // désactivée par défaut
+    private CellView getCellView(int cellSize, int row, int col, Grid grid) {
+        Cell cell = grid.getCell(row, col);
+        CellView cellView = new CellView(new Point(row, col), cellSize, cell.getType());
+        cellView.setPreferredSize(new Dimension(50, 50)); // taille carrée
+        cellView.setBorder(new LineBorder(Color.BLACK)); // quadrillage
+        cellView.setOpaque(true);
+        cellView.setFocusable(false); // désactivée par défaut
         final int cellRow = row;
         final int cellCol = col;
-        cell.addMouseListener(new MouseAdapter() {
+        cellView.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 // 1. Vérifier si la grille n'est pas verrouillée et si la case est cliquable (focus/enabled)
-                if (!_locked && cell.isFocusable() && e.getButton() == MouseEvent.BUTTON1) {
+                if (!_locked && cellView.isFocusable() && e.getButton() == MouseEvent.BUTTON1) {
                     // 2. Appeler la méthode de la GridView pour informer le Contrôleur
                       notifyCellAttacked(cellRow, cellCol);
                 }
             }
         });
-        return cell;
+        return cellView;
     }
 
     /**
@@ -100,6 +103,8 @@ public class GridView extends JPanel {
             case SUNK -> cell.setCellIcon(CellState.SUNK);
 
             case MISS, ALREADY_VISITED -> cell.setCellIcon(CellState.MISS);
+
+            case ITEM_FOUND, ISLAND_MISS -> cell.setCellIcon(CellState.ISLAND_HIT);
 
             case SONAR_RESULT -> {
                 cell.displaySonarScan(result.getSonarCount());
@@ -182,10 +187,23 @@ public class GridView extends JPanel {
         return _locked;
     }
 
-    public void clearGrid() {
+    public void clearShips() {
         for (int r = 0; r < _gridSize; r++) {
             for (int c = 0; c < _gridSize; c++) {
-                _cells[r][c].setCellIcon(CellState.WATER);
+                if (_cells[r][c].getCellState() == CellState.SHIP) {
+                    _cells[r][c].setCellIcon(CellState.WATER);
+                }
+            }
+        }
+    }
+
+    public void hideGrid() {
+        for (int r = 0; r < _gridSize; r++) {
+            for (int c = 0; c < _gridSize; c++) {
+                switch (_cells[r][c].getCellType()) {
+                    case WATER -> _cells[r][c].setCellIcon(CellState.WATER);
+                    case ISLAND -> _cells[r][c].setCellIcon(CellState.ISLAND);
+                }
             }
         }
     }

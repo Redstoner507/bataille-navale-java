@@ -14,9 +14,9 @@ public class Player {
     private ArrayList<Placeable> _inventory;
     private PlayerStrategy _strategy;
 
-    public Player(int gridSize, int cellSize, String playerName) {
-        _grid = new Grid(gridSize);
-        _gridView = new GridView(gridSize, cellSize);
+    public Player(int gridSize, int cellSize, String playerName, boolean islandMode) {
+        _grid = new Grid(gridSize, islandMode);
+        _gridView = new GridView(gridSize, cellSize, _grid);
         _name = playerName;
     }
 

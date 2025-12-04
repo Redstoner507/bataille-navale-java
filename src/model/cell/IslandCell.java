@@ -5,5 +5,6 @@ public class IslandCell extends Cell {
 
     public IslandCell() {
         super(CellType.ISLAND);
+        setScanned(true); // Pour ne pas pouvoir utiliser le Sonar dessus
     }
 }

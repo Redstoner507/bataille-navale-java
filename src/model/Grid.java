@@ -2,6 +2,7 @@ package model;
 
 import model.cell.Cell;
 import model.cell.CellState;
+import model.cell.IslandCell;
 import model.cell.WaterCell;
 import model.ship.Ship;
 import model.trap.Trap;
@@ -14,18 +15,21 @@ public class Grid {
     private static final int MIN_SIZE = 6;
     private static final int MAX_SIZE = 10;
 
+    private static final int ISLAND_START = 3;
+    private static final int ISLAND_END = 7;
+
     private final int _size;
     private final Cell[][] _cells;
     private final ArrayList<Ship> _ships = new ArrayList<>();
+    private final boolean _islandMode;
 
-    public Grid(int size) {
+    public Grid(int size, boolean islandMode) {
         if (size < MIN_SIZE || size > MAX_SIZE)
             throw new IllegalArgumentException("Size must be between " + MIN_SIZE + " and " + MAX_SIZE);
         this._size = size;
+        this._islandMode = islandMode;
         this._cells = new Cell[size][size];
-        for (int r = 0; r < size; r++)
-            for (int c = 0; c < size; c++)
-                _cells[r][c] = new WaterCell();
+        resetGrid();
     }
 
     /**
@@ -100,13 +104,22 @@ public class Grid {
                 trap.activate(attack.getAttackingPlayer().getGrid(), hitCoordinates.x, hitCoordinates.y);
             }
             case ITEM_FOUND -> {
-                cellHit.setState(CellState.MISS);
+                cellHit.setState(CellState.ISLAND_HIT);
                 Placeable object = cellHit.getObject();
                 cellHit.removeObject();
                 attack.getAttackingPlayer().addObjectToInventory(object);
             }
+            case ISLAND_MISS -> cellHit.setState(CellState.ISLAND_HIT);
             case SONAR_RESULT -> cellHit.setHit(false);
         }
+    }
+
+    /**
+     * Checks if a coordinate is on the island.
+     */
+    public boolean isCoordinateInIsland(int row, int col) {
+        return row >= ISLAND_START && row < ISLAND_END &&
+                col >= ISLAND_START && col < ISLAND_END;
     }
 
     public int getSize() {
@@ -123,10 +136,14 @@ public class Grid {
         return _cells[row][col];
     }
 
-    public void clearGrid() {
+    public void resetGrid() {
         for (int r = 0; r < _size; r++) {
             for (int c = 0; c < _size; c++) {
-                _cells[r][c] = new WaterCell();
+                if (_islandMode && isCoordinateInIsland(r, c)) {
+                    _cells[r][c] = new IslandCell();
+                } else {
+                    _cells[r][c] = new WaterCell();
+                }
             }
         }
         _ships.clear();

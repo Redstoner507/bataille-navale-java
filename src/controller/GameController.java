@@ -58,8 +58,8 @@ public class GameController {
     public void showPlacementScreen() {
         _gameState = GameState.SETUP;
         GameConfig config = _configController.getGameConfig();
-        _player = new Player(config.getGridSize(), CELL_SIZE, "Player");
-        _bot = new Player(config.getGridSize(), CELL_SIZE, "Computer");
+        _player = new Player(config.getGridSize(), CELL_SIZE, "Player", config.isIslandModeEnabled());
+        _bot = new Player(config.getGridSize(), CELL_SIZE, "Computer", config.isIslandModeEnabled());
 
         PlayerStrategyFactory playerStrategyFactory = new PlayerStrategyFactory();
         _player.setStrategy(playerStrategyFactory.createHumanStrategy());

@@ -59,4 +59,8 @@ public class ConfigController {
         }
         return ships;
     }
+
+    public void setIslandModeEnabled(boolean islandsEnabled) {
+        this._gameConfig.setIslandModeEnabled(islandsEnabled);
+    }
 }
