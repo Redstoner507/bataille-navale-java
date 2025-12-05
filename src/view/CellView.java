@@ -25,7 +25,10 @@ public class CellView extends JLabel {
     private static final Image IMG_ISLAND_HIT =
             new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/island_hit.png"))).getImage();
 
-    private Image _currentImage;
+    //private Image _currentImage;
+    private Image _baseImage;
+    private Image _overlayImage;  // image superposée
+
     private boolean _isClickable = true;
     private final Point _cellPosition;
     private CellState _cellState;
@@ -46,19 +49,50 @@ public class CellView extends JLabel {
      * Sets the icon of the cell according to its state.
      */
     public void setCellIcon(CellState state) {
+
+        _overlayImage = null; // Par défaut pas de superposition
+
         switch (state) {
-            case SHIP -> _currentImage = IMG_SHIP;
-            case WATER -> _currentImage = IMG_WATER;
-            case MISS -> _currentImage = IMG_MISS;
-            case HIT -> _currentImage = IMG_HIT;
-            case SUNK -> _currentImage = IMG_SUNK;
-            case ISLAND -> _currentImage = IMG_ISLAND;
-            case ISLAND_HIT -> _currentImage = IMG_ISLAND_HIT;
+
+            case SHIP -> {
+                _baseImage = IMG_WATER;        // fond eau
+                _overlayImage = IMG_SHIP;      // superposition bateau
+            }
+
+            case HIT -> {
+                _baseImage = IMG_SHIP;
+                _overlayImage = IMG_HIT;       // impact au-dessus du bateau
+            }
+
+            case MISS -> {
+                _baseImage = IMG_WATER;
+                _overlayImage = IMG_MISS;
+            }
+
+            case SUNK -> {
+                _baseImage = IMG_SHIP;
+                _overlayImage = IMG_SUNK;
+            }
+
+            case ISLAND -> {
+                _baseImage = IMG_WATER;
+                _overlayImage = IMG_ISLAND;
+            }
+
+            case ISLAND_HIT -> {
+                _baseImage = IMG_ISLAND;
+                _overlayImage = IMG_ISLAND_HIT;
+            }
+
+            case WATER -> {
+                _baseImage = IMG_WATER;
+            }
         }
+
         _cellState = state;
-        revalidate();
         repaint();
     }
+
 
     public void displaySonarScan(int sonarCount) {
         _sonarCountToDisplay = sonarCount;
@@ -72,34 +106,34 @@ public class CellView extends JLabel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-
         Graphics2D g2d = (Graphics2D) g;
 
-        // Dessiner l'image de fond
-        g2d.drawImage(_currentImage, 0, 0, getWidth(), getHeight(), this);
-        switch (_cellType) {
-            case WATER -> setBackground(Color.CYAN);
-            case ISLAND -> setBackground(Color.ORANGE);
-        }
+        // Activer la transparence PNG
+        g2d.setComposite(AlphaComposite.SrcOver);
 
-        // --- Dessin du Compteur Sonar ---
-        // Afficher le chiffre si un scan a été effectué (count >= 0)
+        // 1) Fond
+        if (_baseImage != null)
+            g2d.drawImage(_baseImage, 0, 0, getWidth(), getHeight(), this);
+
+        // 2) Superposition
+        if (_overlayImage != null)
+            g2d.drawImage(_overlayImage, 0, 0, getWidth(), getHeight(), this);
+
+        // 3) Sonar
         if (_sonarCountToDisplay >= 0) {
             String text = String.valueOf(_sonarCountToDisplay);
-            // Configuration du texte
             g2d.setFont(new Font("Arial", Font.BOLD, getHeight() / 2));
-            g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-            // Calcul du centrage
             FontMetrics fm = g2d.getFontMetrics();
             int x = (getWidth() - fm.stringWidth(text)) / 2;
             int y = (getHeight() - fm.getHeight()) / 2 + fm.getAscent();
-            // Dessin du nombre au centre
             g2d.drawString(text, x, y);
         }
-        // bordure
+
+        // Bordure
         g2d.setColor(Color.BLACK);
         g2d.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
     }
+
 
     /**
      * Overrides addMouseListener to only detect clicks when clickable.
