@@ -6,10 +6,17 @@ import java.util.Random;
 
 import model.Attack;
 import model.AttackResult;
+import model.weapon.Weapon;
+import model.weapon.WeaponFactory;
 
 public abstract class PlayerStrategy {
     protected final List<int[]> coords = new ArrayList<>();
     protected final Random random = new Random();
+    protected final Weapon missile = new WeaponFactory().createMissile();
+    protected final Weapon bomb = new WeaponFactory().createBomb();
+    protected final Weapon sonar = new WeaponFactory().createSonar();
+    protected int bombUses = 1; // Example usage limit (à modfier l'emplacement (inventaire) de cette variable)
+    protected int sonarUses = 1; // Example usage limit
 
     public PlayerStrategy() {
         // Initialize all possible coordinates (0-9, 0-9)

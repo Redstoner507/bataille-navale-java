@@ -63,15 +63,29 @@ public class GameController {
 
         PlayerStrategyFactory playerStrategyFactory = new PlayerStrategyFactory();
         _player.setStrategy(playerStrategyFactory.createHumanStrategy());
-        _bot.setStrategy(playerStrategyFactory.createComputerEasyStrategy());
 
+        switch (config.getPlayerStrategy()) {
+            case COMPUTER_VERY_EASY ->
+                _bot.setStrategy(playerStrategyFactory.createComputerVeryEasyStrategy());
+            case COMPUTER_EASY ->
+                _bot.setStrategy(playerStrategyFactory.createComputerEasyStrategy());
+            case COMPUTER_MEDIUM ->
+                _bot.setStrategy(playerStrategyFactory.createComputerMediumStrategy());
+            case COMPUTER_HARD ->
+                _bot.setStrategy(playerStrategyFactory.createComputerHardStrategy());
+            case COMPUTER_VERY_HARD ->
+                _bot.setStrategy(playerStrategyFactory.createComputerVeryHardStrategy());
+            case HUMAN -> {
+                // Default to easy if human is selected for bot (à modifier si multi-joueur ou autre)
+                _bot.setStrategy(playerStrategyFactory.createComputerEasyStrategy());
+            }
+        }
         PlacementScreen placement = new PlacementScreen(this, config.getGridSize(), CELL_SIZE, _placementController, _configController);
         _frame.addScreen(PLACEMENT, placement);
         _frame.showScreen(PLACEMENT);
     }
 
     public void showGameScreen() {
-        GameConfig config = _configController.getGameConfig();
         _gameView = new GameView(_player.getGridView(), _bot.getGridView(), _placementController, _bot.getGrid(), _configController, this);
         _frame.addScreen(GAME, _gameView);
         _frame.showScreen(GAME);
