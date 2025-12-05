@@ -9,6 +9,7 @@ import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Objects;
 
 public class ShipView extends JPanel {
     private final Ship _ship;
@@ -52,7 +53,7 @@ public class ShipView extends JPanel {
         _segmentPanel.setLayout(new BoxLayout(_segmentPanel,
                 _orientation == Orientation.HORIZONTAL ? BoxLayout.X_AXIS : BoxLayout.Y_AXIS));
         // A modifier pour éviter de recharger l'image deux fois
-        Icon img = new ImageIcon(CellView.class.getResource("/images/ship.png"));
+        Icon img = new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/ship.png")));
         for (int i = 0; i < _ship.getSize(); i++) {
             JLabel seg = new JLabel(img);
             seg.setPreferredSize(new Dimension(_cellSize, _cellSize));

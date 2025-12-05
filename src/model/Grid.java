@@ -75,6 +75,62 @@ public class Grid {
     }
 
     /**
+     * Tests if the trap's placement coordinates are valid.
+     * @return true if the coordinates are valid, false otherwise.
+     */
+    public boolean canPlaceTrap(int row, int col) {
+        if (row < 0 || row >= _size || col < 0 || col >= _size) return false;
+
+        return _cells[row][col].getState() == CellState.WATER;
+    }
+
+    /**
+     * Places the trap in the grid if the coordinates are valid.
+     * @return true if the trap was placed, false otherwise.
+     */
+    public boolean placeTrap(Trap trap, int row, int col) {
+        if (!canPlaceTrap(row, col)) return false;
+        try {
+            _cells[row][col].setState(CellState.TRAP);
+            _cells[row][col].setObject(trap);
+        }
+        catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return true;
+    }
+
+    /**
+     * Tests if the object's placement coordinates are valid.
+     * @return true if the coordinates are valid, false otherwise.
+     */
+    public boolean canPlaceObjectOnIsland(int row, int col) {
+        if (row < 0 || row >= _size || col < 0 || col >= _size) return false;
+
+        return _cells[row][col].getState() == CellState.ISLAND;
+    }
+
+    /**
+     * Places the object on the island if the coordinates are valid.
+     * @return true if the boat was placed, false otherwise.
+     */
+    public boolean placeObjectOnIsland(Placeable object, int row, int col) {
+        if (!canPlaceObjectOnIsland(row, col)) return false;
+
+        try {
+            _cells[row][col].setState(CellState.OBJECT);
+            _cells[row][col].setObject(object);
+        }
+        catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return true;
+    }
+
+
+    /**
      * Applies the attack to the grid.
      * @param attack The Attack context
      * @param result The AttackResult
@@ -101,7 +157,7 @@ public class Grid {
                 cellHit.setState(CellState.MISS);
                 Trap trap = (Trap) cellHit.getObject();
                 cellHit.removeObject();
-                trap.activate(attack.getAttackingPlayer().getGrid(), hitCoordinates.x, hitCoordinates.y);
+                trap.activate(attack, result);
             }
             case ITEM_FOUND -> {
                 cellHit.setState(CellState.ISLAND_HIT);

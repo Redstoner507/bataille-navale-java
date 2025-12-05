@@ -11,7 +11,7 @@ public abstract class Trap extends Placeable {
         _trapType = type;
     }
 
-    public abstract void activate(Grid grid, int row, int col);
+    public abstract void activate(Attack attack, AttackResult result);
 
     public TrapType getTrapType() {
         return _trapType;

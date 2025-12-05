@@ -1,6 +1,7 @@
 package model.trap;
 
-import model.Grid;
+import model.Attack;
+import model.AttackResult;
 
 public class Tornado extends Trap {
 
@@ -9,7 +10,6 @@ public class Tornado extends Trap {
     }
 
     @Override
-    public void activate(Grid grid, int row, int col) {
-
+    public void activate(Attack attack, AttackResult result) {
     }
 }
