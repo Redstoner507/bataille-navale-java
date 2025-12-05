@@ -191,7 +191,7 @@ public class GridView extends JPanel {
         for (int r = 0; r < _gridSize; r++) {
             for (int c = 0; c < _gridSize; c++) {
                 if (_cells[r][c].getCellState() == CellState.SHIP) {
-                    _cells[r][c].setCellIcon(CellState.WATER);
+                    _cells[r][c].setCellIcon(CellState.EMPTY);
                 }
             }
         }
@@ -200,10 +200,7 @@ public class GridView extends JPanel {
     public void hideGrid() {
         for (int r = 0; r < _gridSize; r++) {
             for (int c = 0; c < _gridSize; c++) {
-                switch (_cells[r][c].getCellType()) {
-                    case WATER -> _cells[r][c].setCellIcon(CellState.WATER);
-                    case ISLAND -> _cells[r][c].setCellIcon(CellState.ISLAND);
-                }
+                _cells[r][c].setCellIcon(CellState.EMPTY);
             }
         }
     }

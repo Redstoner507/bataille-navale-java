@@ -19,7 +19,7 @@ public class PlacementController {
      * @return true if the ship was placed in the grid, false otherwise.
      */
     public boolean placeShip(Grid modelGrid, GridView viewGrid, Ship ship, int row, int col) {
-        if (!modelGrid.placeShip(ship, row, col)) return false;
+        if (!modelGrid.placeObject(ship, row, col)) return false;
 
         for (Point p : ship.getCoordinates()) {
             CellView cell = viewGrid.getCell(p.x, p.y);

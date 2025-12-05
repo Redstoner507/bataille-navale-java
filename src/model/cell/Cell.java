@@ -13,7 +13,7 @@ public abstract class Cell {
     
     public Cell(CellType type) {
         this._type = type;
-        _state = (type == CellType.ISLAND) ? CellState.ISLAND : CellState.WATER;
+        _state = CellState.EMPTY;
     }
 
     public Placeable getObject() {

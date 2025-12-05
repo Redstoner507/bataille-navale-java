@@ -35,10 +35,7 @@ public class CellView extends JLabel {
     public CellView(Point cellPosition, int cellSize, CellType cellType) {
         _cellPosition = cellPosition;
         _cellType = cellType;
-        switch (cellType) {
-            case WATER -> setCellIcon(CellState.WATER);
-            case ISLAND -> setCellIcon(CellState.ISLAND);
-        }
+        setCellIcon(CellState.EMPTY);
         setPreferredSize(new Dimension(cellSize, cellSize));
     }
 
@@ -47,12 +44,14 @@ public class CellView extends JLabel {
      */
     public void setCellIcon(CellState state) {
         switch (state) {
+            case EMPTY -> {
+                if (_cellType == CellType.ISLAND) _currentImage = IMG_ISLAND;
+                else _currentImage = IMG_WATER;
+            }
             case SHIP -> _currentImage = IMG_SHIP;
-            case WATER -> _currentImage = IMG_WATER;
             case MISS -> _currentImage = IMG_MISS;
             case HIT -> _currentImage = IMG_HIT;
             case SUNK -> _currentImage = IMG_SUNK;
-            case ISLAND -> _currentImage = IMG_ISLAND;
             case ISLAND_HIT -> _currentImage = IMG_ISLAND_HIT;
         }
         _cellState = state;

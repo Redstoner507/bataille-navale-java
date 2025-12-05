@@ -1,13 +1,14 @@
 package model.ship;
 
 import model.*;
+import model.cell.CellState;
 import model.cell.CellType;
 
 public abstract class Ship extends Placeable {
     private int _cellsRemaining;
 
     public Ship(int size, String name) {
-        super(size, Orientation.HORIZONTAL, name, CellType.WATER, PlaceableType.SHIP);
+        super(size, Orientation.HORIZONTAL, name, CellType.WATER, PlaceableType.SHIP, CellState.SHIP);
         _cellsRemaining = size;
     }
 

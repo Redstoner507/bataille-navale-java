@@ -1,13 +1,14 @@
 package model.trap;
 
 import model.*;
+import model.cell.CellState;
 import model.cell.CellType;
 
 public abstract class Trap extends Placeable {
     private final TrapType _trapType;
 
     public Trap(TrapType type) {
-        super(1, Orientation.HORIZONTAL, type.name(), CellType.WATER, PlaceableType.TRAP);
+        super(1, Orientation.HORIZONTAL, type.name(), CellType.WATER, PlaceableType.TRAP, CellState.TRAP);
         _trapType = type;
     }
 

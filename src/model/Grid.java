@@ -20,7 +20,7 @@ public class Grid {
 
     private final int _size;
     private final Cell[][] _cells;
-    private final ArrayList<Ship> _ships = new ArrayList<>();
+    private final ArrayList<Placeable> _objects = new ArrayList<>();
     private final boolean _islandMode;
 
     public Grid(int size, boolean islandMode) {
@@ -33,97 +33,37 @@ public class Grid {
     }
 
     /**
-     * Tests if the boat's placement coordinates are valid.
-     * @return true if the coordinates are valid, false otherwise.
-     */
-    public boolean canPlaceShip(Ship ship, int startRow, int startCol) {
-        for (int i = 0; i < ship.getSize(); i++) {
-            int r = startRow;
-            int c = startCol;
-            if (ship.getOrientation() == Orientation.HORIZONTAL) c += i;
-            else r += i;
-
-            if (r < 0 || r >= _size || c < 0 || c >= _size) return false;
-
-            if (_cells[r][c].getState() != CellState.WATER) return false;
-
-        }
-        return true;
-    }
-
-    /**
-     * Places the boat in the grid if the coordinates are valid.
-     * @return true if the boat was placed, false otherwise.
-     */
-    public boolean placeShip(Ship ship, int startRow, int startCol) {
-        if (!canPlaceShip(ship, startRow, startCol)) return false;
-
-        ship.setStartPosition(startRow, startCol);
-        _ships.add(ship);
-
-        for (Point p : ship.getCoordinates()) {
-            try {
-                _cells[p.x][p.y].setState(CellState.SHIP);
-                _cells[p.x][p.y].setObject(ship);
-            }
-            catch (Exception e) {
-                System.out.println(e);
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Tests if the trap's placement coordinates are valid.
-     * @return true if the coordinates are valid, false otherwise.
-     */
-    public boolean canPlaceTrap(int row, int col) {
-        if (row < 0 || row >= _size || col < 0 || col >= _size) return false;
-
-        return _cells[row][col].getState() == CellState.WATER;
-    }
-
-    /**
-     * Places the trap in the grid if the coordinates are valid.
-     * @return true if the trap was placed, false otherwise.
-     */
-    public boolean placeTrap(Trap trap, int row, int col) {
-        if (!canPlaceTrap(row, col)) return false;
-        try {
-            _cells[row][col].setState(CellState.TRAP);
-            _cells[row][col].setObject(trap);
-        }
-        catch (Exception e) {
-            System.out.println(e);
-        }
-
-        return true;
-    }
-
-    /**
      * Tests if the object's placement coordinates are valid.
      * @return true if the coordinates are valid, false otherwise.
      */
-    public boolean canPlaceObjectOnIsland(int row, int col) {
-        if (row < 0 || row >= _size || col < 0 || col >= _size) return false;
+    public boolean canPlaceObject(Placeable object, int startRow, int startCol) {
+        for (int i = 0; i < object.getSize(); i++) {
+            int r = startRow;
+            int c = startCol;
+            if (object.getOrientation() == Orientation.HORIZONTAL) c += i;
+            else r += i;
 
-        return _cells[row][col].getState() == CellState.ISLAND;
+            if (!isCoordinateValid(r, c)) return false;
+            Cell cell = _cells[r][c];
+            if (cell.getType() != object.getCellType()) return false;
+            if (cell.getState() != CellState.EMPTY) return false;
+        }
+        return true;
     }
 
     /**
-     * Places the object on the island if the coordinates are valid.
-     * @return true if the boat was placed, false otherwise.
+     * Places the object in the grid if the coordinates are valid.
+     * @return true if the object was placed, false otherwise.
      */
-    public boolean placeObjectOnIsland(Placeable object, int row, int col) {
-        if (!canPlaceObjectOnIsland(row, col)) return false;
+    public boolean placeObject(Placeable object, int startRow, int startCol) {
+        if (!canPlaceObject(object, startRow, startCol)) return false;
 
-        try {
-            _cells[row][col].setState(CellState.OBJECT);
-            _cells[row][col].setObject(object);
-        }
-        catch (Exception e) {
-            System.out.println(e);
+        object.setStartPosition(startRow, startCol);
+        _objects.add(object);
+
+        for (Point p : object.getCoordinates()) {
+            _cells[p.x][p.y].setState(object.getCellState());
+            _cells[p.x][p.y].setObject(object);
         }
 
         return true;
@@ -183,7 +123,13 @@ public class Grid {
     }
 
     public ArrayList<Ship> getShips() {
-        return _ships;
+        ArrayList<Ship> ships = new ArrayList<>();
+        for (Placeable object : _objects) {
+            if (object.getCellState() == CellState.SHIP) {
+                ships.add((Ship) object);
+            }
+        }
+        return ships;
     }
 
     public Cell getCell(int row, int col) {
@@ -202,7 +148,7 @@ public class Grid {
                 }
             }
         }
-        _ships.clear();
+        _objects.clear();
     }
 
     public boolean isCoordinateValid(int row, int col) {
