@@ -63,4 +63,8 @@ public class ConfigController {
     public void setIslandModeEnabled(boolean islandsEnabled) {
         this._gameConfig.setIslandModeEnabled(islandsEnabled);
     }
+
+    public void setPlayerStrategy(String playerStrategy) {
+        this._gameConfig.setPlayerStrategy(playerStrategy);
+    }
 }

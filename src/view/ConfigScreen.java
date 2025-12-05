@@ -51,6 +51,14 @@ public class ConfigScreen extends JPanel {
         islandPanel.add(islandCheckBox);
         add(islandPanel);
 
+        // Niveau d'IA
+        String[] options = {"Very Easy", "Easy", "Medium", "Hard", "Very Hard"};
+        JComboBox<String> aiLevelBox = new JComboBox<>(options);
+        JPanel aiPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        aiPanel.add(new JLabel("Computer AI Level: "));
+        aiPanel.add(aiLevelBox);
+        add(aiPanel);
+
         add(Box.createVerticalStrut(20));
 
         // Boutons
@@ -80,6 +88,11 @@ public class ConfigScreen extends JPanel {
                 configController.setGridSize(10);
                 _gridSizeSpinner.setValue(10);
             }
+        });
+
+        aiLevelBox.addActionListener(e -> {
+            String selectedLevel = (String) aiLevelBox.getSelectedItem();
+            configController.setPlayerStrategy(selectedLevel);
         });
 
         backButton.addActionListener(e -> gameController.showStartScreen());
