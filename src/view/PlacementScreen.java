@@ -13,20 +13,23 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class PlacementScreen extends JPanel {
-    private static final int SHIP_PANEL_WIDTH = 300;
-    private static final int TRAP_PANEL_WIDTH = 150;
     private final JPanel _shipPanel;
     private final JPanel _trapPanel;
     private Orientation _currentOrientation = Orientation.HORIZONTAL;
 
-    public PlacementScreen(GameController gameController, int gridSize, int cellSize, PlacementController placementController, ConfigController configController) {
-        
+    public PlacementScreen(GameController gameController, int cellSize, PlacementController placementController, ConfigController configController) {
+
+        int gridSize = gameController.getPlayerGrid().getSize();
+
         setLayout(new BorderLayout(10, 10));
 
-        int gridWidth = (gridSize+1) * cellSize;
-        int gridHeight = (gridSize+1) * cellSize;
+        // Calcul des tailles basées sur la grille
+        int gridPanelWidth = (gridSize+1) * cellSize;
+        int gridPanelHeight = (gridSize+1) * cellSize;
 
-        int totalContentWidth = SHIP_PANEL_WIDTH + 10 + gridWidth + 10 + TRAP_PANEL_WIDTH;
+        // Définir des largeurs minimales pour les panneaux latéraux
+        final int MIN_SHIP_WIDTH = 250;
+        final int MIN_TRAP_WIDTH = 100;
 
         // Panneau boutons
         JPanel buttonPanel = new JPanel(new FlowLayout());
@@ -42,42 +45,59 @@ public class PlacementScreen extends JPanel {
         buttonPanel.add(cancelButton);
         add(buttonPanel, BorderLayout.SOUTH);
 
-        // Conteneur pour le Centrage Horizontal
-        JPanel centerWrapper = new JPanel(new GridBagLayout());
-        add(centerWrapper, BorderLayout.CENTER);
-
+        // JLayeredPane Principal
         JLayeredPane mainLayeredPane = new JLayeredPane();
-        mainLayeredPane.setPreferredSize(new Dimension(totalContentWidth, gridHeight));
-        mainLayeredPane.setLayout(null);
+        mainLayeredPane.setLayout(new GridBagLayout());
+        add(mainLayeredPane, BorderLayout.CENTER);
 
-        centerWrapper.add(mainLayeredPane, new GridBagConstraints());
+        // Configuration des contraintes pour l'étirement
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(0, 5, 0, 5); // Marge
+        gbc.gridy = 0; // Tous sur la même ligne
+        gbc.weighty = 1.0; // Prendre toute la hauteur
 
         // Conteneur des Bateaux
         _shipPanel = new JPanel();
         _shipPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
         _shipPanel.setBorder(BorderFactory.createTitledBorder("Your ships"));
-        _shipPanel.setPreferredSize(new Dimension(SHIP_PANEL_WIDTH, gridHeight));
         _shipPanel.setOpaque(true);
         _shipPanel.setBackground(Color.LIGHT_GRAY);
-        _shipPanel.setBounds(0, 0, SHIP_PANEL_WIDTH, gridHeight);
-        mainLayeredPane.add(_shipPanel, JLayeredPane.DEFAULT_LAYER);
+        Dimension minShipDim = new Dimension(MIN_SHIP_WIDTH, 1);
+        _shipPanel.setMinimumSize(minShipDim); // Taille minimale
+        _shipPanel.setPreferredSize(minShipDim);
+
+        gbc.gridx = 0;
+        gbc.weightx = 0.15; // 15% de l'espace horizontal extensible
+        gbc.fill = GridBagConstraints.BOTH; // Permet l'étirement
+        gbc.anchor = GridBagConstraints.NORTH; // Aligner les éléments en haut
+        mainLayeredPane.add(_shipPanel, gbc, JLayeredPane.DEFAULT_LAYER);
 
         // Grille joueur
         LabeledGridView playerGrid = new LabeledGridView("Place your objects in the grid", gameController.getPlayerGridView(), false);
         playerGrid.setOpaque(true);
-        // Utiliser la taille réelle de la grille pour les Bounds (départ en 0, 0 du LayeredPane)
-        playerGrid.setBounds(SHIP_PANEL_WIDTH + 10, 0, gridWidth, gridHeight);
-        mainLayeredPane.add(playerGrid, JLayeredPane.DEFAULT_LAYER);
+        playerGrid.setMinimumSize(new Dimension(gridPanelWidth, gridPanelHeight)); // Taille minimale
+
+        gbc.gridx = 1;
+        gbc.weightx = 0.7; // 70% de l'espace horizontal extensible
+        gbc.fill = GridBagConstraints.BOTH; // Permet l'étirement
+        gbc.anchor = GridBagConstraints.CENTER; // Centrer au milieu de sa zone
+        mainLayeredPane.add(playerGrid, gbc, JLayeredPane.DEFAULT_LAYER);
 
         // Conteneur des Pièges
         _trapPanel = new JPanel();
         _trapPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
         _trapPanel.setBorder(BorderFactory.createTitledBorder("Your traps"));
-        _trapPanel.setPreferredSize(new Dimension(TRAP_PANEL_WIDTH, gridHeight));
         _trapPanel.setOpaque(true);
         _trapPanel.setBackground(Color.LIGHT_GRAY);
-        _trapPanel.setBounds(SHIP_PANEL_WIDTH + gridWidth + 20, 0, TRAP_PANEL_WIDTH, gridHeight);
-        mainLayeredPane.add(_trapPanel, JLayeredPane.DEFAULT_LAYER);
+        Dimension trapDim = new Dimension(MIN_TRAP_WIDTH, 10);
+        _trapPanel.setMinimumSize(trapDim); // Taille minimale
+        _trapPanel.setPreferredSize(trapDim);
+
+        gbc.gridx = 2;
+        gbc.weightx = 0.15; // // 15% de l'espace horizontal extensible
+        gbc.fill = GridBagConstraints.BOTH; // Permet l'étirement
+        gbc.anchor = GridBagConstraints.NORTH;
+        mainLayeredPane.add(_trapPanel, gbc, JLayeredPane.DEFAULT_LAYER);
 
         // Récupérer les objets à placer
         ArrayList<Placeable> objects = new ArrayList<>();

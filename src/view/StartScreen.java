@@ -21,7 +21,7 @@ public class StartScreen extends JPanel {
 
         JLabel title = new JLabel("Bataille Navale", SwingConstants.CENTER);
         title.setAlignmentX(CENTER_ALIGNMENT);
-        title.setFont(new Font("Arial", Font.BOLD, 30));
+        title.setFont(new Font("Arial", Font.BOLD, 50));
         contentPanel.add(title);
         contentPanel.add(Box.createVerticalStrut(50));
 

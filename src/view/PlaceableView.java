@@ -95,7 +95,10 @@ public class PlaceableView extends JLabel {
                 // Retirer du panel original et ajouter au topLayer
                 Point loc = SwingUtilities.convertPoint(PlaceableView.this, new Point(0, 0), _topLayer);
                 _originalPanel.remove(PlaceableView.this);
-                _topLayer.add(PlaceableView.this, JLayeredPane.DRAG_LAYER);
+
+                _topLayer.add(PlaceableView.this);
+                _topLayer.setLayer(PlaceableView.this, JLayeredPane.DRAG_LAYER);
+
                 setBounds(loc.x, loc.y, getWidth(), getHeight());
                 _topLayer.moveToFront(PlaceableView.this);
                 _topLayer.revalidate();

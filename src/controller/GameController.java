@@ -81,7 +81,7 @@ public class GameController {
                 // Default to easy if human is selected for bot (à modifier si multi-joueur ou autre)
                 _bot.setStrategy(playerStrategyFactory.createComputerEasyStrategy());
         }
-        PlacementScreen placement = new PlacementScreen(this, config.getGridSize(), CELL_SIZE, _placementController, _configController);
+        PlacementScreen placement = new PlacementScreen(this, CELL_SIZE, _placementController, _configController);
         _frame.addScreen(PLACEMENT, placement);
         _frame.showScreen(PLACEMENT);
     }
