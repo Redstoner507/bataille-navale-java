@@ -10,88 +10,135 @@ import java.awt.*;
 
 public class ConfigScreen extends JPanel {
     private static final int MAX_OCCUPIABLE_CELLS = 35;
-    private final JSpinner _gridSizeSpinner;
+    private final JSlider _gridSizeSlider;
     private final JSpinner _carrierSpinner, _battleshipSpinner, _cruiserSpinner, _submarineSpinner, _destroyerSpinner;
     private final JLabel _occupiedCellsLabel;
+    private final JCheckBox _islandCheckBox;
+    private final JComboBox<String> _aiLevelBox;
 
     public ConfigScreen(GameController gameController, ConfigController configController) {
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        setLayout(new BorderLayout());
 
-        JLabel title = new JLabel("Game configuration", SwingConstants.CENTER);
+        // Conteneur principal pour tous les éléments de configuration
+        JPanel contentPanel = new JPanel();
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
+
+        // Titre
+        JLabel title = new JLabel("Game Configuration", SwingConstants.CENTER);
         title.setAlignmentX(CENTER_ALIGNMENT);
-        title.setFont(new Font("Arial", Font.BOLD, 20));
-        add(title);
-        add(Box.createVerticalStrut(20));
+        title.setFont(new Font("Arial", Font.BOLD, 24));
+        contentPanel.add(title);
+        contentPanel.add(Box.createVerticalStrut(40));
 
         // Taille de la grille
-        JPanel gridPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        gridPanel.add(new JLabel("Grid size :"));
-        _gridSizeSpinner = new JSpinner(new SpinnerNumberModel(10, 6, 10, 1));
-        gridPanel.add(_gridSizeSpinner);
-        add(gridPanel);
+        JPanel gridPanel = new JPanel();
+        gridPanel.add(new JLabel("Grid Size :"));
+
+        // JSlider pour la taille (6 à 10)
+        _gridSizeSlider = new JSlider(SwingConstants.HORIZONTAL, 6, 10, 10);
+        _gridSizeSlider.setMajorTickSpacing(1);
+        _gridSizeSlider.setPaintTicks(true);
+        _gridSizeSlider.setPaintLabels(true);
+        _gridSizeSlider.setPreferredSize(new Dimension(200, 50));
+
+        gridPanel.add(_gridSizeSlider);
+        contentPanel.add(gridPanel);
+        contentPanel.add(Box.createVerticalStrut(20));
 
         // Nombre de bateaux
+        // Étiquette des cellules occupées
         _occupiedCellsLabel = new JLabel();
         _occupiedCellsLabel.setAlignmentX(CENTER_ALIGNMENT);
-        add(_occupiedCellsLabel);
+        _occupiedCellsLabel.setFont(new Font("Arial", Font.BOLD, 14));
 
-        _carrierSpinner = createShipSpinner(configController, ShipType.CARRIER, "Carrier (5 cells) : ");
-        _battleshipSpinner = createShipSpinner(configController, ShipType.BATTLESHIP, "Battleship (4 cells) : ");
-        _cruiserSpinner = createShipSpinner(configController, ShipType.CRUISER, "Cruiser (3 cells) : ");
-        _submarineSpinner = createShipSpinner(configController, ShipType.SUBMARINE, "Submarine (3 cells) : ");
-        _destroyerSpinner = createShipSpinner(configController, ShipType.DESTROYER, "Destroyer (2 cells) : ");
+        // Panneau pour les spinners de bateaux (GridBagLayout pour aligner les titres)
+        JPanel shipConfigPanel = new JPanel(new GridLayout(6, 1));
+        shipConfigPanel.setLayout(new BoxLayout(shipConfigPanel, BoxLayout.Y_AXIS));
+
+        // Panneau enveloppe pour centrer le BoxLayout horizontalement
+        JPanel shipPanelWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        shipPanelWrapper.add(shipConfigPanel);
+
+        _occupiedCellsLabel.setAlignmentX(CENTER_ALIGNMENT);
+        shipConfigPanel.add(_occupiedCellsLabel); // Ajout du label dans le panneau
+        shipConfigPanel.add(Box.createVerticalStrut(10));
+
+        _carrierSpinner = createShipSpinner(configController, ShipType.CARRIER, "Carrier (5 cells) : ", shipConfigPanel);
+        _battleshipSpinner = createShipSpinner(configController, ShipType.BATTLESHIP, "Battleship (4 cells) : ", shipConfigPanel);
+        _cruiserSpinner = createShipSpinner(configController, ShipType.CRUISER, "Cruiser (3 cells) : ", shipConfigPanel);
+        _submarineSpinner = createShipSpinner(configController, ShipType.SUBMARINE, "Submarine (3 cells) : ", shipConfigPanel);
+        _destroyerSpinner = createShipSpinner(configController, ShipType.DESTROYER, "Destroyer (2 cells) : ", shipConfigPanel);
+
+        contentPanel.add(shipPanelWrapper);
+        contentPanel.add(Box.createVerticalStrut(20));
 
         updateOccupiedCellsLabel(getOccupiedCellsCount());
 
+        // Mode île et difficulté de l'ordinateur
+        JPanel optionsPanel = new JPanel(new BorderLayout());
+        JPanel verticalOptionsPanel = new JPanel();
+        verticalOptionsPanel.setLayout(new BoxLayout(verticalOptionsPanel, BoxLayout.Y_AXIS));
+        verticalOptionsPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0)); // Marge interne
+
         // Mode île
-        JPanel islandPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JCheckBox islandCheckBox = new JCheckBox("Island mode");
-        islandCheckBox.setSelected(false);
-        islandPanel.add(islandCheckBox);
-        add(islandPanel);
+        _islandCheckBox = new JCheckBox("Island mode");
+        _islandCheckBox.setAlignmentX(CENTER_ALIGNMENT);
+        verticalOptionsPanel.add(_islandCheckBox);
+        verticalOptionsPanel.add(Box.createVerticalStrut(10)); // Espacement
 
-        // Niveau d'IA
+        // Difficulté de l'ordinateur
         String[] options = {"Very Easy", "Easy", "Medium", "Hard", "Very Hard"};
-        JComboBox<String> aiLevelBox = new JComboBox<>(options);
-        JPanel aiPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        aiPanel.add(new JLabel("Computer AI Level: "));
-        aiPanel.add(aiLevelBox);
-        add(aiPanel);
+        _aiLevelBox = new JComboBox<>(options);
 
-        add(Box.createVerticalStrut(20));
+        JPanel aiPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        aiPanel.add(new JLabel("Computer difficulty : "));
+        aiPanel.add(_aiLevelBox);
+        aiPanel.setAlignmentX(CENTER_ALIGNMENT);
+        verticalOptionsPanel.add(aiPanel);
+        verticalOptionsPanel.add(Box.createVerticalStrut(10)); // Espacement
+
+        optionsPanel.add(verticalOptionsPanel, BorderLayout.CENTER);
+        contentPanel.add(optionsPanel);
+        contentPanel.add(Box.createVerticalStrut(20));
 
         // Boutons
         JButton backButton = new JButton("Back");
-
         JButton startPlacementButton = new JButton("Confirm");
 
-        JPanel buttonPanel = new JPanel();
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         buttonPanel.add(backButton);
+        buttonPanel.add(Box.createHorizontalStrut(20));
         buttonPanel.add(startPlacementButton);
-        
-        add(buttonPanel);
+
+        contentPanel.add(buttonPanel);
+
+        // Centrer le contentPanel dans le BorderLayout
+        add(contentPanel, BorderLayout.CENTER);
 
         // Listeners
-
-        _gridSizeSpinner.addChangeListener(e -> {
-            int gridSize = (int) _gridSizeSpinner.getValue();
+        _gridSizeSlider.addChangeListener(e -> {
+            int gridSize = _gridSizeSlider.getValue();
             configController.setGridSize(gridSize);
-            if (gridSize < 10) {
-                islandCheckBox.setSelected(false);
+
+            // Si la grille est < 10, désactiver le mode Île
+            if (gridSize < 10 && _islandCheckBox.isSelected()) {
+                _islandCheckBox.setSelected(false);
+                configController.setIslandModeEnabled(false);
             }
         });
 
-        islandCheckBox.addActionListener(e -> {
-            configController.setIslandModeEnabled(islandCheckBox.isSelected());
-            if (islandCheckBox.isSelected()) {
+        _islandCheckBox.addActionListener(e -> {
+            configController.setIslandModeEnabled(_islandCheckBox.isSelected());
+            if (_islandCheckBox.isSelected()) {
+                // Forcer la taille à 10 si le mode Île est activé
                 configController.setGridSize(10);
-                _gridSizeSpinner.setValue(10);
+                _gridSizeSlider.setValue(10);
             }
         });
 
-        aiLevelBox.addActionListener(e -> {
-            String selectedLevel = (String) aiLevelBox.getSelectedItem();
+        _aiLevelBox.addActionListener(e -> {
+            String selectedLevel = (String) _aiLevelBox.getSelectedItem();
             configController.setPlayerStrategy(selectedLevel);
         });
 
@@ -99,22 +146,27 @@ public class ConfigScreen extends JPanel {
         startPlacementButton.addActionListener(e -> gameController.showPlacementScreen());
     }
 
-    private JSpinner createShipSpinner(ConfigController configController, ShipType shipType, String label) {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+    private JSpinner createShipSpinner(ConfigController configController, ShipType shipType, String label, JPanel container) {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         panel.add(new JLabel(label));
+        panel.setAlignmentX(CENTER_ALIGNMENT);
         JSpinner spinner = new JSpinner(new SpinnerNumberModel(1, 1, 3, 1));
+        spinner.setPreferredSize(new Dimension(50, 25)); // Taille fixe pour l'alignement
+
         spinner.addChangeListener(e -> {
             int occupiedCells = getOccupiedCellsCount();
             updateOccupiedCellsLabel(occupiedCells);
             if (occupiedCells > MAX_OCCUPIABLE_CELLS) {
+                // Annuler la modification
                 spinner.setValue(spinner.getPreviousValue());
             }
             else {
                 configController.setShipNumber(shipType, (int) spinner.getValue());
             }
+            updateOccupiedCellsLabel(getOccupiedCellsCount()); // Mise à jour après validation
         });
         panel.add(spinner);
-        add(panel);
+        container.add(panel);
         return spinner;
     }
 
@@ -128,5 +180,6 @@ public class ConfigScreen extends JPanel {
 
     private void updateOccupiedCellsLabel(int occupiedCells) {
         _occupiedCellsLabel.setText("Occupied cells : " + occupiedCells + " / " + MAX_OCCUPIABLE_CELLS);
+        _occupiedCellsLabel.setForeground(occupiedCells >= MAX_OCCUPIABLE_CELLS ? Color.RED : Color.BLUE.darker());
     }
 }
