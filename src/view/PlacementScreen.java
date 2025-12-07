@@ -26,6 +26,8 @@ public class PlacementScreen extends JPanel {
         int gridWidth = (gridSize+1) * cellSize;
         int gridHeight = (gridSize+1) * cellSize;
 
+        int totalContentWidth = SHIP_PANEL_WIDTH + 10 + gridWidth + 10 + TRAP_PANEL_WIDTH;
+
         // Panneau boutons
         JPanel buttonPanel = new JPanel(new FlowLayout());
         JButton rotateButton = new JButton("Orientation");
@@ -40,12 +42,15 @@ public class PlacementScreen extends JPanel {
         buttonPanel.add(cancelButton);
         add(buttonPanel, BorderLayout.SOUTH);
 
-        // JLayeredPane pour superposer la GRILLE et les Objets (CENTRE)
-        JLayeredPane layeredPane = new JLayeredPane();
-        // Définir la taille préférée du JLayeredPane pour qu'il prenne sa place dans le GridLayout
-        layeredPane.setPreferredSize(new Dimension(gridWidth, gridHeight));
-        layeredPane.setLayout(null); // layout absolu pour les composants de Drag & Drop
-        add(layeredPane, BorderLayout.CENTER);
+        // Conteneur pour le Centrage Horizontal
+        JPanel centerWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        add(centerWrapper, BorderLayout.CENTER);
+
+        JLayeredPane mainLayeredPane = new JLayeredPane();
+        mainLayeredPane.setPreferredSize(new Dimension(totalContentWidth, gridHeight));
+        mainLayeredPane.setLayout(null);
+
+        centerWrapper.add(mainLayeredPane, BorderLayout.CENTER);
 
         // Conteneur des Bateaux
         _shipPanel = new JPanel();
@@ -55,14 +60,14 @@ public class PlacementScreen extends JPanel {
         _shipPanel.setOpaque(true);
         _shipPanel.setBackground(Color.LIGHT_GRAY);
         _shipPanel.setBounds(0, 0, SHIP_PANEL_WIDTH, gridHeight);
-        layeredPane.add(_shipPanel, JLayeredPane.DEFAULT_LAYER);
+        mainLayeredPane.add(_shipPanel, JLayeredPane.DEFAULT_LAYER);
 
         // Grille joueur
         LabeledGridView playerGrid = new LabeledGridView("Place your objects in the grid", gameController.getPlayerGridView(), false);
         playerGrid.setOpaque(true);
         // Utiliser la taille réelle de la grille pour les Bounds (départ en 0, 0 du LayeredPane)
         playerGrid.setBounds(SHIP_PANEL_WIDTH + 10, 0, gridWidth, gridHeight);
-        layeredPane.add(playerGrid, JLayeredPane.DEFAULT_LAYER);
+        mainLayeredPane.add(playerGrid, JLayeredPane.DEFAULT_LAYER);
 
         // Conteneur des Pièges
         _trapPanel = new JPanel();
@@ -72,7 +77,7 @@ public class PlacementScreen extends JPanel {
         _trapPanel.setOpaque(true);
         _trapPanel.setBackground(Color.LIGHT_GRAY);
         _trapPanel.setBounds(SHIP_PANEL_WIDTH + gridWidth + 20, 0, TRAP_PANEL_WIDTH, gridHeight);
-        layeredPane.add(_trapPanel, JLayeredPane.DEFAULT_LAYER);
+        mainLayeredPane.add(_trapPanel, JLayeredPane.DEFAULT_LAYER);
 
         // Récupérer les objets à placer
         ArrayList<Placeable> objects = new ArrayList<>();
@@ -85,7 +90,7 @@ public class PlacementScreen extends JPanel {
         if (traps != null && !traps.isEmpty()) {
             for (Placeable trap : traps) {
                 // ShipView doit être créé avec le JLayeredPane central pour le Drag&Drop
-                TrapView trapView = new TrapView((Trap)trap, playerGrid, layeredPane, _trapPanel, cellSize);
+                TrapView trapView = new TrapView((Trap)trap, playerGrid, mainLayeredPane, _trapPanel, cellSize);
                 trapView.setAlignmentX(Component.CENTER_ALIGNMENT);
                 _trapPanel.add(trapView);
             }
@@ -95,7 +100,7 @@ public class PlacementScreen extends JPanel {
         if (ships != null && !ships.isEmpty()) {
             for (Placeable ship : ships) {
                 // ShipView doit être créé avec le JLayeredPane central pour le Drag&Drop
-                ShipView shipView = new ShipView((Ship)ship, playerGrid, layeredPane, _shipPanel, cellSize);
+                ShipView shipView = new ShipView((Ship)ship, playerGrid, mainLayeredPane, _shipPanel, cellSize);
                 shipView.setAlignmentX(Component.CENTER_ALIGNMENT);
                 _shipPanel.add(shipView);
             }
