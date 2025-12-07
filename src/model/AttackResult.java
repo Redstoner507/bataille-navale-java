@@ -1,7 +1,6 @@
 package model;
 
 import java.awt.*;
-import java.util.ArrayList;
 
 /**
  * Représents the result of an attack after being applied to the grid.

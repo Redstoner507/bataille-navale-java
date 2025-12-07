@@ -15,7 +15,6 @@ import java.util.ArrayList;
 public class PlacementScreen extends JPanel {
     private static final int SHIP_PANEL_WIDTH = 300;
     private static final int TRAP_PANEL_WIDTH = 150;
-    private static final int LABEL_HEIGHT = 20;
     private final JPanel _shipPanel;
     private final JPanel _trapPanel;
     private Orientation _currentOrientation = Orientation.HORIZONTAL;
