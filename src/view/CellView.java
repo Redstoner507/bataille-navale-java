@@ -24,6 +24,10 @@ public class CellView extends JLabel {
             new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/island.png"))).getImage();
     private static final Image IMG_ISLAND_HIT =
             new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/island_hit.png"))).getImage();
+    private static final Image IMG_BLACKHOLE =
+            new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/blackhole.png"))).getImage();
+    private static final Image IMG_TORNADO =
+            new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/tornado.png"))).getImage();
 
     //private Image _currentImage;
     private Image _baseImage;
@@ -82,6 +86,15 @@ public class CellView extends JLabel {
             case ISLAND_HIT -> {
                 _baseImage = IMG_ISLAND;
                 _overlayImage = IMG_ISLAND_HIT;
+            }
+
+            case BLACKHOLE -> {
+                _baseImage = IMG_WATER;
+                _overlayImage = IMG_BLACKHOLE;
+            }
+            case TORNADO -> {
+                _baseImage = IMG_WATER;
+                _overlayImage = IMG_TORNADO;
             }
         }
 

@@ -7,6 +7,7 @@ public enum CellState {
     SUNK,
     EMPTY,
     ISLAND_HIT,
-    TRAP,
+    BLACKHOLE,
+    TORNADO,
     OBJECT
 }

@@ -2,11 +2,13 @@ package model.trap;
 
 import model.Attack;
 import model.AttackResult;
+import model.AttackStatus;
+import model.cell.CellState;
 
 public class Tornado extends Trap {
 
     public Tornado() {
-        super(TrapType.TORNADO);
+        super(TrapType.TORNADO, CellState.TORNADO, AttackStatus.TORNADO);
     }
 
     @Override

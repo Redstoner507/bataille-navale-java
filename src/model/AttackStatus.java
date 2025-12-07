@@ -8,7 +8,8 @@ public enum AttackStatus {
     ISLAND_MISS,        // Tirs manqués sur l'île
     HIT,                // Bateau touché mais pas coulé
     SUNK,               // Bateau coulé
-    TRAP_ACTIVATED,     // Piège (Trou Noir/Tornade) touché et activé
+    BLACKHOLE,          // Trou Noir activé
+    TORNADO,            // Tornade activée
     ITEM_FOUND,         // Arme/Piège trouvé sur l'Île
     SONAR_RESULT,       // Résultat d'une analyse Sonar (ne cause pas de dégâts)
     ALREADY_VISITED     // Case déjà visée (utile pour l'ordinateur)

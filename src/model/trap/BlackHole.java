@@ -2,15 +2,17 @@ package model.trap;
 
 import model.Attack;
 import model.AttackResult;
+import model.AttackStatus;
 import model.Grid;
 import model.cell.Cell;
+import model.cell.CellState;
 
 import java.awt.*;
 
 public class BlackHole extends Trap {
 
     public BlackHole() {
-        super(TrapType.BLACKHOLE);
+        super(TrapType.BLACKHOLE, CellState.BLACKHOLE, AttackStatus.BLACKHOLE);
     }
 
     @Override

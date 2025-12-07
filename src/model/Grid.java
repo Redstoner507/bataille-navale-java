@@ -79,6 +79,7 @@ public class Grid {
         Point hitCoordinates = result.getHitCoordinates();
 
         Cell cellHit = getCell(hitCoordinates.x, hitCoordinates.y);
+        GridView playerGridView = attack.getTargetPlayer().getGridView();
 
         switch (result.getStatus()) {
             case MISS -> cellHit.setState(CellState.MISS);
@@ -88,16 +89,9 @@ public class Grid {
             case SUNK -> {
                 cellHit.setState(CellState.SUNK);
                 Ship ship = (Ship) cellHit.getObject();
-                GridView playerGridView = attack.getTargetPlayer().getGridView();
                 for (Point p : ship.getCoordinates()) {
                     playerGridView.updateCellDisplay(result, p.x, p.y);
                 }
-            }
-            case TRAP_ACTIVATED -> {
-                cellHit.setState(CellState.MISS);
-                Trap trap = (Trap) cellHit.getObject();
-                cellHit.removeObject();
-                trap.activate(attack, result);
             }
             case ITEM_FOUND -> {
                 cellHit.setState(CellState.ISLAND_HIT);
@@ -107,6 +101,21 @@ public class Grid {
             }
             case ISLAND_MISS -> cellHit.setState(CellState.ISLAND_HIT);
             case SONAR_RESULT -> cellHit.setHit(false);
+            case BLACKHOLE -> {
+                cellHit.setState(CellState.BLACKHOLE);
+                Trap trap = (Trap) cellHit.getObject();
+                cellHit.removeObject();
+                trap.activate(attack, result);
+                playerGridView.updateCellDisplay(result, hitCoordinates.x, hitCoordinates.y);
+
+            }
+            case TORNADO -> {
+                cellHit.setState(CellState.TORNADO);
+                Trap trap = (Trap) cellHit.getObject();
+                cellHit.removeObject();
+                trap.activate(attack, result);
+                playerGridView.updateCellDisplay(result, hitCoordinates.x, hitCoordinates.y);
+            }
         }
     }
 
