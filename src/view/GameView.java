@@ -34,7 +34,7 @@ public class GameView extends JPanel {
         playerControlPanel.add(playerSquarePanel, BorderLayout.CENTER);
 
         // Panneau des armes (à placer en SOUTH du panneau de contrôle du joueur)
-        JPanel weaponSelectionPanel = createWeaponSelectionPanel(gameController, new ButtonGroup(), playerGridView);
+        JPanel weaponSelectionPanel = createWeaponSelectionPanel(gameController, new ButtonGroup());
         playerControlPanel.add(weaponSelectionPanel, BorderLayout.SOUTH);
 
 
@@ -77,7 +77,7 @@ public class GameView extends JPanel {
     /**
      * Creates the pannel containing the radio buttons to select the weapon.
      */
-    private JPanel createWeaponSelectionPanel(GameController gameController, ButtonGroup buttonGroup, GridView playerGridView) {
+    private JPanel createWeaponSelectionPanel(GameController gameController, ButtonGroup buttonGroup) {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
         panel.setBorder(BorderFactory.createTitledBorder("Weapons"));
 
