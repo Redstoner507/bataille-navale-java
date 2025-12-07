@@ -23,6 +23,8 @@ public class GameController {
     private Weapon _selectedWeapon;
     private ArrayList<AttackResult> _previousBotResults = new ArrayList<>();
     private int _turnNumber = 0;
+    private final ArrayList<String> _playerAttackHistory = new ArrayList<>();
+    private final ArrayList<String> _botAttackHistory = new ArrayList<>();
     //Vues
     private final MainFrame _frame;
     private GameView _gameView;
@@ -75,10 +77,9 @@ public class GameController {
                 _bot.setStrategy(playerStrategyFactory.createComputerHardStrategy());
             case COMPUTER_VERY_HARD ->
                 _bot.setStrategy(playerStrategyFactory.createComputerVeryHardStrategy());
-            case HUMAN -> {
+            case HUMAN ->
                 // Default to easy if human is selected for bot (à modifier si multi-joueur ou autre)
                 _bot.setStrategy(playerStrategyFactory.createComputerEasyStrategy());
-            }
         }
         PlacementScreen placement = new PlacementScreen(this, config.getGridSize(), CELL_SIZE, _placementController, _configController);
         _frame.addScreen(PLACEMENT, placement);
@@ -121,40 +122,156 @@ public class GameController {
         endTurn(_previousBotResults, attack);
     }
 
+    /**
+     * Handles the end of the turn after an attack was executed.
+     * Manages and displays the effects of the attack.
+     * * @param results ArrayList containing the impacts of the attack for each cell concerned.
+     * @param attack The initial Attack
+     */
     public void endTurn(ArrayList<AttackResult> results, Attack attack) {
-        // Afficher le résultat du coup
-        String playerName = attack.getAttackingPlayer().getName();
-        GridView targetGridView = attack.getTargetPlayer().getGridView();
-        GridView attackerGridView = attack.getAttackingPlayer().getGridView();
+        if (results.isEmpty()) {
+            changeTurn();
+            return;
+        }
 
-        for (AttackResult result : results) {
-            Point hitCoordinates = result.getHitCoordinates();
-            updateGameView(result, playerName, targetGridView, hitCoordinates.x, hitCoordinates.y);
+        AttackResult mainResult = results.getFirst();
 
-            if (result.getStatus() == AttackStatus.BLACKHOLE && result.getAttackToRelaunch() != null) {
-                Attack counterAttack = result.getAttackToRelaunch();
-                Player targetOfCounterAttack = counterAttack.getTargetPlayer();
+        // Vérification des pièges
+        if (mainResult.getStatus() == AttackStatus.BLACKHOLE && mainResult.getAttackToRelaunch() != null) {
 
-                ArrayList<AttackResult> counterResults = targetOfCounterAttack.receiveAttack(counterAttack);
+            // Afficher l'impact unique du Trou Noir sur la grille d'origine
+            processSingleImpact(mainResult, attack);
 
-                for (AttackResult finalHit : counterResults) {
-                    attackerGridView.updateCellDisplay(finalHit, finalHit.getHitCoordinates().x, finalHit.getHitCoordinates().y);
-                    _gameView.setStatus(finalHit.getMessage());
-                }
+            // Exécuter l'attaque miroir
+            Attack counterAttack = mainResult.getAttackToRelaunch();
+            executeCounterAttack(counterAttack);
+        }
+        // Traitement normal (Missile, Sonar, Bombe sans piège)
+        else {
+            // Traiter tous les impacts séquentiellement (Missile, ou Bombe sur bateaux/eau)
+            for (AttackResult result : results) {
+                processSingleImpact(result, attack);
             }
         }
 
+        // Mettre à jour l'historique
+        updateHistoryLog(results, attack);
+
+        // Vérifier la fin du jeu et changer de tour
         if (checkGameOver()) {
             _gameView.setStatus("Game Over !");
             return;
         }
+
         changeTurn();
     }
 
-    private void updateGameView(AttackResult result, String playerName, GridView targetGridView, int row, int col) {
-        // 1. Mettre à jour la grille visuelle
+    /**
+     * Updates the game log.
+     * @param results ArrayList of the real attack impacts.
+     * @param attack The initial Attack.
+     */
+    private void updateHistoryLog(ArrayList<AttackResult> results, Attack attack) {
+        // Déterminer la liste d'historique à mettre à jour (Humain ou Ordinateur)
+        boolean isHumanAttack = attack.getAttackingPlayer() == _player;
+        ArrayList<String> targetHistory = isHumanAttack ? _playerAttackHistory : _botAttackHistory;
+
+        // Le résultat principal est le premier de la liste
+        AttackResult mainResult = results.getFirst();
+
+        // Créer la chaîne de base
+        String entryBase = String.format("%s%d : %s",
+                (char)('A' + attack.getTargetCol()),
+                attack.getTargetRow() + 1,
+                mainResult.getMessage());
+
+        // Gérer les cas spéciaux et ajouter les entrées à la liste
+        if (attack.getWeapon().getWeaponType() == WeaponType.BOMB && results.size() > 1) {
+            // Cas Bombe : Ajout de la ligne principale et de tous les impacts secondaires
+            targetHistory.add(entryBase);
+
+            for (int i = 1; i < results.size(); i++) {
+                AttackResult subResult = results.get(i);
+                // Format : "E4 : Hit" (Utiliser l'indentation pour aligner dans la colonne)
+                String subEntry = String.format("      %s%d : %s",
+                        (char)('A' + subResult.getHitCoordinates().y),
+                        subResult.getHitCoordinates().x + 1,
+                        subResult.getMessage());
+                targetHistory.add(subEntry);
+            }
+        }
+        else if (attack.getWeapon().getWeaponType() == WeaponType.SONAR && mainResult.getSonarCount() != null) {
+            // Cas Sonar : Affichage du compte des objets trouvés
+            targetHistory.add(String.format("%s%d : Sonar -> %d",
+                    (char)('A' + attack.getTargetCol()),
+                    attack.getTargetRow() + 1,
+                    mainResult.getSonarCount()));
+        }
+        else if (mainResult.getStatus() == AttackStatus.BLACKHOLE && mainResult.getAttackToRelaunch() != null) {
+            // Cas Trou Noir : Affichage de l'activation + marqueur de contre-coup
+            targetHistory.add(entryBase);
+            targetHistory.add("      -> Attack sent back !");
+        }
+        else {
+            // Cas Missile
+            targetHistory.add(entryBase);
+        }
+
+        // Equilibrage des listes pour l'affichage en colonnes
+        int maxLen = Math.max(_playerAttackHistory.size(), _botAttackHistory.size());
+
+        // Remplir les listes avec des entrées vides (" ") pour maintenir l'alignement visuel
+        while (_playerAttackHistory.size() < maxLen) { _playerAttackHistory.add(" "); }
+        while (_botAttackHistory.size() < maxLen) { _botAttackHistory.add(" "); }
+
+        // Mise à jour de la Vue
+        // Cette méthode dans HistoryPanel rafraîchit les JTextArea pour les deux colonnes.
+        _gameView.getHistoryView().updateHistory(_playerAttackHistory, _botAttackHistory);
+    }
+
+    /**
+     * Handles the result of a single impact of an attack.
+     * Manages the grid display.
+     * @param result The result of a single impact.
+     * @param originalAttack The original Attack.
+     */
+    private void processSingleImpact(AttackResult result, Attack originalAttack) {
         Point hitCoordinates = result.getHitCoordinates();
-        targetGridView.updateCellDisplay(result, hitCoordinates.x, hitCoordinates.y);
+        String playerName = originalAttack.getAttackingPlayer().getName();
+        GridView targetGridView = originalAttack.getTargetPlayer().getGridView();
+
+        // Mise à jour de la grille et du statut de la victime
+        updateGameView(result, playerName, targetGridView, hitCoordinates.x, hitCoordinates.y);
+    }
+
+    /**
+     * Executes the attack returned by the BlackHole.
+     * @param counterAttack The Attack Object prepared by the trap.
+     */
+    private void executeCounterAttack(Attack counterAttack) {
+        Player targetOfCounterAttack = counterAttack.getTargetPlayer();
+        GridView attackerGridView = targetOfCounterAttack.getGridView();
+
+        _gameView.setStatus("Trap triggered ! Attack sent back to " + targetOfCounterAttack.getName() + " !");
+
+        // Exécuter la relance complète
+        ArrayList<AttackResult> counterResults = targetOfCounterAttack.receiveAttack(counterAttack);
+
+        // Afficher tous les impacts du contre-coup
+        for (AttackResult finalHit : counterResults) {
+            Point hitCoordinates = finalHit.getHitCoordinates();
+
+            // Mise à jour de la grille du joueur qui s'est tiré dessus
+            attackerGridView.updateCellDisplay(finalHit, hitCoordinates.x, hitCoordinates.y);
+
+            // Mettre à jour le statut global avec le dernier message
+            _gameView.setStatus(finalHit.getMessage());
+        }
+    }
+
+    private void updateGameView(AttackResult result, String playerName, GridView targetGridView, int row, int col) {
+        // Mettre à jour la grille visuelle
+        targetGridView.updateCellDisplay(result, row, col);
 
         // Mettre à jour le statut
         _gameView.setStatus(playerName + " shot at coordinates " + (char)('A' + col) + (row + 1) + ". Result : " + result.getMessage());

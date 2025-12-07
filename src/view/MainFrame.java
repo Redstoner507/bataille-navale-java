@@ -10,14 +10,12 @@ public class MainFrame extends JFrame {
     public MainFrame() {
         setTitle("Bataille Navale");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(1000, 800);
-        setLocationRelativeTo(null);
         _cardLayout = new CardLayout();
         _container = new JPanel(_cardLayout);
         setContentPane(_container);
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(1280, 720);
+        setSize(1600, 720);
         setLocationRelativeTo(null);
     }
 

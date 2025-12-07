@@ -12,6 +12,7 @@ import java.awt.*;
 public class GameView extends JPanel {
     private final JLabel _statusLabel; // Status du jeu
     private final GridView _computerGridView;
+    private final HistoryView _historyView;
 
     public GameView(GridView playerGridView, GridView computerGridView, PlacementController placementController, Grid computerGrid, ConfigController configController, GameController gameController) {
         setLayout(new BorderLayout(10, 10));
@@ -36,12 +37,12 @@ public class GameView extends JPanel {
         playerControlPanel.add(weaponSelectionPanel, BorderLayout.SOUTH);
 
 
-        // --- 2. Panneau Central contenant les 2 Grilles ---
+        // --- 2. Panneau Central contenant les 2 Grilles et l'historique ---
 
-        JPanel gridsPanel = new JPanel(new GridLayout(1, 2, 30, 0));
+        JPanel gridsPanel = new JPanel(new GridLayout(1, 3, 30, 0));
         gridsPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
-        // Grille de l'ordinateur (Attaque)
+        // Grille de l'ordinateur
         LabeledGridView computerLabeledGridView = new LabeledGridView("Enemy ships", computerGridView, false);
         _computerGridView = computerLabeledGridView.getGridView();
         _computerGridView.setAttackListener(gameController::handleHumanAttack);
@@ -50,8 +51,15 @@ public class GameView extends JPanel {
         placementController.randomObjectsPlacement(computerGrid, _computerGridView, configController.getAllPlaceables());
         _computerGridView.clearGrid(); // Cache les bateaux
 
+        // Historique
+        _historyView = new HistoryView();
+
         // Ajouter le Panneau de Contrôle du Joueur à gauche
         gridsPanel.add(playerControlPanel);
+
+        // Ajouter l'historique au centre
+        gridsPanel.add(_historyView);
+
         // Ajouter la Grille de l'Ordinateur à droite
         gridsPanel.add(computerLabeledGridView);
 
@@ -100,5 +108,9 @@ public class GameView extends JPanel {
 
     public GridView getComputerGridView() {
         return _computerGridView;
+    }
+
+    public HistoryView getHistoryView() {
+        return _historyView;
     }
 }

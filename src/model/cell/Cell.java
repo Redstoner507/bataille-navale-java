@@ -62,12 +62,14 @@ public abstract class Cell {
         }
         _isHit = true;
         if (_object == null) {
-            AttackStatus status = null;
             switch (_type) {
-                case WATER -> status = AttackStatus.MISS;
-                case ISLAND -> status = AttackStatus.ISLAND_MISS;
+                case WATER -> {
+                    return new AttackResult(AttackStatus.MISS, "You missed !");
+                }
+                case ISLAND -> {
+                    return new AttackResult(AttackStatus.ISLAND_MISS, "You found nothing !");
+                }
             }
-            return new AttackResult(status, "You missed !");
         }
         return _object.hit();
     }
