@@ -14,15 +14,22 @@ public class ConfigScreen extends JPanel {
     private final JSpinner _carrierSpinner, _battleshipSpinner, _cruiserSpinner, _submarineSpinner, _destroyerSpinner;
     private final JLabel _occupiedCellsLabel;
     private final JCheckBox _islandCheckBox;
-    private final JComboBox<String> _aiLevelBox;
+    private final JComboBox<String> _computerLevelBox;
 
     public ConfigScreen(GameController gameController, ConfigController configController) {
         setLayout(new BorderLayout());
+
+        // Conteneur pour le centrage
+        JPanel centerWrapper = new JPanel(new GridBagLayout());
+        add(centerWrapper, BorderLayout.CENTER);
 
         // Conteneur principal pour tous les éléments de configuration
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
+
+        // Ajouter le contentPanel au GridBagLayout
+        centerWrapper.add(contentPanel, new GridBagConstraints());
 
         // Titre
         JLabel title = new JLabel("Game Configuration", SwingConstants.CENTER);
@@ -43,6 +50,7 @@ public class ConfigScreen extends JPanel {
         _gridSizeSlider.setPreferredSize(new Dimension(200, 50));
 
         gridPanel.add(_gridSizeSlider);
+        gridPanel.setAlignmentX(CENTER_ALIGNMENT);
         contentPanel.add(gridPanel);
         contentPanel.add(Box.createVerticalStrut(20));
 
@@ -52,13 +60,14 @@ public class ConfigScreen extends JPanel {
         _occupiedCellsLabel.setAlignmentX(CENTER_ALIGNMENT);
         _occupiedCellsLabel.setFont(new Font("Arial", Font.BOLD, 14));
 
-        // Panneau pour les spinners de bateaux (GridBagLayout pour aligner les titres)
-        JPanel shipConfigPanel = new JPanel(new GridLayout(6, 1));
+        // Panneau pour les spinners de bateaux
+        JPanel shipConfigPanel = new JPanel();
         shipConfigPanel.setLayout(new BoxLayout(shipConfigPanel, BoxLayout.Y_AXIS));
 
         // Panneau enveloppe pour centrer le BoxLayout horizontalement
         JPanel shipPanelWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER));
         shipPanelWrapper.add(shipConfigPanel);
+        shipPanelWrapper.setAlignmentX(CENTER_ALIGNMENT);
 
         _occupiedCellsLabel.setAlignmentX(CENTER_ALIGNMENT);
         shipConfigPanel.add(_occupiedCellsLabel); // Ajout du label dans le panneau
@@ -89,16 +98,17 @@ public class ConfigScreen extends JPanel {
 
         // Difficulté de l'ordinateur
         String[] options = {"Very Easy", "Easy", "Medium", "Hard", "Very Hard"};
-        _aiLevelBox = new JComboBox<>(options);
+        _computerLevelBox = new JComboBox<>(options);
 
-        JPanel aiPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        aiPanel.add(new JLabel("Computer difficulty : "));
-        aiPanel.add(_aiLevelBox);
-        aiPanel.setAlignmentX(CENTER_ALIGNMENT);
-        verticalOptionsPanel.add(aiPanel);
+        JPanel computerDifficultyPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        computerDifficultyPanel.add(new JLabel("Computer difficulty : "));
+        computerDifficultyPanel.add(_computerLevelBox);
+        computerDifficultyPanel.setAlignmentX(CENTER_ALIGNMENT);
+        verticalOptionsPanel.add(computerDifficultyPanel);
         verticalOptionsPanel.add(Box.createVerticalStrut(10)); // Espacement
 
         optionsPanel.add(verticalOptionsPanel, BorderLayout.CENTER);
+        optionsPanel.setAlignmentX(CENTER_ALIGNMENT);
         contentPanel.add(optionsPanel);
         contentPanel.add(Box.createVerticalStrut(20));
 
@@ -110,11 +120,9 @@ public class ConfigScreen extends JPanel {
         buttonPanel.add(backButton);
         buttonPanel.add(Box.createHorizontalStrut(20));
         buttonPanel.add(startPlacementButton);
+        buttonPanel.setAlignmentX(CENTER_ALIGNMENT);
 
         contentPanel.add(buttonPanel);
-
-        // Centrer le contentPanel dans le BorderLayout
-        add(contentPanel, BorderLayout.CENTER);
 
         // Listeners
         _gridSizeSlider.addChangeListener(e -> {
@@ -137,8 +145,8 @@ public class ConfigScreen extends JPanel {
             }
         });
 
-        _aiLevelBox.addActionListener(e -> {
-            String selectedLevel = (String) _aiLevelBox.getSelectedItem();
+        _computerLevelBox.addActionListener(e -> {
+            String selectedLevel = (String) _computerLevelBox.getSelectedItem();
             configController.setPlayerStrategy(selectedLevel);
         });
 

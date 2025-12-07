@@ -43,14 +43,14 @@ public class PlacementScreen extends JPanel {
         add(buttonPanel, BorderLayout.SOUTH);
 
         // Conteneur pour le Centrage Horizontal
-        JPanel centerWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        JPanel centerWrapper = new JPanel(new GridBagLayout());
         add(centerWrapper, BorderLayout.CENTER);
 
         JLayeredPane mainLayeredPane = new JLayeredPane();
         mainLayeredPane.setPreferredSize(new Dimension(totalContentWidth, gridHeight));
         mainLayeredPane.setLayout(null);
 
-        centerWrapper.add(mainLayeredPane, BorderLayout.CENTER);
+        centerWrapper.add(mainLayeredPane, new GridBagConstraints());
 
         // Conteneur des Bateaux
         _shipPanel = new JPanel();
