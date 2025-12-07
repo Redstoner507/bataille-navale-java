@@ -2,8 +2,7 @@ package controller;
 
 import model.Grid;
 import model.Orientation;
-import model.cell.CellState;
-import model.ship.Ship;
+import model.Placeable;
 import view.CellView;
 import view.GridView;
 
@@ -15,16 +14,16 @@ public class PlacementController {
     public PlacementController() {}
 
     /**
-     * Tries to place a ship in the grid and updates the view if it was successful.
-     * @return true if the ship was placed in the grid, false otherwise.
+     * Tries to place an object in the grid and updates the view if it was successful.
+     * @return true if the object was placed in the grid, false otherwise.
      */
-    public boolean placeShip(Grid modelGrid, GridView viewGrid, Ship ship, int row, int col) {
-        if (!modelGrid.placeObject(ship, row, col)) return false;
+    public boolean placeObject(Grid modelGrid, GridView viewGrid, Placeable object, int row, int col) {
+        if (!modelGrid.placeObject(object, row, col)) return false;
 
-        for (Point p : ship.getCoordinates()) {
+        for (Point p : object.getCoordinates()) {
             CellView cell = viewGrid.getCell(p.x, p.y);
             if (cell != null) {
-                cell.setCellIcon(CellState.SHIP);
+                cell.setCellIcon(object.getCellState());
             }
         }
 
@@ -34,25 +33,25 @@ public class PlacementController {
     /**
      * Randomly places all ships in the grid.
      */
-    public void randomShipsPlacement(Grid modelGrid, GridView viewGrid, ArrayList<Ship> ships) {
+    public void randomObjectsPlacement(Grid modelGrid, GridView viewGrid, ArrayList<Placeable> objects) {
         clearGrid(modelGrid, viewGrid);
 
         Random rand = new Random();
 
-        for (Ship ship : ships) {
+        for (Placeable placeable : objects) {
             boolean placed;
             do {
                 // Random orientation
                 Orientation orientation =
                     rand.nextBoolean() ? Orientation.HORIZONTAL : Orientation.VERTICAL;
-                ship.setOrientation(orientation);
+                placeable.setOrientation(orientation);
 
                 // Random position
                 int row = rand.nextInt(modelGrid.getSize());
                 int col = rand.nextInt(modelGrid.getSize());
 
                 // Use controller logic
-                placed = placeShip(modelGrid, viewGrid, ship, row, col);
+                placed = placeObject(modelGrid, viewGrid, placeable, row, col);
             } while (!placed);
         }
     }
@@ -60,14 +59,14 @@ public class PlacementController {
     /**
      * Changes the ship orientation.
      */
-    public void rotateShip(Ship ship) {
-        ship.setOrientation(
-            ship.getOrientation() == Orientation.HORIZONTAL ? Orientation.VERTICAL : Orientation.HORIZONTAL
+    public void rotatePlaceable(Placeable placeable) {
+        placeable.setOrientation(
+            placeable.getOrientation() == Orientation.HORIZONTAL ? Orientation.VERTICAL : Orientation.HORIZONTAL
         );
     }
 
     public void clearGrid(Grid modelGrid, GridView viewGrid) {
         modelGrid.resetGrid();
-        viewGrid.clearShips();
+        viewGrid.clearGrid();
     }
 }

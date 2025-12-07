@@ -1,7 +1,7 @@
 package view;
 
 import controller.AttackListener;
-import controller.ShipPlacementListener;
+import controller.ObjectPlacementListener;
 import model.AttackResult;
 import model.Grid;
 import model.cell.Cell;
@@ -18,7 +18,7 @@ public class GridView extends JPanel {
     private final int _gridSize;        // Taille de la grille
     private final CellView[][] _cells;  // Cases de la grille
     private boolean _locked = false;    // Etat verrouillé
-    private ShipPlacementListener _placementListener;
+    private ObjectPlacementListener _placementListener;
     private AttackListener _attackListener;
 
     public GridView(int gridSize, int cellSize, Grid grid) {
@@ -110,6 +110,8 @@ public class GridView extends JPanel {
                 cell.displaySonarScan(result.getSonarCount());
                 return;
             }
+            case BLACKHOLE -> cell.setCellIcon(CellState.BLACKHOLE);
+            case TORNADO -> cell.setCellIcon(CellState.TORNADO);
         }
         // La cellule n'est plus cliquable après avoir été attaquée.
         cell.setFocusable(false);
@@ -151,16 +153,16 @@ public class GridView extends JPanel {
         }
     }
 
-    public void setShipPlacementListener(ShipPlacementListener listener) {
+    public void setObjectPlacementListener(ObjectPlacementListener listener) {
         this._placementListener = listener;
     }
 
     /**
      * Called by ShipView when a ship is dropped.
      */
-    public boolean notifyShipDropped(ShipView shipView, int row, int col) {
+    public boolean notifyPlaceableDropped(PlaceableView placeableView, int row, int col) {
         if (_placementListener != null) {
-            return _placementListener.shipDropped(shipView, row, col);
+            return _placementListener.objectDropped(placeableView, row, col);
         }
         return false;
     }
@@ -187,17 +189,7 @@ public class GridView extends JPanel {
         return _locked;
     }
 
-    public void clearShips() {
-        for (int r = 0; r < _gridSize; r++) {
-            for (int c = 0; c < _gridSize; c++) {
-                if (_cells[r][c].getCellState() == CellState.SHIP) {
-                    _cells[r][c].setCellIcon(CellState.EMPTY);
-                }
-            }
-        }
-    }
-
-    public void hideGrid() {
+    public void clearGrid() {
         for (int r = 0; r < _gridSize; r++) {
             for (int c = 0; c < _gridSize; c++) {
                 _cells[r][c].setCellIcon(CellState.EMPTY);

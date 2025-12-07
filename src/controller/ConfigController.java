@@ -1,9 +1,10 @@
 package controller;
 
 import model.GameConfig;
-import model.ship.Ship;
+import model.Placeable;
 import model.ship.ShipFactory;
 import model.ship.ShipType;
+import model.trap.TrapFactory;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -28,7 +29,7 @@ public class ConfigController {
         return _gameConfig;
     }
 
-    public ArrayList<Ship> getShipConfig() { 
+    public ArrayList<Placeable> getShipConfig() {
         Map<ShipType, Integer> config = _gameConfig.getShipConfig();
         int carriers    = config.get(ShipType.CARRIER);
         int battleShips = config.get(ShipType.BATTLESHIP);
@@ -39,8 +40,8 @@ public class ConfigController {
         return getShipConfig(carriers, battleShips, cruisers, submarines, destroyers);
     }
     
-    public ArrayList<Ship> getShipConfig(int carriers, int batteShips, int cruisers, int submarines, int destroyer) {
-        ArrayList<Ship> ships = new ArrayList<>();
+    public ArrayList<Placeable> getShipConfig(int carriers, int batteShips, int cruisers, int submarines, int destroyer) {
+        ArrayList<Placeable> ships = new ArrayList<>();
         ShipFactory factory = new ShipFactory();
         for (int i = 0; i < carriers; i++) {
             ships.add(factory.createCarrier());
@@ -58,6 +59,23 @@ public class ConfigController {
             ships.add(factory.createDestroyer());
         }
         return ships;
+    }
+
+    public ArrayList<Placeable> getTrapConfig() {
+        ArrayList<Placeable> traps = new ArrayList<>();
+        TrapFactory factory = new TrapFactory();
+        if (!_gameConfig.isIslandModeEnabled()) {
+            traps.add(factory.createBlackHole());
+            traps.add(factory.createTornado());
+        }
+        return traps;
+    }
+
+    public ArrayList<Placeable> getAllPlaceables() {
+        ArrayList<Placeable> placeables = new ArrayList<>();
+        placeables.addAll(getShipConfig());
+        placeables.addAll(getTrapConfig());
+        return placeables;
     }
 
     public void setIslandModeEnabled(boolean islandsEnabled) {
