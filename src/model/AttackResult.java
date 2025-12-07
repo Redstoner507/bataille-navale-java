@@ -1,6 +1,7 @@
 package model;
 
 import java.awt.*;
+import java.util.ArrayList;
 
 /**
  * Représents the result of an attack after being applied to the grid.
@@ -10,6 +11,7 @@ public class AttackResult {
 
     private final AttackStatus _status; // Le résultat principal du coup
     private String _message;            // Message à afficher à l'utilisateur
+    private Attack _attackToRelaunch;
 
     // Informations
     private int _rowHit;                // La ligne touchée
@@ -48,5 +50,13 @@ public class AttackResult {
 
     public Integer getSonarCount() {
         return _sonarCount;
+    }
+
+    public Attack getAttackToRelaunch() {
+        return _attackToRelaunch;
+    }
+
+    public void setAttackToRelaunch(Attack attack) {
+        this._attackToRelaunch = attack;
     }
 }

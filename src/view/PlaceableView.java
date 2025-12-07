@@ -31,8 +31,6 @@ public class PlaceableView extends JLabel {
         this._orientation =_placeable.getOrientation();
         this._imagePath = imagePath;
 
-        System.out.println(imagePath);
-
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setOpaque(false);
 

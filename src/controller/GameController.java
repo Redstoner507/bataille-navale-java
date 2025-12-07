@@ -124,10 +124,24 @@ public class GameController {
     public void endTurn(ArrayList<AttackResult> results, Attack attack) {
         // Afficher le résultat du coup
         String playerName = attack.getAttackingPlayer().getName();
-        GridView playerGridView = attack.getTargetPlayer().getGridView();
+        GridView targetGridView = attack.getTargetPlayer().getGridView();
+        GridView attackerGridView = attack.getAttackingPlayer().getGridView();
+
         for (AttackResult result : results) {
             Point hitCoordinates = result.getHitCoordinates();
-            updateGameView(result, playerName, playerGridView, hitCoordinates.x, hitCoordinates.y);
+            updateGameView(result, playerName, targetGridView, hitCoordinates.x, hitCoordinates.y);
+
+            if (result.getStatus() == AttackStatus.BLACKHOLE && result.getAttackToRelaunch() != null) {
+                Attack counterAttack = result.getAttackToRelaunch();
+                Player targetOfCounterAttack = counterAttack.getTargetPlayer();
+
+                ArrayList<AttackResult> counterResults = targetOfCounterAttack.receiveAttack(counterAttack);
+
+                for (AttackResult finalHit : counterResults) {
+                    attackerGridView.updateCellDisplay(finalHit, finalHit.getHitCoordinates().x, finalHit.getHitCoordinates().y);
+                    _gameView.setStatus(finalHit.getMessage());
+                }
+            }
         }
 
         if (checkGameOver()) {

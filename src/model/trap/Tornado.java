@@ -12,6 +12,7 @@ public class Tornado extends Trap {
     }
 
     @Override
-    public void activate(Attack attack, AttackResult result) {
+    public AttackResult activate(Attack attack, AttackResult result) {
+        return null;
     }
 }

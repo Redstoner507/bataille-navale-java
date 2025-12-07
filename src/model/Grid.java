@@ -105,9 +105,9 @@ public class Grid {
                 cellHit.setState(CellState.BLACKHOLE);
                 Trap trap = (Trap) cellHit.getObject();
                 cellHit.removeObject();
-                trap.activate(attack, result);
+                AttackResult counterSignal = trap.activate(attack, result);
+                result.setAttackToRelaunch(counterSignal.getAttackToRelaunch());
                 playerGridView.updateCellDisplay(result, hitCoordinates.x, hitCoordinates.y);
-
             }
             case TORNADO -> {
                 cellHit.setState(CellState.TORNADO);
