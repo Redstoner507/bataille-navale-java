@@ -77,11 +77,13 @@ public class PlacementScreen extends JPanel {
         playerGrid.setOpaque(true);
         playerGrid.setMinimumSize(new Dimension(gridPanelWidth, gridPanelHeight)); // Taille minimale
 
+        SquarePanel squarePanel = new SquarePanel(playerGrid);
+
         gbc.gridx = 1;
         gbc.weightx = 0.7; // 70% de l'espace horizontal extensible
         gbc.fill = GridBagConstraints.BOTH; // Permet l'étirement
         gbc.anchor = GridBagConstraints.CENTER; // Centrer au milieu de sa zone
-        mainLayeredPane.add(playerGrid, gbc, JLayeredPane.DEFAULT_LAYER);
+        mainLayeredPane.add(squarePanel, gbc, JLayeredPane.DEFAULT_LAYER);
 
         // Conteneur des Pièges
         _trapPanel = new JPanel();

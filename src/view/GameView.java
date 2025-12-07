@@ -30,7 +30,8 @@ public class GameView extends JPanel {
         // Grille du joueur
         LabeledGridView playerLabeledGridView = new LabeledGridView("Your ships", playerGridView);
         playerGridView.setLocked(true);
-        playerControlPanel.add(playerLabeledGridView, BorderLayout.CENTER);
+        SquarePanel playerSquarePanel = new SquarePanel(playerLabeledGridView);
+        playerControlPanel.add(playerSquarePanel, BorderLayout.CENTER);
 
         // Panneau des armes (à placer en SOUTH du panneau de contrôle du joueur)
         JPanel weaponSelectionPanel = createWeaponSelectionPanel(gameController, new ButtonGroup(), playerGridView);
@@ -61,7 +62,8 @@ public class GameView extends JPanel {
         gridsPanel.add(_historyView);
 
         // Ajouter la Grille de l'Ordinateur à droite
-        gridsPanel.add(computerLabeledGridView);
+        SquarePanel computerSquarePanel = new SquarePanel(computerLabeledGridView);
+        gridsPanel.add(computerSquarePanel);
 
         add(gridsPanel, BorderLayout.CENTER);
 
