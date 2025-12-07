@@ -79,7 +79,7 @@ public class GameView extends JPanel {
      */
     private JPanel createWeaponSelectionPanel(GameController gameController, ButtonGroup buttonGroup, GridView playerGridView) {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
-        panel.setBorder(BorderFactory.createTitledBorder("Armes disponibles"));
+        panel.setBorder(BorderFactory.createTitledBorder("Weapons"));
 
         // Supposons que vous avez une enum WeaponType : MISSILE, BOMB, SONAR
         WeaponType[] availableWeapons = {WeaponType.MISSILE, WeaponType.BOMB, WeaponType.SONAR};
