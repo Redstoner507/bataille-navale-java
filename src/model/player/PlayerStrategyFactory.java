@@ -15,14 +15,17 @@ public class PlayerStrategyFactory {
     }
 
     public PlayerStrategy createComputerMediumStrategy() {
-        return new ComputerMediumStrategy();
+        return new ComputerEasyStrategy();
+        //return new ComputerMediumStrategy(); // Not implemented yet
     }
 
     public PlayerStrategy createComputerHardStrategy() {
-        return new ComputerHardStrategy();
+        return new ComputerEasyStrategy();
+        //return new ComputerHardStrategy(); // Not implemented yet
     }
 
     public PlayerStrategy createComputerVeryHardStrategy() {
-        return new ComputerVeryHardStrategy();
+        return new ComputerEasyStrategy(); 
+        //return new ComputerVeryHardStrategy(); // Not implemented yet
     }
 }
