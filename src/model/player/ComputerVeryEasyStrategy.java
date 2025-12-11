@@ -1,7 +1,6 @@
 package model.player;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 import model.Attack;
 import model.AttackResult;
@@ -11,9 +10,7 @@ public class ComputerVeryEasyStrategy extends PlayerStrategy {
     @Override
     public Attack getAttack(ArrayList<AttackResult> previousAttackResults) {
         // Generate completely random coordinates
-        Random random = new Random();
-        int row = random.nextInt(10);
-        int col = random.nextInt(10);
+        int[] coords = super.getRandomCoordinates();
         
         // Randomly choose a weapon (mostly missile, sometimes bomb)
         Weapon selectedWeapon = this.missile; // Default weapon for very easy strategy
@@ -21,6 +18,6 @@ public class ComputerVeryEasyStrategy extends PlayerStrategy {
             selectedWeapon = this.bomb;
             this.bombUses--;
         }
-        return new Attack(null, null, selectedWeapon, row, col); // Player will be set later
+        return new Attack(null, null, selectedWeapon, coords[0], coords[1]); // Player will be set later
     }
 }

@@ -112,6 +112,9 @@ public class GridView extends JPanel {
             }
             case BLACKHOLE -> cell.setCellIcon(CellState.BLACKHOLE);
             case TORNADO -> cell.setCellIcon(CellState.TORNADO);
+            case ALREADY_VISITED -> {
+                return;
+            }
         }
         // La cellule n'est plus cliquable après avoir été attaquée.
         cell.setFocusable(false);

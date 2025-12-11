@@ -95,7 +95,11 @@ public class CellView extends JLabel {
             case TORNADO -> {
                 _baseImage = IMG_WATER;
                 _overlayImage = IMG_TORNADO;
-            }
+            }      
+            case OBJECT -> {
+                _baseImage = IMG_WATER;
+                // Pas de superposition spécifique pour l'instant
+            }      
         }
 
         _cellState = state;
