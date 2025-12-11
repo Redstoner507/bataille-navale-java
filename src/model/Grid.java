@@ -88,14 +88,6 @@ public class Grid {
 
         GridView playerGridView = attack.getTargetPlayer().getGridView();
 
-        if (_tornadoEffect > 0) {
-            _tornadoEffect--;
-        }
-        else {
-            _rowOffset = 0;
-            _colOffset = 0;
-        }
-
         switch (result.getStatus()) {
             case MISS -> cellHit.setState(CellState.MISS);
             case HIT -> {
@@ -197,5 +189,14 @@ public class Grid {
         int realRow = (realCoordinates.x + _rowOffset) % _size;
         int realCol = (realCoordinates.y + _colOffset) % _size;
         return new Point(realRow, realCol);
+    }
+
+    public void decreaseEffects(AttackResult baseResult) {
+        if (baseResult.getStatus() == AttackStatus.ALREADY_VISITED) return;
+        _tornadoEffect--;
+        if (_tornadoEffect <= 0) {
+            _rowOffset = 0;
+            _colOffset = 0;
+        }
     }
 }
