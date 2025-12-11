@@ -50,7 +50,7 @@ public class GameView extends JPanel {
 
         // Logique de placement aléatoire de l'ordinateur
         placementController.randomObjectsPlacement(computerGrid, _computerGridView, configController.getAllPlaceables());
-        _computerGridView.clearGrid(); // Cache les bateaux
+        //_computerGridView.clearGrid(); // Cache les bateaux
 
         // Historique
         _historyView = new HistoryView();

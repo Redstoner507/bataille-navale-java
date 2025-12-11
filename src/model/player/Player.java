@@ -5,6 +5,7 @@ import model.ship.Ship;
 import model.weapon.Weapon;
 import view.GridView;
 
+import java.awt.*;
 import java.util.ArrayList;
 
 public class Player {
@@ -48,11 +49,10 @@ public class Player {
      * @return AttackResult The result of the attack.
      */
     public ArrayList<AttackResult> receiveAttack(Attack attack) {
-        // La logique de Piège (Trou Noir, Tornade) devrait être vérifiée ici ou dans applyAttack.
-        // Pour l'instant, nous déléguons directement à la grille.
 
-        // getGrid() est la grille de défense de ce joueur.
         Weapon weapon = attack.getWeapon();
+        Point realCoords = _grid.applyOffset(attack.getRealCoordinates());
+        attack.setRealCoordinates(realCoords);
         ArrayList<AttackResult> results = weapon.applyAttack(_grid, attack);
         for(AttackResult result : results) {
             _grid.applyAttack(attack, result);

@@ -13,6 +13,6 @@ public class Tornado extends Trap {
 
     @Override
     public AttackResult activate(Attack attack, AttackResult result) {
-        return null;
+        return new AttackResult(AttackStatus.TORNADO, "You triggered a Tornado !");
     }
 }

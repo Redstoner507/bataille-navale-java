@@ -181,8 +181,8 @@ public class GameController {
 
         // Créer la chaîne de base
         String entryBase = String.format("%s%d : %s",
-                (char)('A' + attack.getTargetCol()),
-                attack.getTargetRow() + 1,
+                (char)('A' + attack.getRealCol()),
+                attack.getRealRow() + 1,
                 mainResult.getMessage());
 
         // Gérer les cas spéciaux et ajouter les entrées à la liste
@@ -203,8 +203,8 @@ public class GameController {
         else if (attack.getWeapon().getWeaponType() == WeaponType.SONAR && mainResult.getSonarCount() != null) {
             // Cas Sonar : Affichage du compte des objets trouvés
             targetHistory.add(String.format("%s%d : Sonar -> %d",
-                    (char)('A' + attack.getTargetCol()),
-                    attack.getTargetRow() + 1,
+                    (char)('A' + attack.getRealCol()),
+                    attack.getRealRow() + 1,
                     mainResult.getSonarCount()));
         }
         else if (mainResult.getStatus() == AttackStatus.BLACKHOLE && mainResult.getAttackToRelaunch() != null) {

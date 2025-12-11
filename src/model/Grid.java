@@ -10,6 +10,7 @@ import view.GridView;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Grid {
     private static final int MIN_SIZE = 6;
@@ -18,10 +19,15 @@ public class Grid {
     private static final int ISLAND_START = 3;
     private static final int ISLAND_END = 7;
 
+    private static final int TORNADO_DURATION = 3;
+
     private final int _size;
     private final Cell[][] _cells;
     private final ArrayList<Placeable> _objects = new ArrayList<>();
     private final boolean _islandMode;
+    private int _rowOffset = 0;
+    private int _colOffset = 0;
+    private int _tornadoEffect = 0;
 
     public Grid(int size, boolean islandMode) {
         if (size < MIN_SIZE || size > MAX_SIZE)
@@ -76,10 +82,19 @@ public class Grid {
      * @param result The AttackResult
      */
     public void applyAttack(Attack attack, AttackResult result) {
-        Point hitCoordinates = result.getHitCoordinates();
+        int realRow = attack.getRealRow();
+        int realCol = attack.getRealCol();
+        Cell cellHit = getCell(realRow, realCol);
 
-        Cell cellHit = getCell(hitCoordinates.x, hitCoordinates.y);
         GridView playerGridView = attack.getTargetPlayer().getGridView();
+
+        if (_tornadoEffect > 0) {
+            _tornadoEffect--;
+        }
+        else {
+            _rowOffset = 0;
+            _colOffset = 0;
+        }
 
         switch (result.getStatus()) {
             case MISS -> cellHit.setState(CellState.MISS);
@@ -107,14 +122,15 @@ public class Grid {
                 cellHit.removeObject();
                 AttackResult counterSignal = trap.activate(attack, result);
                 result.setAttackToRelaunch(counterSignal.getAttackToRelaunch());
-                playerGridView.updateCellDisplay(result, hitCoordinates.x, hitCoordinates.y);
+                playerGridView.updateCellDisplay(result, realRow, realCol);
             }
             case TORNADO -> {
                 cellHit.setState(CellState.TORNADO);
                 Trap trap = (Trap) cellHit.getObject();
                 cellHit.removeObject();
                 trap.activate(attack, result);
-                playerGridView.updateCellDisplay(result, hitCoordinates.x, hitCoordinates.y);
+                playerGridView.updateCellDisplay(result, realRow, realCol);
+                activateTornadoEffect();
             }
         }
     }
@@ -143,7 +159,10 @@ public class Grid {
 
     public Cell getCell(int row, int col) {
         // Vérification de la validité de la cible (hors limites ou déjà touchée)
-        if (!isCoordinateValid(row, col)) return null;
+        if (!isCoordinateValid(row, col)) {
+            throw new IllegalArgumentException("Coordinates must be between " + MIN_SIZE + " and " + MAX_SIZE + "\n" +
+            "Row : " + row + ", Col : " + col);
+        }
         return _cells[row][col];
     }
 
@@ -162,5 +181,21 @@ public class Grid {
 
     public boolean isCoordinateValid(int row, int col) {
         return (row >= 0 & row < _size && col >= 0 && col < _size);
+    }
+
+    public void activateTornadoEffect() {
+        _tornadoEffect = TORNADO_DURATION;
+    }
+
+    public Point applyOffset(Point realCoordinates) {
+        if (_tornadoEffect <= 0) return realCoordinates;
+
+        Random random = new Random();
+        _rowOffset = random.nextInt(1, _size);
+        _colOffset = random.nextInt(1, _size);
+
+        int realRow = (realCoordinates.x + _rowOffset) % _size;
+        int realCol = (realCoordinates.y + _colOffset) % _size;
+        return new Point(realRow, realCol);
     }
 }

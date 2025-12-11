@@ -17,8 +17,8 @@ public class Bomb extends Weapon{
 
     @Override
     public ArrayList<AttackResult> applyAttack(Grid grid, Attack attack) {
-        int centerRow = attack.getTargetRow();
-        int centerCol = attack.getTargetCol();
+        int centerRow = attack.getRealRow();
+        int centerCol = attack.getRealCol();
 
         ArrayList<AttackResult> impactResults = new ArrayList<>();
 

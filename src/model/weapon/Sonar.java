@@ -20,8 +20,8 @@ public class Sonar extends Weapon{
     public ArrayList<AttackResult> applyAttack(Grid grid, Attack attack) {
         ArrayList<AttackResult> sonarResults = new ArrayList<>();
 
-        int centerRow = attack.getTargetRow();
-        int centerCol = attack.getTargetCol();
+        int centerRow = attack.getRealRow();
+        int centerCol = attack.getRealCol();
 
         Cell centerCell = grid.getCell(centerRow, centerCol);
         // Ne pas pouvoir utiliser le sonar sur l'île

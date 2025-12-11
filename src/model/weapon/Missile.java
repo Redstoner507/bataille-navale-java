@@ -15,8 +15,8 @@ public class Missile extends Weapon{
 
     @Override
     public ArrayList<AttackResult> applyAttack(Grid grid, Attack attack) {
-        int row = attack.getTargetRow();
-        int col = attack.getTargetCol();
+        int row = attack.getRealRow();
+        int col = attack.getRealCol();
         Cell cell = grid.getCell(row, col);
         ArrayList<AttackResult> results = new ArrayList<>();
         AttackResult result = cell.hit();
