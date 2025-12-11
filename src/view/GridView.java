@@ -69,7 +69,7 @@ public class GridView extends JPanel {
 
     private CellView getCellView(int cellSize, int row, int col, Grid grid) {
         Cell cell = grid.getCell(row, col);
-        CellView cellView = new CellView(new Point(row, col), cellSize, cell.getType());
+        CellView cellView = new CellView(cellSize, cell.getType());
         cellView.setPreferredSize(new Dimension(50, 50)); // taille carrée
         cellView.setBorder(new LineBorder(Color.BLACK)); // quadrillage
         cellView.setOpaque(true);
@@ -132,27 +132,6 @@ public class GridView extends JPanel {
         }
     }
 
-    /**
-     * Activates or deactivates a single cell.
-     */
-    public void setCellEnabled(int row, int col, boolean enabled) {
-        if (row < 0 || row >= _gridSize || col < 0 || col >= _gridSize) {
-            return;
-        }
-        _cells[row][col].setFocusable(enabled);
-    }
-
-    /**
-     * Adds a click listener to every cell.
-     */
-    public void addCellClickListener(MouseListener listener) {
-        for (int row = 0; row < _gridSize; row++) {
-            for (int col = 0; col < _gridSize; col++) {
-                _cells[row][col].addMouseListener(listener);
-            }
-        }
-    }
-
     public void setObjectPlacementListener(ObjectPlacementListener listener) {
         this._placementListener = listener;
     }
@@ -183,10 +162,6 @@ public class GridView extends JPanel {
 
     public int getGridSize() {
         return _gridSize;
-    }
-
-    public boolean isLocked() {
-        return _locked;
     }
 
     public void clearGrid() {

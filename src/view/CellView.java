@@ -33,14 +33,11 @@ public class CellView extends JLabel {
     private Image _baseImage;
     private Image _overlayImage;  // image superposée
 
-    private boolean _isClickable = true;
-    private final Point _cellPosition;
     private CellState _cellState;
     private final CellType _cellType;
     private int _sonarCountToDisplay = -1;
 
-    public CellView(Point cellPosition, int cellSize, CellType cellType) {
-        _cellPosition = cellPosition;
+    public CellView(int cellSize, CellType cellType) {
         _cellType = cellType;
         setCellIcon(CellState.EMPTY);
         setPreferredSize(new Dimension(cellSize, cellSize));
@@ -149,27 +146,10 @@ public class CellView extends JLabel {
      */
     @Override
     public void addMouseListener(MouseListener l) {
-        if (_isClickable)
-            super.addMouseListener(l);
+        super.addMouseListener(l);
     }
 
     public CellState getCellState() {
         return _cellState;
-    }
-
-    public CellType getCellType() {
-        return _cellType;
-    }
-
-    public void setClickable(boolean clickable) {
-        this._isClickable = clickable;
-    }
-
-    public boolean isClickable() {
-        return _isClickable;
-    }
-
-    public Point getCellPosition() {
-        return _cellPosition;
     }
 }

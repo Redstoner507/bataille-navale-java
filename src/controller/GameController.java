@@ -312,20 +312,12 @@ public class GameController {
         return _player.getGrid();
     }
 
-    public Grid getBotGrid() {
-        return _bot.getGrid();
-    }
-
     public GridView getPlayerGridView() {
         return _player.getGridView();
     }
     
     public void quit() {
         _frame.dispose();
-    }
-
-    public Weapon getSelectedWeapon() {
-        return this._selectedWeapon;
     }
 
     public void setSelectedWeapon(WeaponType weaponType) {

@@ -9,7 +9,7 @@ import java.awt.*;
 public class AttackResult {
 
     private final AttackStatus _status; // Le résultat principal du coup
-    private String _message;            // Message à afficher à l'utilisateur
+    private final String _message;      // Message à afficher à l'utilisateur
     private Attack _attackToRelaunch;
 
     // Informations
@@ -41,10 +41,6 @@ public class AttackResult {
 
     public String getMessage() {
         return _message;
-    }
-
-    public void setMessage(String message) {
-        this._message = message;
     }
 
     public Integer getSonarCount() {

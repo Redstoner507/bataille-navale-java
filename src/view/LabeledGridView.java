@@ -49,8 +49,4 @@ public class LabeledGridView extends JPanel {
     public GridView getGridView() {
         return _gridView;
     }
-
-    public void setTitle(String title) {
-        _titleLabel.setText(title);
-    }
 }
