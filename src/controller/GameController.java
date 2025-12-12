@@ -64,22 +64,22 @@ public class GameController {
         _bot = new Player(config.getGridSize(), CELL_SIZE, "Computer", config.isIslandModeEnabled());
 
         PlayerStrategyFactory playerStrategyFactory = new PlayerStrategyFactory();
-        _player.setStrategy(playerStrategyFactory.createHumanStrategy());
+        _player.setStrategy(playerStrategyFactory.createHumanStrategy(config.getGridSize()));
 
         switch (config.getPlayerStrategy()) {
             case COMPUTER_VERY_EASY ->
-                _bot.setStrategy(playerStrategyFactory.createComputerVeryEasyStrategy());
+                _bot.setStrategy(playerStrategyFactory.createComputerVeryEasyStrategy(config.getGridSize()));
             case COMPUTER_EASY ->
-                _bot.setStrategy(playerStrategyFactory.createComputerEasyStrategy());
+                _bot.setStrategy(playerStrategyFactory.createComputerEasyStrategy(config.getGridSize()));
             case COMPUTER_MEDIUM ->
-                _bot.setStrategy(playerStrategyFactory.createComputerMediumStrategy());
+                _bot.setStrategy(playerStrategyFactory.createComputerMediumStrategy(config.getGridSize()));
             case COMPUTER_HARD ->
-                _bot.setStrategy(playerStrategyFactory.createComputerHardStrategy());
+                _bot.setStrategy(playerStrategyFactory.createComputerHardStrategy(config.getGridSize()));
             case COMPUTER_VERY_HARD ->
-                _bot.setStrategy(playerStrategyFactory.createComputerVeryHardStrategy());
+                _bot.setStrategy(playerStrategyFactory.createComputerVeryHardStrategy(config.getGridSize()));
             case HUMAN ->
                 // Default to easy if human is selected for bot (à modifier si multi-joueur ou autre)
-                _bot.setStrategy(playerStrategyFactory.createComputerEasyStrategy());
+                _bot.setStrategy(playerStrategyFactory.createComputerEasyStrategy(config.getGridSize()));
         }
         PlacementScreen placement = new PlacementScreen(this, CELL_SIZE, _placementController, _configController);
         _frame.addScreen(PLACEMENT, placement);
