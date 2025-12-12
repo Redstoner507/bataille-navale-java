@@ -4,11 +4,12 @@ import java.util.ArrayList;
 
 import model.Attack;
 import model.AttackResult;
+import model.GameConfig;
 import model.weapon.Weapon;
 
 public class ComputerVeryEasyStrategy extends PlayerStrategy {
-    public ComputerVeryEasyStrategy (int gridSize) {
-        super(gridSize); // Assuming a default grid size of 10
+    public ComputerVeryEasyStrategy (GameConfig config) {
+        super(config); // Assuming a default grid size of 10
     }
     @Override
     public Attack getAttack(ArrayList<AttackResult> previousAttackResults) {

@@ -8,14 +8,15 @@ import java.util.ArrayList;
 import model.Attack;
 import model.AttackResult;
 import model.AttackStatus;
+import model.GameConfig;
 import model.weapon.Weapon;
 
 public class ComputerMediumStrategy extends PlayerStrategy {
 
     private final Queue<int[]> _priorityCoords = new ArrayDeque<>();
 
-    public ComputerMediumStrategy (int gridSize) {
-        super(gridSize); // Assuming a default grid size of 10
+    public ComputerMediumStrategy (GameConfig config) {
+        super(config); // Assuming a default grid size of 10
     }
     // Same as ComputerEasyStrategy for now
     /*

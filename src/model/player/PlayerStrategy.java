@@ -8,6 +8,7 @@ import java.util.Random;
 
 import model.Attack;
 import model.AttackResult;
+import model.GameConfig;
 import model.weapon.Weapon;
 import model.weapon.WeaponFactory;
 
@@ -20,12 +21,14 @@ public abstract class PlayerStrategy {
     protected final Weapon sonar = new WeaponFactory().createSonar();
     protected int _bombUses = 1; // Example usage limit (à modfier l'emplacement (inventaire) de cette variable)
     protected int _sonarUses = 1; // Example usage limit
+    protected GameConfig _config;
     protected int _gridSize = 10;
 
-    public PlayerStrategy(int gridSize) {
-        this._gridSize = gridSize;
-        for (int row = 0; row < gridSize; row++) {
-            for (int col = 0; col < gridSize; col++) {
+    public PlayerStrategy(GameConfig config) {
+        this._config = config;
+        this._gridSize = config.getGridSize();
+        for (int row = 0; row < _gridSize; row++) {
+            for (int col = 0; col < _gridSize; col++) {
                 coordsList.add(new int[] { row, col });
             }
         }

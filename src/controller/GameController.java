@@ -64,22 +64,22 @@ public class GameController {
         _bot = new Player(config.getGridSize(), CELL_SIZE, "Computer", config.isIslandModeEnabled());
 
         PlayerStrategyFactory playerStrategyFactory = new PlayerStrategyFactory();
-        _player.setStrategy(playerStrategyFactory.createHumanStrategy(config.getGridSize()));
+        _player.setStrategy(playerStrategyFactory.createHumanStrategy(config));
 
         switch (config.getPlayerStrategy()) {
             case COMPUTER_VERY_EASY ->
-                _bot.setStrategy(playerStrategyFactory.createComputerVeryEasyStrategy(config.getGridSize()));
+                _bot.setStrategy(playerStrategyFactory.createComputerVeryEasyStrategy(config));
             case COMPUTER_EASY ->
-                _bot.setStrategy(playerStrategyFactory.createComputerEasyStrategy(config.getGridSize()));
+                _bot.setStrategy(playerStrategyFactory.createComputerEasyStrategy(config));
             case COMPUTER_MEDIUM ->
-                _bot.setStrategy(playerStrategyFactory.createComputerMediumStrategy(config.getGridSize()));
+                _bot.setStrategy(playerStrategyFactory.createComputerMediumStrategy(config));
             case COMPUTER_HARD ->
-                _bot.setStrategy(playerStrategyFactory.createComputerHardStrategy(config.getGridSize()));
+                _bot.setStrategy(playerStrategyFactory.createComputerHardStrategy(config));
             case COMPUTER_VERY_HARD ->
-                _bot.setStrategy(playerStrategyFactory.createComputerVeryHardStrategy(config.getGridSize()));
+                _bot.setStrategy(playerStrategyFactory.createComputerVeryHardStrategy(config));
             case HUMAN ->
                 // Default to easy if human is selected for bot (à modifier si multi-joueur ou autre)
-                _bot.setStrategy(playerStrategyFactory.createComputerEasyStrategy(config.getGridSize()));
+                _bot.setStrategy(playerStrategyFactory.createComputerEasyStrategy(config));
         }
         PlacementScreen placement = new PlacementScreen(this, CELL_SIZE, _placementController, _configController);
         _frame.addScreen(PLACEMENT, placement);

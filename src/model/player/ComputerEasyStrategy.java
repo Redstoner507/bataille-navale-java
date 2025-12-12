@@ -6,11 +6,12 @@ import java.util.ArrayList;
 import model.Attack;
 import model.AttackResult;
 import model.AttackStatus;
+import model.GameConfig;
 import model.weapon.Weapon;
 
 public class ComputerEasyStrategy extends PlayerStrategy {
-    public ComputerEasyStrategy (int gridSize) {
-        super(gridSize); // Assuming a default grid size of 10
+    public ComputerEasyStrategy (GameConfig config) {
+        super(config); // Assuming a default grid size of 10
     }
 
     /*
