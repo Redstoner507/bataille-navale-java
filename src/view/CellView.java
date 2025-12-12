@@ -4,6 +4,7 @@ import javax.swing.*;
 
 import model.cell.CellState;
 import model.cell.CellType;
+import utils.ImageUtils;
 
 import java.awt.*;
 import java.awt.event.MouseListener;
@@ -11,7 +12,7 @@ import java.util.Objects;
 
 public class CellView extends JLabel {  
     private static final Image IMG_SHIP =
-        new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/ship.png"))).getImage();
+        ImageUtils.getSpriteIcon(0, 5).getImage();
     private static final Image IMG_HIT =
             new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/hit.png"))).getImage();
     private static final Image IMG_MISS =

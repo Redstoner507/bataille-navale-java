@@ -8,7 +8,7 @@ import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Objects;
+import utils.ImageUtils;
 
 public class PlaceableView extends JLabel {
     private final Placeable _placeable;
@@ -20,16 +20,16 @@ public class PlaceableView extends JLabel {
     private boolean _dragging = false;
     private Point _dragOffset;
     private final JPanel _segmentPanel = new JPanel();
-    private final String _imagePath;
+    private final int[] _imageLocation;
 
-    public PlaceableView(Placeable _placeable, LabeledGridView grid, JLayeredPane topLayer, JPanel originalPanel, int cellSize, String imagePath) {
+    public PlaceableView(Placeable _placeable, LabeledGridView grid, JLayeredPane topLayer, JPanel originalPanel, int cellSize, int[] imageLocation) {
         this._placeable =_placeable;
         this._grid = grid;
         this._topLayer = topLayer;
         this._originalPanel = originalPanel;
         this._cellSize = cellSize;
         this._orientation =_placeable.getOrientation();
-        this._imagePath = imagePath;
+        this._imageLocation = imageLocation;
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setOpaque(false);
@@ -54,8 +54,9 @@ public class PlaceableView extends JLabel {
         _segmentPanel.setLayout(new BoxLayout(_segmentPanel,
                 _orientation == Orientation.HORIZONTAL ? BoxLayout.X_AXIS : BoxLayout.Y_AXIS));
         // A modifier pour éviter de recharger l'image deux fois
-        Icon img = new ImageIcon(Objects.requireNonNull(getClass().getClassLoader().getResource(_imagePath)));
+        Icon img = ImageUtils.getSpriteIcon(_imageLocation[0], _imageLocation[1]);
         for (int i = 0; i < _placeable.getSize(); i++) {
+            img = ImageUtils.getSpriteIcon(_imageLocation[0], _imageLocation[1]+i);
             JLabel seg = new JLabel(img);
             seg.setPreferredSize(new Dimension(_cellSize, _cellSize));
             seg.setMinimumSize(new Dimension(_cellSize, _cellSize));
