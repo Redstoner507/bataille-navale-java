@@ -1,34 +1,39 @@
 package view;
 
-import controller.GridActionListener;
+import controller.AttackListener;
+import controller.ObjectPlacementListener;
+import model.AttackResult;
 import model.Grid;
+import model.cell.Cell;
+import model.cell.CellState;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 public class GridView extends JPanel {
     private final int _gridSize;        // Taille de la grille
     private final CellView[][] _cells;  // Cases de la grille
     private boolean _locked = false;    // Etat verrouillé
-    private final Grid _grid;           // Grille concrète
-    private GridActionListener _listener;
+    private ObjectPlacementListener _placementListener;
+    private AttackListener _attackListener;
 
-    public GridView(int gridSize, int cellSize) {
+    public GridView(int gridSize, int cellSize, Grid grid) {
         this._gridSize = gridSize;
         this._cells = new CellView[gridSize][gridSize];
-        this._grid = new Grid(gridSize);
 
         setLayout(new BorderLayout());
-        add(createGridPanel(cellSize), BorderLayout.CENTER);
+        add(createGridPanel(cellSize, grid), BorderLayout.CENTER);
     }
 
     /**
      * Creates the main grid panel with column and row headers.
      * @return JPanel
      */
-    private JPanel createGridPanel(int cellSize) {
+    private JPanel createGridPanel(int cellSize, Grid grid) {
         JPanel panel = new JPanel(new GridLayout(_gridSize + 1, _gridSize + 1)); // +1 pour les labels
 
         // Première cellule vide (coin supérieur gauche)
@@ -53,16 +58,69 @@ public class GridView extends JPanel {
 
             // Cases de la grille
             for (int col = 0; col < _gridSize; col++) {
-                CellView cell = new CellView(new Point(row, col), cellSize);
-                cell.setPreferredSize(new Dimension(50, 50)); // taille carrée
-                cell.setBorder(new LineBorder(Color.BLACK)); // quadrillage
-                cell.setEnabled(false); // désactivée par défaut
+                CellView cell = getCellView(cellSize, row, col, grid);
                 _cells[row][col] = cell;
                 panel.add(cell);
             }
         }
 
         return panel;
+    }
+
+    private CellView getCellView(int cellSize, int row, int col, Grid grid) {
+        Cell cell = grid.getCell(row, col);
+        CellView cellView = new CellView(new Point(row, col), cellSize, cell.getType());
+        cellView.setPreferredSize(new Dimension(50, 50)); // taille carrée
+        cellView.setBorder(new LineBorder(Color.BLACK)); // quadrillage
+        cellView.setOpaque(true);
+        cellView.setFocusable(false); // désactivée par défaut
+        final int cellRow = row;
+        final int cellCol = col;
+        cellView.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // 1. Vérifier si la grille n'est pas verrouillée et si la case est cliquable (focus/enabled)
+                if (!_locked && cellView.isFocusable() && e.getButton() == MouseEvent.BUTTON1) {
+                    // 2. Appeler la méthode de la GridView pour informer le Contrôleur
+                      notifyCellAttacked(cellRow, cellCol);
+                }
+            }
+        });
+        return cellView;
+    }
+
+    /**
+     * Updates the appearance of a cell according to the result of an attack.
+     * @param result The result of the attack, contains the status, and the coordinates of the cell affected by the attack.
+     */
+    public void updateCellDisplay(AttackResult result, int row, int col) {
+        CellView cell = _cells[row][col];
+
+        switch (result.getStatus()) {
+            case HIT -> {
+                if (cell.getCellState() != CellState.SUNK) cell.setCellIcon(CellState.HIT);
+            }
+            case SUNK -> cell.setCellIcon(CellState.SUNK);
+
+            case MISS -> cell.setCellIcon(CellState.MISS);
+
+            case ITEM_FOUND, ISLAND_MISS -> cell.setCellIcon(CellState.ISLAND_HIT);
+
+            case SONAR_RESULT -> {
+                cell.displaySonarScan(result.getSonarCount());
+                return;
+            }
+            case BLACKHOLE -> cell.setCellIcon(CellState.BLACKHOLE);
+            case TORNADO -> cell.setCellIcon(CellState.TORNADO);
+            case ALREADY_VISITED -> {
+                return;
+            }
+        }
+        // La cellule n'est plus cliquable après avoir été attaquée.
+        cell.setFocusable(false);
+        for (MouseListener listener : cell.getMouseListeners()) {
+            cell.removeMouseListener(listener);
+        }
     }
 
     /**
@@ -72,7 +130,7 @@ public class GridView extends JPanel {
         _locked = locked;
         for (int row = 0; row < _gridSize; row++) {
             for (int col = 0; col < _gridSize; col++) {
-                _cells[row][col].setEnabled(!locked);
+                _cells[row][col].setFocusable(!locked);
             }
         }
     }
@@ -84,7 +142,7 @@ public class GridView extends JPanel {
         if (row < 0 || row >= _gridSize || col < 0 || col >= _gridSize) {
             return;
         }
-        _cells[row][col].setEnabled(enabled);
+        _cells[row][col].setFocusable(enabled);
     }
 
     /**
@@ -98,18 +156,28 @@ public class GridView extends JPanel {
         }
     }
 
-    public void setGridActionListener(GridActionListener listener) {
-        this._listener = listener;
+    public void setObjectPlacementListener(ObjectPlacementListener listener) {
+        this._placementListener = listener;
     }
 
     /**
      * Called by ShipView when a ship is dropped.
      */
-    public boolean notifyShipDropped(ShipView shipView, int row, int col) {
-        if (_listener != null) {
-            return _listener.shipDropped(shipView, row, col);
+    public boolean notifyPlaceableDropped(PlaceableView placeableView, int row, int col) {
+        if (_placementListener != null) {
+            return _placementListener.objectDropped(placeableView, row, col);
         }
         return false;
+    }
+
+    public void setAttackListener(AttackListener listener) {
+        this._attackListener = listener;
+    }
+
+    public void notifyCellAttacked(int row, int col) {
+        if (_attackListener != null) {
+            _attackListener.onCellAttacked(row, col);
+        }
     }
 
     public CellView getCell(int row, int col) {
@@ -124,7 +192,11 @@ public class GridView extends JPanel {
         return _locked;
     }
 
-    public Grid getGrid() {
-        return _grid;
+    public void clearGrid() {
+        for (int r = 0; r < _gridSize; r++) {
+            for (int c = 0; c < _gridSize; c++) {
+                _cells[r][c].setCellIcon(CellState.EMPTY);
+            }
+        }
     }
 }

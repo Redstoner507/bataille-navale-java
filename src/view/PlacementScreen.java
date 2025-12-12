@@ -1,26 +1,35 @@
 package view;
 
+import controller.ConfigController;
 import controller.GameController;
 import controller.PlacementController;
 import model.Orientation;
+import model.Placeable;
 import model.ship.Ship;
+import model.trap.Trap;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 
 public class PlacementScreen extends JPanel {
-    private static final int SHIP_PANEL_WIDTH = 300;
-    private static final int LABEL_HEIGHT = 20;
     private final JPanel _shipPanel;
+    private final JPanel _trapPanel;
     private Orientation _currentOrientation = Orientation.HORIZONTAL;
 
-    public PlacementScreen(GameController gameController, int gridSize, ArrayList<Ship> ships, int cellSize, PlacementController placementController) {
-        
+    public PlacementScreen(GameController gameController, int cellSize, PlacementController placementController, ConfigController configController) {
+
+        int gridSize = gameController.getPlayerGrid().getSize();
+
         setLayout(new BorderLayout(10, 10));
 
-        int width = SHIP_PANEL_WIDTH + (gridSize+1) * cellSize;
-        int height = (gridSize+1) * cellSize + LABEL_HEIGHT;
+        // Calcul des tailles basées sur la grille
+        int gridPanelWidth = (gridSize+1) * cellSize;
+        int gridPanelHeight = (gridSize+1) * cellSize;
+
+        // Définir des largeurs minimales pour les panneaux latéraux
+        final int MIN_SHIP_WIDTH = 250;
+        final int MIN_TRAP_WIDTH = 100;
 
         // Panneau boutons
         JPanel buttonPanel = new JPanel(new FlowLayout());
@@ -36,41 +45,93 @@ public class PlacementScreen extends JPanel {
         buttonPanel.add(cancelButton);
         add(buttonPanel, BorderLayout.SOUTH);
 
-        // LayeredPane pour superposer la grille et les ShipView
-        JLayeredPane layeredPane = new JLayeredPane();
-        layeredPane.setPreferredSize(new Dimension(width, height));
-        layeredPane.setLayout(null); // layout absolu pour setBounds
-        add(layeredPane, BorderLayout.CENTER);
+        // JLayeredPane Principal
+        JLayeredPane mainLayeredPane = new JLayeredPane();
+        mainLayeredPane.setLayout(new GridBagLayout());
+        add(mainLayeredPane, BorderLayout.CENTER);
 
-        // Grille joueur
-        LabeledGridView playerGrid = new LabeledGridView("Place your ships in the grid", gridSize, cellSize, false);
-        playerGrid.setOpaque(true);
-        playerGrid.setBounds(SHIP_PANEL_WIDTH, 0, width - SHIP_PANEL_WIDTH, height);
-        layeredPane.add(playerGrid, JLayeredPane.DEFAULT_LAYER);
+        // Configuration des contraintes pour l'étirement
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(0, 5, 0, 5); // Marge
+        gbc.gridy = 0; // Tous sur la même ligne
+        gbc.weighty = 1.0; // Prendre toute la hauteur
 
-        // Panel gauche : bateaux à drag
+        // Conteneur des Bateaux
         _shipPanel = new JPanel();
-        _shipPanel.setLayout(new BoxLayout(_shipPanel, BoxLayout.Y_AXIS));
+        _shipPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
         _shipPanel.setBorder(BorderFactory.createTitledBorder("Your ships"));
         _shipPanel.setOpaque(true);
         _shipPanel.setBackground(Color.LIGHT_GRAY);
-        _shipPanel.setBounds(0, 0, SHIP_PANEL_WIDTH, height);
-        layeredPane.add(_shipPanel, JLayeredPane.DEFAULT_LAYER);
+        Dimension minShipDim = new Dimension(MIN_SHIP_WIDTH, 1);
+        _shipPanel.setMinimumSize(minShipDim); // Taille minimale
+        _shipPanel.setPreferredSize(minShipDim);
 
-        // PlacementController
-        playerGrid.getGridView().setGridActionListener((shipView, row, col) ->
-                placementController.placeShip(playerGrid.getGridView().getGrid(), playerGrid.getGridView(), shipView.getShip(), row, col)
-        );
+        gbc.gridx = 0;
+        gbc.weightx = 0.15; // 15% de l'espace horizontal extensible
+        gbc.fill = GridBagConstraints.BOTH; // Permet l'étirement
+        gbc.anchor = GridBagConstraints.NORTH; // Aligner les éléments en haut
+        mainLayeredPane.add(_shipPanel, gbc, JLayeredPane.DEFAULT_LAYER);
 
-        // Ajouter les ShipView
-        if (ships != null && !ships.isEmpty()) {
-            for (Ship ship : ships) {
-                ShipView shipView = new ShipView(ship, playerGrid, layeredPane, _shipPanel, cellSize);
-                shipView.setAlignmentX(Component.CENTER_ALIGNMENT);
-                _shipPanel.add(shipView);
-                _shipPanel.add(Box.createRigidArea(new Dimension(0, 10))); // espacement vertical
+        // Grille joueur
+        LabeledGridView playerGrid = new LabeledGridView("Place your objects in the grid", gameController.getPlayerGridView(), false);
+        playerGrid.setOpaque(true);
+        playerGrid.setMinimumSize(new Dimension(gridPanelWidth, gridPanelHeight)); // Taille minimale
+
+        SquarePanel squarePanel = new SquarePanel(playerGrid);
+
+        gbc.gridx = 1;
+        gbc.weightx = 0.7; // 70% de l'espace horizontal extensible
+        gbc.fill = GridBagConstraints.BOTH; // Permet l'étirement
+        gbc.anchor = GridBagConstraints.CENTER; // Centrer au milieu de sa zone
+        mainLayeredPane.add(squarePanel, gbc, JLayeredPane.DEFAULT_LAYER);
+
+        // Conteneur des Pièges
+        _trapPanel = new JPanel();
+        _trapPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        _trapPanel.setBorder(BorderFactory.createTitledBorder("Your traps"));
+        _trapPanel.setOpaque(true);
+        _trapPanel.setBackground(Color.LIGHT_GRAY);
+        Dimension trapDim = new Dimension(MIN_TRAP_WIDTH, 10);
+        _trapPanel.setMinimumSize(trapDim); // Taille minimale
+        _trapPanel.setPreferredSize(trapDim);
+
+        gbc.gridx = 2;
+        gbc.weightx = 0.15; // // 15% de l'espace horizontal extensible
+        gbc.fill = GridBagConstraints.BOTH; // Permet l'étirement
+        gbc.anchor = GridBagConstraints.NORTH;
+        mainLayeredPane.add(_trapPanel, gbc, JLayeredPane.DEFAULT_LAYER);
+
+        // Récupérer les objets à placer
+        ArrayList<Placeable> objects = new ArrayList<>();
+        ArrayList<Placeable> ships = configController.getShipConfig();
+        ArrayList<Placeable> traps = configController.getTrapConfig();
+        objects.addAll(ships);
+        objects.addAll(traps);
+
+        // Ajouter les TrapView dans _trapPanel
+        if (traps != null && !traps.isEmpty()) {
+            for (Placeable trap : traps) {
+                // ShipView doit être créé avec le JLayeredPane central pour le Drag&Drop
+                TrapView trapView = new TrapView((Trap)trap, playerGrid, mainLayeredPane, _trapPanel, cellSize);
+                trapView.setAlignmentX(Component.CENTER_ALIGNMENT);
+                _trapPanel.add(trapView);
             }
         }
+
+        // Ajouter les ShipView dans _shipPanel
+        if (ships != null && !ships.isEmpty()) {
+            for (Placeable ship : ships) {
+                // ShipView doit être créé avec le JLayeredPane central pour le Drag&Drop
+                ShipView shipView = new ShipView((Ship)ship, playerGrid, mainLayeredPane, _shipPanel, cellSize);
+                shipView.setAlignmentX(Component.CENTER_ALIGNMENT);
+                _shipPanel.add(shipView);
+            }
+        }
+
+        // PlacementController
+        playerGrid.getGridView().setObjectPlacementListener((placeableView, row, col) ->
+            placementController.placeObject(gameController.getPlayerGrid(), playerGrid.getGridView(), placeableView.getPlaceable(), row, col)
+        );
 
         rotateButton.addActionListener(e -> {
             // Change l'orientation globale
@@ -80,10 +141,36 @@ public class PlacementScreen extends JPanel {
             // Parcours tous les ShipView du panel et applique la nouvelle orientation
             for (Component comp : _shipPanel.getComponents()) {
                 if (comp instanceof ShipView shipView) {
-                    placementController.rotateShip(shipView.getShip());
+                    placementController.rotatePlaceable(shipView.getPlaceable());
                     shipView.setOrientation(_currentOrientation);
                 }
             }
         });
+
+        randomPlacementButton.addActionListener(e -> {
+            placementController.randomObjectsPlacement(gameController.getPlayerGrid(), playerGrid.getGridView(), objects);
+            clearPlaceableViews();
+        });
+        
+        startGameButton.addActionListener(e -> {
+            if (_shipPanel.getComponentCount() == 0) {
+                gameController.showGameScreen();
+            }
+        });
+
+        revalidate();
+        repaint();
+    }
+
+    public void clearPlaceableViews() {
+        // Nettoyage du conteneur de bateaux
+        _shipPanel.removeAll();
+        _shipPanel.revalidate();
+        _shipPanel.repaint();
+
+        // Nettoyage du conteneur de pièges
+        _trapPanel.removeAll();
+        _trapPanel.revalidate();
+        _trapPanel.repaint();
     }
 }

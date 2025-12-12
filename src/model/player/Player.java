@@ -1,0 +1,83 @@
+package model.player;
+
+import model.*;
+import model.ship.Ship;
+import model.weapon.Weapon;
+import view.GridView;
+
+import java.awt.*;
+import java.util.ArrayList;
+
+public class Player {
+    private final String _name;
+    private final Grid _grid;
+    private final GridView _gridView;
+    private ArrayList<Placeable> _inventory;
+    private PlayerStrategy _strategy;
+
+    public Player(int gridSize, int cellSize, String playerName, boolean islandMode) {
+        _grid = new Grid(gridSize, islandMode);
+        _gridView = new GridView(gridSize, cellSize, _grid);
+        _name = playerName;
+    }
+
+    public void setStrategy(PlayerStrategy strategy) {
+        this._strategy = strategy;
+    }
+
+    public Attack play(ArrayList<AttackResult> attackResults) {
+        if (_strategy == null) return null;
+        return _strategy.getAttack(attackResults);
+    }
+
+    /**
+     * Checks if all the player's ships are sunk.
+     * @return true if all the ships are sunk, otherwise false.
+     */
+    public boolean allShipsSunk() {
+        for (Ship ship : _grid.getShips()) {
+            if (!ship.isSunk()) {
+                return false;
+            }
+        }
+        return !_grid.getShips().isEmpty();
+    }
+
+    /**
+     * Handles an attack received by a player.
+     * @param attack The Attack object encapsulating the weapon and the target.
+     * @return AttackResult The result of the attack.
+     */
+    public ArrayList<AttackResult> receiveAttack(Attack attack) {
+
+        Weapon weapon = attack.getWeapon();
+        Point realCoords = _grid.applyOffset(attack.getRealCoordinates());
+        attack.setRealCoordinates(realCoords);
+        ArrayList<AttackResult> results = weapon.applyAttack(_grid, attack);
+        AttackResult baseResult = results.getFirst();
+        if (baseResult != null) {
+            _grid.decreaseEffects(baseResult);
+        }
+        for (AttackResult result : results) {
+            _grid.applyAttack(attack, result);
+        }
+
+        return results;
+    }
+
+    public Grid getGrid() {
+        return _grid;
+    }
+
+    public GridView getGridView() {
+        return _gridView;
+    }
+
+    public String getName() {
+        return _name;
+    }
+
+    public void addObjectToInventory(Placeable placeable) {
+        _inventory.add(placeable);
+    }
+}

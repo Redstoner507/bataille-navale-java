@@ -1,45 +1,152 @@
 package view;
 
-import utils.ShipImageProvider;
-
 import javax.swing.*;
+
+import model.cell.CellState;
+import model.cell.CellType;
+
 import java.awt.*;
 import java.awt.event.MouseListener;
+import java.util.Objects;
 
-public class CellView extends JPanel {
-    private Image _segmentImage;
+public class CellView extends JLabel {  
+    private static final Image IMG_SHIP =
+        new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/ship.png"))).getImage();
+    private static final Image IMG_HIT =
+            new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/hit.png"))).getImage();
+    private static final Image IMG_MISS =
+            new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/miss.png"))).getImage();
+    private static final Image IMG_SUNK =
+            new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/sunk.png"))).getImage();
+    private static final Image IMG_WATER =
+            new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/water.png"))).getImage();
+    private static final Image IMG_ISLAND =
+            new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/island.png"))).getImage();
+    private static final Image IMG_ISLAND_HIT =
+            new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/island_hit.png"))).getImage();
+    private static final Image IMG_BLACKHOLE =
+            new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/blackhole.png"))).getImage();
+    private static final Image IMG_TORNADO =
+            new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/tornado.png"))).getImage();
+
+    //private Image _currentImage;
+    private Image _baseImage;
+    private Image _overlayImage;  // image superposée
+
     private boolean _isClickable = true;
     private final Point _cellPosition;
-    private final int _cellSize;
+    private CellState _cellState;
+    private final CellType _cellType;
+    private int _sonarCountToDisplay = -1;
 
-    public CellView(Point cellPosition, int cellSize) {
+    public CellView(Point cellPosition, int cellSize, CellType cellType) {
         _cellPosition = cellPosition;
-        _cellSize = cellSize;
+        _cellType = cellType;
+        setCellIcon(CellState.EMPTY);
         setPreferredSize(new Dimension(cellSize, cellSize));
     }
 
     /**
-     * Defines the segment of the ship to display.
+     * Sets the icon of the cell according to its state.
      */
-    public void setSegmentImage() {
-        this._segmentImage = ShipImageProvider.getShipSegment(_cellSize);
+    public void setCellIcon(CellState state) {
+
+        _overlayImage = null; // Par défaut pas de superposition
+
+        switch (state) {
+
+            case EMPTY -> {
+                if (_cellType == CellType.ISLAND) {
+                    _baseImage = IMG_WATER;
+                    _overlayImage = IMG_ISLAND;
+                }
+                else _baseImage = IMG_WATER;
+            }
+
+            case SHIP -> {
+                _baseImage = IMG_WATER;        // fond eau
+                _overlayImage = IMG_SHIP;      // superposition bateau
+            }
+
+            case HIT -> {
+                _baseImage = IMG_SHIP;
+                _overlayImage = IMG_HIT;       // impact au-dessus du bateau
+            }
+
+            case MISS -> {
+                _baseImage = IMG_WATER;
+                _overlayImage = IMG_MISS;
+            }
+
+            case SUNK -> {
+                _baseImage = IMG_SHIP;
+                _overlayImage = IMG_SUNK;
+            }
+
+            case ISLAND_HIT -> {
+                _baseImage = IMG_ISLAND;
+                _overlayImage = IMG_ISLAND_HIT;
+            }
+
+            case BLACKHOLE -> {
+                _baseImage = IMG_WATER;
+                _overlayImage = IMG_BLACKHOLE;
+            }
+            case TORNADO -> {
+                _baseImage = IMG_WATER;
+                _overlayImage = IMG_TORNADO;
+            }      
+            case OBJECT -> {
+                _baseImage = IMG_WATER;
+                // Pas de superposition spécifique pour l'instant
+            }      
+        }
+
+        _cellState = state;
+        repaint();
+    }
+
+
+    public void displaySonarScan(int sonarCount) {
+        _sonarCountToDisplay = sonarCount;
         revalidate();
         repaint();
     }
 
+    /** 
+     * Paints the cell and scales the image to fill the label.
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        if (_segmentImage != null) {
-            g.drawImage(_segmentImage, 0, 0, getWidth(), getHeight(), null);
-        } else {
-            g.setColor(Color.CYAN);
-            g.fillRect(0, 0, getWidth(), getHeight());
+        Graphics2D g2d = (Graphics2D) g;
+
+        // Activer la transparence PNG
+        g2d.setComposite(AlphaComposite.SrcOver);
+
+        // 1) Fond
+        if (_baseImage != null)
+            g2d.drawImage(_baseImage, 0, 0, getWidth(), getHeight(), this);
+
+        // 2) Superposition
+        if (_overlayImage != null)
+            g2d.drawImage(_overlayImage, 0, 0, getWidth(), getHeight(), this);
+
+        // 3) Sonar
+        if (_sonarCountToDisplay >= 0) {
+            String text = String.valueOf(_sonarCountToDisplay);
+            g2d.setFont(new Font("Arial", Font.BOLD, getHeight() / 2));
+            FontMetrics fm = g2d.getFontMetrics();
+            int x = (getWidth() - fm.stringWidth(text)) / 2;
+            int y = (getHeight() - fm.getHeight()) / 2 + fm.getAscent();
+            g2d.drawString(text, x, y);
         }
-        // bordure
-        g.setColor(Color.BLACK);
-        g.drawRect(0, 0, getWidth()-1, getHeight()-1);
+
+        // Bordure
+        g2d.setColor(Color.BLACK);
+        g2d.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
     }
+
 
     /**
      * Overrides addMouseListener to only detect clicks when clickable.
@@ -48,6 +155,14 @@ public class CellView extends JPanel {
     public void addMouseListener(MouseListener l) {
         if (_isClickable)
             super.addMouseListener(l);
+    }
+
+    public CellState getCellState() {
+        return _cellState;
+    }
+
+    public CellType getCellType() {
+        return _cellType;
     }
 
     public void setClickable(boolean clickable) {

@@ -3,3 +3,6 @@ Case Ocean (case virge) -> Bleu (spite eau)
 Case touche -> Rouge/orange (Explosion)
 Case coulé -> Noir  (Fumé Noir)
 Case tir manqué -> Blanc (Explosion Eau)
+
+Case Ile -> Jaune sable (sprite sable)
+Case Ile touche -> Marron Jaune (-> Trou)

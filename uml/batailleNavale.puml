@@ -18,13 +18,13 @@ package model {
     class GameConfig {
         - _gridSize : Integer
         - _islandsEnabled : Boolean
-        - _shipConfig : Map<ShipType, Integer>
+        - _shipConfig : Integer[*]
         + <<create>> GameConfig()
         + getGridSize() : Integer
         + setGridSize(gridSize: Integer)
         + isIslandsEnabled() : Boolean
         + setIslandsEnabled(islandsEnabled: Boolean)
-        + getShipConfig() : Map<ShipType, Integer>
+        + getShipConfig() : Integer[*]
         + setShipNumber(shipType: ShipType, number: Integer)
     }
 
@@ -135,6 +135,8 @@ package model {
     package cell {
         abstract class Cell <<abstract>> {
             - _isHit : Boolean
+            - _type : CellType
+            - _state : CellState
             + <<create>> Cell(cellType: CellType)
             + {abstract} hit()
             + isHit() : Boolean
@@ -147,6 +149,16 @@ package model {
         enum CellType <<enumerate>> {
             WATER
             ISLAND
+        }
+
+        enum CellState <<enumerate>> {
+            WATER
+            SHIP
+            HIT
+            MISS
+            SUNK
+            ISLAND
+            ISLAND_HIT
         }
 
         class WaterCell extends Cell {
@@ -418,7 +430,6 @@ Ship "1" *--> "1\n-_shipType" ShipType : Is of type >
 Trap "1" *--> "1\n-_trapType" TrapType : Is of type >
 Weapon "1" *--> "1\n-_weaponType" WeaponType : Is of type >
 
-
 PlayerStrategyFactory ..> PlayerStrategy : Instantiates >
 
 ShipFactory ..> Ship : Instantiates >
@@ -426,6 +437,8 @@ ShipFactory ..> Ship : Instantiates >
 WeaponFactory ..> Weapon : Instantiates >
 
 TrapFactory ..> Trap : Instantiates >
+
+GameConfig ..> ShipType : Uses >
 
 'Controller
 GameController "1" *--> "1\n-_frame" MainFrame : Displays >

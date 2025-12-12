@@ -1,5 +1,8 @@
 package model;
 
+import model.cell.CellState;
+import model.cell.CellType;
+
 import java.awt.*;
 import java.util.ArrayList;
 
@@ -9,11 +12,17 @@ public abstract class Placeable {
     private int _startRow = -1;
     private int _startCol = -1;
     private Orientation _orientation;
+    private final CellType _cellType;
+    private final CellState _cellState;
+    private final PlaceableType _placeableType;
 
-    public Placeable(int size, Orientation defaultOrientation, String name) {
+    public Placeable(int size, Orientation defaultOrientation, String name, CellType placementCellType, PlaceableType placeableType, CellState cellState) {
         _size = size;
         _orientation = defaultOrientation;
         _name = name;
+        _cellType = placementCellType;
+        _placeableType = placeableType;
+        _cellState = cellState;
     }
 
     public int getSize() {
@@ -22,6 +31,18 @@ public abstract class Placeable {
 
     public void setOrientation(Orientation orientation) {
         this._orientation = orientation;
+    }
+
+    public PlaceableType getPlaceableType() {
+        return _placeableType;
+    }
+
+    public CellType getCellType() {
+        return _cellType;
+    }
+
+    public CellState getCellState() {
+        return _cellState;
     }
 
     public Orientation getOrientation() {
@@ -60,4 +81,6 @@ public abstract class Placeable {
         }
         return coordinates;
     }
+
+    public abstract AttackResult hit();
 }
