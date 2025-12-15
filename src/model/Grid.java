@@ -124,6 +124,9 @@ public class Grid {
                 playerGridView.updateCellDisplay(result, realRow, realCol);
                 activateTornadoEffect();
             }
+            case ALREADY_VISITED -> {
+                // No state change
+            }
         }
     }
 

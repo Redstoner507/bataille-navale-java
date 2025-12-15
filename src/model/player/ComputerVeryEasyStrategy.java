@@ -1,26 +1,27 @@
 package model.player;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 import model.Attack;
 import model.AttackResult;
+import model.GameConfig;
 import model.weapon.Weapon;
 
 public class ComputerVeryEasyStrategy extends PlayerStrategy {
+    public ComputerVeryEasyStrategy (GameConfig config) {
+        super(config); // Assuming a default grid size of 10
+    }
     @Override
     public Attack getAttack(ArrayList<AttackResult> previousAttackResults) {
         // Generate completely random coordinates
-        Random random = new Random();
-        int row = random.nextInt(10);
-        int col = random.nextInt(10);
+        int[] coords = super.getRandomCoordinates();
         
         // Randomly choose a weapon (mostly missile, sometimes bomb)
         Weapon selectedWeapon = this.missile; // Default weapon for very easy strategy
-        if (random.nextInt(100) < 10 && this.bombUses > 0) { // 10% chance to use bomb if available
+        if (random.nextInt(100) < 10 && this._bombUses > 0) { // 10% chance to use bomb if available
             selectedWeapon = this.bomb;
-            this.bombUses--;
+            this._bombUses--;
         }
-        return new Attack(null, null, selectedWeapon, row, col); // Player will be set later
+        return new Attack(null, null, selectedWeapon, coords[0], coords[1]); // Player will be set later
     }
 }
