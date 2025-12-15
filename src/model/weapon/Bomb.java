@@ -48,6 +48,12 @@ public class Bomb extends Weapon{
                 // Sauter la case si elle est déja touchée
                 if (!targetCell.isHit()) {
                     AttackResult singleResult = targetCell.hit();
+                    if (currentRow == centerRow && currentCol == centerCol) {
+                        singleResult.setWeapon(attack.getWeapon());
+                    }
+                    else {
+                        singleResult.setWeapon(new WeaponFactory().createMissile());
+                    }
                     singleResult.setHitCoordinates(currentRow, currentCol);
                     impactResults.add(singleResult);
                 }

@@ -1,5 +1,7 @@
 package model;
 
+import model.weapon.Weapon;
+
 import java.awt.*;
 
 /**
@@ -16,6 +18,7 @@ public class AttackResult {
     private int _rowHit;                // La ligne touchée
     private int _colHit;                // La colonne touchée
     private Integer _sonarCount;        // Résultat du Sonar (nombre d'éléments trouvés dans la zone)
+    private Weapon _weapon;             // Arme utilisée
 
     public AttackResult(AttackStatus status, String message) {
         this._status = status;
@@ -53,5 +56,13 @@ public class AttackResult {
 
     public void setAttackToRelaunch(Attack attack) {
         this._attackToRelaunch = attack;
+    }
+
+    public void setWeapon(Weapon weapon) {
+        this._weapon = weapon;
+    }
+
+    public Weapon getWeapon() {
+        return _weapon;
     }
 }

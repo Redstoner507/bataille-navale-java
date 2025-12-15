@@ -22,7 +22,7 @@ public class BlackHole extends Trap {
         Attack attackToRelaunch = new Attack(
                 attack.getTargetPlayer(),
                 attack.getAttackingPlayer(),
-                attack.getWeapon(),
+                originalResult.getWeapon(),
                 counterCoords.x,
                 counterCoords.y
         );

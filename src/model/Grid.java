@@ -82,9 +82,8 @@ public class Grid {
      * @param result The AttackResult
      */
     public void applyAttack(Attack attack, AttackResult result) {
-        int realRow = attack.getRealRow();
-        int realCol = attack.getRealCol();
-        Cell cellHit = getCell(realRow, realCol);
+        Point hitCoordinates = result.getHitCoordinates();
+        Cell cellHit = getCell(hitCoordinates.x, hitCoordinates.y);
 
         GridView playerGridView = attack.getTargetPlayer().getGridView();
 
@@ -114,14 +113,14 @@ public class Grid {
                 cellHit.removeObject();
                 AttackResult counterSignal = trap.activate(attack, result);
                 result.setAttackToRelaunch(counterSignal.getAttackToRelaunch());
-                playerGridView.updateCellDisplay(result, realRow, realCol);
+                playerGridView.updateCellDisplay(result, hitCoordinates.x, hitCoordinates.y);
             }
             case TORNADO -> {
                 cellHit.setState(CellState.TORNADO);
                 Trap trap = (Trap) cellHit.getObject();
                 cellHit.removeObject();
                 trap.activate(attack, result);
-                playerGridView.updateCellDisplay(result, realRow, realCol);
+                playerGridView.updateCellDisplay(result, hitCoordinates.x, hitCoordinates.y);
                 activateTornadoEffect();
             }
             case ALREADY_VISITED -> {

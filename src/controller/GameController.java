@@ -134,23 +134,13 @@ public class GameController {
             return;
         }
 
-        AttackResult mainResult = results.getFirst();
-
-        // Vérification des pièges
-        if (mainResult.getStatus() == AttackStatus.BLACKHOLE && mainResult.getAttackToRelaunch() != null) {
-
-            // Afficher l'impact unique du Trou Noir sur la grille d'origine
-            processSingleImpact(mainResult, attack);
-
+        // Traiter tous les impacts séquentiellement (Missile, ou Bombe sur bateaux/eau)
+        for (AttackResult result : results) {
+            processSingleImpact(result, attack);
             // Exécuter l'attaque miroir
-            Attack counterAttack = mainResult.getAttackToRelaunch();
-            executeCounterAttack(counterAttack);
-        }
-        // Traitement normal (Missile, Sonar, Bombe sans piège)
-        else {
-            // Traiter tous les impacts séquentiellement (Missile, ou Bombe sur bateaux/eau)
-            for (AttackResult result : results) {
-                processSingleImpact(result, attack);
+            if (result.getStatus() == AttackStatus.BLACKHOLE) {
+                Attack counterAttack = result.getAttackToRelaunch();
+                executeCounterAttack(counterAttack);
             }
         }
 
