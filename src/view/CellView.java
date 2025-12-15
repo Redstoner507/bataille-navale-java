@@ -4,7 +4,6 @@ import javax.swing.*;
 
 import model.cell.CellState;
 import model.cell.CellType;
-import utils.ImageUtils;
 
 import java.awt.*;
 import java.awt.event.MouseListener;
@@ -12,7 +11,7 @@ import java.util.Objects;
 
 public class CellView extends JLabel {  
     private static final Image IMG_SHIP =
-        ImageUtils.getSpriteIcon(0, 5).getImage();
+            new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/ship.png"))).getImage();
     private static final Image IMG_HIT =
             new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/hit.png"))).getImage();
     private static final Image IMG_MISS =
@@ -26,9 +25,9 @@ public class CellView extends JLabel {
     private static final Image IMG_ISLAND_HIT =
             new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/island_hit.png"))).getImage();
     private static final Image IMG_BLACKHOLE =
-            new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/blackhole.png"))).getImage();
+            new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/traps/blackhole.png"))).getImage();
     private static final Image IMG_TORNADO =
-            new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/tornado.png"))).getImage();
+            new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/traps/tornado.png"))).getImage();
 
     //private Image _currentImage;
     private Image _baseImage;

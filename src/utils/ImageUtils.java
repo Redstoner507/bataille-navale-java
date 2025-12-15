@@ -1,7 +1,6 @@
 package utils;
 
 import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -12,25 +11,36 @@ import java.awt.geom.AffineTransform;
 
 public class ImageUtils {
 
-    private static final BufferedImage SPRITE_SHEET;
-
-    static { // bloc static = exécuté une seule fois
+    public static BufferedImage getShipSegement(String type, int segment, int orientation) {
+        int size = 50;
+        String location = "/images/ships/" + type + ".png";
+        BufferedImage shipSeg;
         try {
-            SPRITE_SHEET = ImageIO.read(Objects.requireNonNull(
-                    ImageUtils.class.getResource("/images/Sprites_Bataille_Navale.png")
+            shipSeg = ImageIO.read(Objects.requireNonNull(
+                    ImageUtils.class.getResource(location)
             ));
         } catch (IOException e) {
-            throw new RuntimeException("Impossible de charger le sprite sheet", e);
+            throw new RuntimeException("Impossible de charger le sprite sheet du bateau: " + type, e);
+        }
+        BufferedImage segmentImg = shipSeg.getSubimage(0, segment * size, size, size);
+        if (orientation == 0) { // 0 = horizontal
+            return segmentImg;
+        } else { // 1 = vertical
+            return rotate(segmentImg, 270);
         }
     }
 
-    public static BufferedImage getSprite(int col, int row) {
-        int size = 50;
-        return SPRITE_SHEET.getSubimage(col * size, row * size, size, size);
-    }
-
-    public static ImageIcon getSpriteIcon(int col, int row) {
-        return new ImageIcon(getSprite(col, row));
+    public static BufferedImage getTrapImage(String trapType) {
+        String location = "/images/traps/" + trapType + ".png";
+        BufferedImage trapSheet;
+        try {
+            trapSheet = ImageIO.read(Objects.requireNonNull(
+                    ImageUtils.class.getResource(location)
+            ));
+        } catch (IOException e) {
+            throw new RuntimeException("Impossible de charger le sprite sheet des pièges.", e);
+        }
+        return trapSheet;
     }
 
     public static BufferedImage rotate(BufferedImage img, double angleDegrees) {
