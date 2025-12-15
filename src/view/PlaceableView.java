@@ -2,13 +2,14 @@ package view;
 
 import model.Orientation;
 import model.Placeable;
+import model.PlaceableType;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Objects;
+import utils.ImageUtils;
 
 public class PlaceableView extends JLabel {
     private final Placeable _placeable;
@@ -20,16 +21,14 @@ public class PlaceableView extends JLabel {
     private boolean _dragging = false;
     private Point _dragOffset;
     private final JPanel _segmentPanel = new JPanel();
-    private final String _imagePath;
 
-    public PlaceableView(Placeable _placeable, LabeledGridView grid, JLayeredPane topLayer, JPanel originalPanel, int cellSize, String imagePath) {
+    public PlaceableView(Placeable _placeable, LabeledGridView grid, JLayeredPane topLayer, JPanel originalPanel, int cellSize) {
         this._placeable =_placeable;
         this._grid = grid;
         this._topLayer = topLayer;
         this._originalPanel = originalPanel;
         this._cellSize = cellSize;
         this._orientation =_placeable.getOrientation();
-        this._imagePath = imagePath;
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setOpaque(false);
@@ -53,21 +52,43 @@ public class PlaceableView extends JLabel {
         _segmentPanel.removeAll();
         _segmentPanel.setLayout(new BoxLayout(_segmentPanel,
                 _orientation == Orientation.HORIZONTAL ? BoxLayout.X_AXIS : BoxLayout.Y_AXIS));
-        // A modifier pour éviter de recharger l'image deux fois
-        Icon img = new ImageIcon(Objects.requireNonNull(getClass().getClassLoader().getResource(_imagePath)));
-        for (int i = 0; i < _placeable.getSize(); i++) {
-            JLabel seg = new JLabel(img);
-            seg.setPreferredSize(new Dimension(_cellSize, _cellSize));
-            seg.setMinimumSize(new Dimension(_cellSize, _cellSize));
-            seg.setMaximumSize(new Dimension(_cellSize, _cellSize));
-            seg.setBorder(new LineBorder(Color.BLACK));
-            seg.setAlignmentX(Component.CENTER_ALIGNMENT);
-            seg.setAlignmentY(Component.CENTER_ALIGNMENT);
-            _segmentPanel.add(seg);
-        }
 
+        switch (_placeable.getPlaceableType()) {
+            case PlaceableType.SHIP:
+                loadShipSegments();
+                break;
+            default:
+                loadTrapSegments();
+                break;
+        }
         _segmentPanel.revalidate();
         _segmentPanel.repaint();
+    }
+
+    private void loadShipSegments() {
+        String shipType = _placeable.getName().toLowerCase();
+        Icon img;
+
+        for (int i = 0; i < _placeable.getSize(); i++) {
+            img = new ImageIcon(ImageUtils.getShipSegement(shipType, i, _orientation == Orientation.HORIZONTAL ? 1 : 0));
+            JLabel seg = new JLabel(img);
+            seg.setPreferredSize(new Dimension(_cellSize, _cellSize)); 
+            seg.setMinimumSize(new Dimension(_cellSize, _cellSize)); 
+            seg.setMaximumSize(new Dimension(_cellSize, _cellSize));
+            seg.setBorder(new LineBorder(Color.BLACK));
+            _segmentPanel.add(seg);
+        }
+    }
+
+    private void loadTrapSegments() {
+        Icon img = new ImageIcon(ImageUtils.getTrapImage(_placeable.getName().toLowerCase())); // image générique pour les pièges
+
+        JLabel seg = new JLabel(img);
+        seg.setPreferredSize(new Dimension(_cellSize, _cellSize));
+        seg.setMinimumSize(new Dimension(_cellSize, _cellSize));
+        seg.setMaximumSize(new Dimension(_cellSize, _cellSize));
+        seg.setBorder(new LineBorder(Color.BLACK));
+        _segmentPanel.add(seg);
     }
 
     private void updateSize() {
