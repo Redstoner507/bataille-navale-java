@@ -10,7 +10,6 @@ import javax.swing.*;
 import java.awt.*;
 
 public class GameView extends JPanel {
-    private final JLabel _statusLabel; // Status du jeu
     private final GridView _computerGridView;
     private final HistoryView _historyView;
 
@@ -67,11 +66,12 @@ public class GameView extends JPanel {
 
         add(gridsPanel, BorderLayout.CENTER);
 
-        // Label d'état
-        _statusLabel = new JLabel("Attack the other enemy's grid.", SwingConstants.CENTER);
-        _statusLabel.setFont(new Font("Arial", Font.ITALIC, 16));
-        _statusLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
-        add(_statusLabel, BorderLayout.SOUTH);
+        JPanel buttonPanel = new JPanel(new FlowLayout());
+        JButton quitButton = new JButton("Quit");
+        quitButton.addActionListener(e -> gameController.showPlacementScreen());
+        quitButton.setFont(new Font("Arial", Font.BOLD, 22));
+        buttonPanel.add(quitButton);
+        add(buttonPanel, BorderLayout.SOUTH);
     }
 
     /**
@@ -102,10 +102,6 @@ public class GameView extends JPanel {
         }
 
         return panel;
-    }
-
-    public void setStatus(String text) {
-        _statusLabel.setText(text);
     }
 
     public GridView getComputerGridView() {

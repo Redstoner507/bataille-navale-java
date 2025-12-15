@@ -91,7 +91,6 @@ public class GameController {
         _frame.addScreen(GAME, _gameView);
         _frame.showScreen(GAME);
         this._gameState = GameState.HUMAN_TURN;
-        _gameView.setStatus("It's your turn !");
     }
 
     public void handleHumanAttack(int row, int col) {
@@ -149,7 +148,6 @@ public class GameController {
 
         // Vérifier la fin du jeu et changer de tour
         if (checkGameOver()) {
-            _gameView.setStatus("Game Over !");
             return;
         }
 
@@ -242,8 +240,6 @@ public class GameController {
         Player targetOfCounterAttack = counterAttack.getTargetPlayer();
         GridView attackerGridView = targetOfCounterAttack.getGridView();
 
-        _gameView.setStatus("Trap triggered ! Attack sent back to " + targetOfCounterAttack.getName() + " !");
-
         // Exécuter la relance complète
         ArrayList<AttackResult> counterResults = targetOfCounterAttack.receiveAttack(counterAttack);
 
@@ -253,20 +249,12 @@ public class GameController {
 
             // Mise à jour de la grille du joueur qui s'est tiré dessus
             attackerGridView.updateCellDisplay(finalHit, hitCoordinates.x, hitCoordinates.y);
-
-            // Mettre à jour le statut global avec le dernier message
-            _gameView.setStatus(finalHit.getMessage());
         }
     }
 
     private void updateGameView(AttackResult result, String playerName, GridView targetGridView, int row, int col) {
         // Mettre à jour la grille visuelle
         targetGridView.updateCellDisplay(result, row, col);
-
-        // Mettre à jour le statut
-        _gameView.setStatus(playerName + " shot at coordinates " + (char)('A' + col) + (row + 1) + ". Result : " + result.getMessage());
-
-        // Mettre à jour les statistiques (E3)
     }
 
     private void changeTurn() {
