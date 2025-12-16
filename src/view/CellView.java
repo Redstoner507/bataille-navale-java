@@ -29,6 +29,10 @@ public class CellView extends JLabel {
             new ImageIcon(ImageUtils.getTrapImage("blackhole")).getImage();
     private static final Image IMG_TORNADO =
             new ImageIcon(ImageUtils.getTrapImage("tornado")).getImage();
+    private static final Image IMG_BOMB =
+            new ImageIcon(ImageUtils.getWeaponImage("bomb")).getImage();
+    private static final Image IMG_SONAR =
+            new ImageIcon(ImageUtils.getWeaponImage("sonar")).getImage();
 
     private Image _baseImage;
     private Image _overlayImage;  // image superposée
@@ -103,10 +107,14 @@ public class CellView extends JLabel {
                 _baseImage = IMG_WATER;
                 _overlayImage = IMG_TORNADO;
             }      
-            case OBJECT -> {
-                _baseImage = IMG_ISLAND_HIT;
-                // Pas de superposition spécifique pour l'instant
-            }      
+            case BOMB -> {
+                _baseImage = IMG_ISLAND;
+                _overlayImage = IMG_BOMB;
+            }
+            case SONAR -> {
+                _baseImage = IMG_ISLAND;
+                _overlayImage = IMG_SONAR;
+            }
         }
 
         _cellState = state;

@@ -5,6 +5,7 @@ import model.Placeable;
 import model.ship.ShipFactory;
 import model.ship.ShipType;
 import model.trap.TrapFactory;
+import model.weapon.WeaponFactory;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -64,17 +65,27 @@ public class ConfigController {
     public ArrayList<Placeable> getTrapConfig() {
         ArrayList<Placeable> traps = new ArrayList<>();
         TrapFactory factory = new TrapFactory();
-        if (!_gameConfig.isIslandModeEnabled()) {
-            traps.add(factory.createBlackHole());
-            traps.add(factory.createTornado());
-        }
+        traps.add(factory.createBlackHole());
+        traps.add(factory.createTornado());
         return traps;
+    }
+
+    public ArrayList<Placeable> getWeaponConfig() {
+        ArrayList<Placeable> weapons = new ArrayList<>();
+        if (_gameConfig.isIslandModeEnabled()) {
+            WeaponFactory factory = new WeaponFactory();
+            weapons.add(factory.createBomb());
+            weapons.add(factory.createSonar());
+            System.out.println("Weapons added");
+        }
+        return weapons;
     }
 
     public ArrayList<Placeable> getAllPlaceables() {
         ArrayList<Placeable> placeables = new ArrayList<>();
         placeables.addAll(getShipConfig());
         placeables.addAll(getTrapConfig());
+        placeables.addAll(getWeaponConfig());
         return placeables;
     }
 

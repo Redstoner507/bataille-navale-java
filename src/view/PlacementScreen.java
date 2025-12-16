@@ -7,6 +7,7 @@ import model.Orientation;
 import model.Placeable;
 import model.ship.Ship;
 import model.trap.Trap;
+import model.weapon.Weapon;
 
 import javax.swing.*;
 import java.awt.*;
@@ -105,9 +106,20 @@ public class PlacementScreen extends JPanel {
         ArrayList<Placeable> objects = new ArrayList<>();
         ArrayList<Placeable> ships = configController.getShipConfig();
         ArrayList<Placeable> traps = configController.getTrapConfig();
+        ArrayList<Placeable> weapons = configController.getWeaponConfig();
         objects.addAll(ships);
         objects.addAll(traps);
+        objects.addAll(weapons);
 
+        // Ajouter les WeaponView dans _trapPanel
+        if (weapons != null && !weapons.isEmpty()) {
+            for (Placeable weapon : weapons) {
+                // ShipView doit être créé avec le JLayeredPane central pour le Drag&Drop
+                WaeponView weaponView = new WaeponView((Weapon)weapon, playerGrid, mainLayeredPane, _trapPanel, cellSize);
+                weaponView.setAlignmentX(Component.CENTER_ALIGNMENT);
+                _trapPanel.add(weaponView);
+            }
+        }
         // Ajouter les TrapView dans _trapPanel
         if (traps != null && !traps.isEmpty()) {
             for (Placeable trap : traps) {

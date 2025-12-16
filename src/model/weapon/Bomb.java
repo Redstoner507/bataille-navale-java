@@ -6,13 +6,14 @@ import model.AttackStatus;
 import model.Grid;
 import model.cell.Cell;
 import model.cell.CellType;
+import model.cell.CellState;
 
 import java.util.ArrayList;
 
 public class Bomb extends Weapon{
 
     public Bomb() {
-        super(WeaponType.BOMB);
+        super(WeaponType.BOMB, CellState.BOMB);
     }
 
     @Override

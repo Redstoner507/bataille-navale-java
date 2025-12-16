@@ -43,6 +43,19 @@ public class ImageUtils {
         return trapSheet;
     }
 
+    public static BufferedImage getWeaponImage(String weaponType) {
+        String location = "/images/weapon/" + weaponType + ".png";
+        BufferedImage weaponSheet;
+        try {
+            weaponSheet = ImageIO.read(Objects.requireNonNull(
+                    ImageUtils.class.getResource(location)
+            ));
+        } catch (IOException e) {
+            throw new RuntimeException("Impossible de charger le sprite sheet des armes.", e);
+        }
+        return weaponSheet;
+    }
+
     public static BufferedImage rotate(BufferedImage img, double angleDegrees) {
         int w = img.getWidth();
         int h = img.getHeight();
