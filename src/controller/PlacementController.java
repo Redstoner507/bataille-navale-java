@@ -3,6 +3,7 @@ package controller;
 import model.Grid;
 import model.Orientation;
 import model.Placeable;
+import model.PlaceableType;
 import view.CellView;
 import view.GridView;
 
@@ -18,15 +19,29 @@ public class PlacementController {
      * @return true if the object was placed in the grid, false otherwise.
      */
     public boolean placeObject(Grid modelGrid, GridView viewGrid, Placeable object, int row, int col) {
-        if (!modelGrid.placeObject(object, row, col)) return false;
+        // placement for the model
+        if (!modelGrid.placeObject(object, row, col)) return false;  
 
+        if (object.getPlaceableType() != PlaceableType.SHIP) {
+            // For non-ship objects, update all cells at once
+            for (Point p : object.getCoordinates()) {
+                CellView cell = viewGrid.getCell(p.x, p.y);
+                if (cell != null) {
+                    cell.setCellIcon(object.getCellState());
+                }
+            }
+            return true;
+        }
+        // placement for the view (ships only)
+        int segmentIndex = 0;
         for (Point p : object.getCoordinates()) {
             CellView cell = viewGrid.getCell(p.x, p.y);
             if (cell != null) {
+                cell.setShipInfo(object.getName().toLowerCase(), segmentIndex);
                 cell.setCellIcon(object.getCellState());
             }
+            segmentIndex++;
         }
-
         return true;
     }
 

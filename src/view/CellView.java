@@ -4,6 +4,7 @@ import javax.swing.*;
 
 import model.cell.CellState;
 import model.cell.CellType;
+import utils.ImageUtils;
 
 import java.awt.*;
 import java.awt.event.MouseListener;
@@ -25,22 +26,30 @@ public class CellView extends JLabel {
     private static final Image IMG_ISLAND_HIT =
             new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/island_hit.png"))).getImage();
     private static final Image IMG_BLACKHOLE =
-            new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/traps/blackhole.png"))).getImage();
+            new ImageIcon(ImageUtils.getTrapImage("blackhole")).getImage();
     private static final Image IMG_TORNADO =
-            new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/traps/tornado.png"))).getImage();
+            new ImageIcon(ImageUtils.getTrapImage("tornado")).getImage();
 
-    //private Image _currentImage;
     private Image _baseImage;
     private Image _overlayImage;  // image superposée
 
     private CellState _cellState;
     private final CellType _cellType;
     private int _sonarCountToDisplay = -1;
+    private String _StringShip;
+    private int _shipSegment; 
 
     public CellView(int cellSize, CellType cellType) {
         _cellType = cellType;
         setCellIcon(CellState.EMPTY);
         setPreferredSize(new Dimension(cellSize, cellSize));
+        _StringShip = "";
+        _shipSegment = -1;
+    }
+
+    public void setShipInfo(String shipType, int segmentIndex) {
+        _StringShip = shipType;
+        _shipSegment = segmentIndex;
     }
 
     /**
@@ -76,6 +85,7 @@ public class CellView extends JLabel {
             }
 
             case SUNK -> {
+                //_baseImage = ImageUtils.getShipSegement(_StringShip, _shipSegment,0);
                 _baseImage = IMG_SHIP;
                 _overlayImage = IMG_SUNK;
             }
@@ -94,7 +104,7 @@ public class CellView extends JLabel {
                 _overlayImage = IMG_TORNADO;
             }      
             case OBJECT -> {
-                _baseImage = IMG_WATER;
+                _baseImage = IMG_ISLAND_HIT;
                 // Pas de superposition spécifique pour l'instant
             }      
         }
