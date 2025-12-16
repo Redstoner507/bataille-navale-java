@@ -37,7 +37,8 @@ public class PlacementController {
         for (Point p : object.getCoordinates()) {
             CellView cell = viewGrid.getCell(p.x, p.y);
             if (cell != null) {
-                cell.setShipInfo(object.getName().toLowerCase(), segmentIndex);
+                cell.setShipInfo(object.getName().toLowerCase(), segmentIndex,
+                    object.getOrientation() == Orientation.HORIZONTAL ? 1 : 0);
                 cell.setCellIcon(object.getCellState());
             }
             segmentIndex++;

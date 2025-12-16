@@ -8,6 +8,7 @@ import utils.ImageUtils;
 
 import java.awt.*;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class CellView extends JLabel {  
@@ -35,13 +36,14 @@ public class CellView extends JLabel {
             new ImageIcon(ImageUtils.getWeaponImage("sonar")).getImage();
 
     private Image _baseImage;
-    private Image _overlayImage;  // image superposée
+    private ArrayList<Image> _overlays = new ArrayList<>();
 
     private CellState _cellState;
     private final CellType _cellType;
     private int _sonarCountToDisplay = -1;
     private String _StringShip;
-    private int _shipSegment; 
+    private int _shipSegment;
+    private int _shipOrientation;
 
     public CellView(int cellSize, CellType cellType) {
         _cellType = cellType;
@@ -51,9 +53,10 @@ public class CellView extends JLabel {
         _shipSegment = -1;
     }
 
-    public void setShipInfo(String shipType, int segmentIndex) {
+    public void setShipInfo(String shipType, int segmentIndex, int orientation) {
         _StringShip = shipType;
         _shipSegment = segmentIndex;
+        _shipOrientation = orientation;
     }
 
     /**
@@ -61,59 +64,47 @@ public class CellView extends JLabel {
      */
     public void setCellIcon(CellState state) {
 
-        _overlayImage = null; // Par défaut pas de superposition
-
+        _overlays.clear();
         switch (state) {
 
             case EMPTY -> {
-                if (_cellType == CellType.ISLAND) {
-                    _baseImage = IMG_WATER;
-                    _overlayImage = IMG_ISLAND;
-                }
+                if (_cellType == CellType.ISLAND) _baseImage = IMG_ISLAND;
                 else _baseImage = IMG_WATER;
             }
 
             case SHIP -> {
-                _baseImage = IMG_WATER;        // fond eau
-                _overlayImage = IMG_SHIP;      // superposition bateau
+                _overlays.add(ImageUtils.getShipSegement(_StringShip, _shipSegment, _shipOrientation));
             }
 
             case HIT -> {
-                _baseImage = IMG_SHIP;
-                _overlayImage = IMG_HIT;       // impact au-dessus du bateau
+                _overlays.add(IMG_SHIP);
+                _overlays.add(IMG_HIT);
             }
 
             case MISS -> {
-                _baseImage = IMG_WATER;
-                _overlayImage = IMG_MISS;
+                _overlays.add(IMG_MISS);
             }
 
             case SUNK -> {
-                //_baseImage = ImageUtils.getShipSegement(_StringShip, _shipSegment,0);
-                _baseImage = IMG_SHIP;
-                _overlayImage = IMG_SUNK;
+                _overlays.add(ImageUtils.getShipSegement(_StringShip, _shipSegment, _shipOrientation));
+                _overlays.add(IMG_SUNK);
             }
 
             case ISLAND_HIT -> {
-                _baseImage = IMG_ISLAND;
-                _overlayImage = IMG_ISLAND_HIT;
+                _overlays.add(IMG_ISLAND_HIT);
             }
 
             case BLACKHOLE -> {
-                _baseImage = IMG_WATER;
-                _overlayImage = IMG_BLACKHOLE;
+                _overlays.add(IMG_BLACKHOLE);
             }
             case TORNADO -> {
-                _baseImage = IMG_WATER;
-                _overlayImage = IMG_TORNADO;
+                _overlays.add(IMG_TORNADO);
             }      
             case BOMB -> {
-                _baseImage = IMG_ISLAND;
-                _overlayImage = IMG_BOMB;
+                _overlays.add(IMG_BOMB);
             }
             case SONAR -> {
-                _baseImage = IMG_ISLAND;
-                _overlayImage = IMG_SONAR;
+                _overlays.add(IMG_SONAR);
             }
         }
 
@@ -144,8 +135,9 @@ public class CellView extends JLabel {
             g2d.drawImage(_baseImage, 0, 0, getWidth(), getHeight(), this);
 
         // 2) Superposition
-        if (_overlayImage != null)
-            g2d.drawImage(_overlayImage, 0, 0, getWidth(), getHeight(), this);
+        for (Image overlay : _overlays) {
+            g2d.drawImage(overlay, 0, 0, getWidth(), getHeight(), this);
+        }
 
         // 3) Sonar
         if (_sonarCountToDisplay >= 0) {
