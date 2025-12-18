@@ -53,8 +53,6 @@ public class Sonar extends Weapon{
             }
         }
 
-        centerCell.setScanned(true);
-
         AttackResult result = new AttackResult(AttackStatus.SONAR_RESULT, "You detected " + detectedShips + " !");
         result.setHitCoordinates(centerRow, centerCol);
         result.setSonarCount(detectedShips);

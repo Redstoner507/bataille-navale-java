@@ -12,13 +12,6 @@ public abstract class Ship extends Placeable {
         _cellsRemaining = size;
     }
 
-    /*
-     * Constructor for copy
-     */
-    public Ship(Ship model) {
-        this(model.getSize(), model.getName());
-    }
-
     /**
      * Checks if a ship is sunk.
      * @return true if the number of cells remaining is inferior or equal to 0.

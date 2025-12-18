@@ -66,7 +66,7 @@ public class GameController {
         PlayerStrategyFactory playerStrategyFactory = new PlayerStrategyFactory();
         _player.setStrategy(playerStrategyFactory.createHumanStrategy(config));
 
-        switch (config.getPlayerStrategy()) {
+        switch (config.getComputerStrategy()) {
             case COMPUTER_VERY_EASY ->
                 _bot.setStrategy(playerStrategyFactory.createComputerVeryEasyStrategy(config));
             case COMPUTER_EASY ->
@@ -103,7 +103,7 @@ public class GameController {
         endTurn(results, attack);
     }
 
-    public void handleComputerAttack() {
+    private void handleComputerAttack() {
         if (_gameState != GameState.COMPUTER_TURN) return;
 
         Attack attack = null;
@@ -127,7 +127,7 @@ public class GameController {
      * * @param results ArrayList containing the impacts of the attack for each cell concerned.
      * @param attack The initial Attack
      */
-    public void endTurn(ArrayList<AttackResult> results, Attack attack) {
+    private void endTurn(ArrayList<AttackResult> results, Attack attack) {
         if (results.isEmpty()) {
             changeTurn();
             return;
@@ -225,11 +225,10 @@ public class GameController {
      */
     private void processSingleImpact(AttackResult result, Attack originalAttack) {
         Point hitCoordinates = result.getHitCoordinates();
-        String playerName = originalAttack.getAttackingPlayer().getName();
         GridView targetGridView = originalAttack.getTargetPlayer().getGridView();
 
         // Mise à jour de la grille et du statut de la victime
-        updateGameView(result, playerName, targetGridView, hitCoordinates.x, hitCoordinates.y);
+        updateGameView(result, targetGridView, hitCoordinates.x, hitCoordinates.y);
     }
 
     /**
@@ -252,7 +251,7 @@ public class GameController {
         }
     }
 
-    private void updateGameView(AttackResult result, String playerName, GridView targetGridView, int row, int col) {
+    private void updateGameView(AttackResult result, GridView targetGridView, int row, int col) {
         // Mettre à jour la grille visuelle
         targetGridView.updateCellDisplay(result, row, col);
     }

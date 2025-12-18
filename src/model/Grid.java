@@ -51,7 +51,7 @@ public class Grid {
 
             if (!isCoordinateValid(r, c)) return false;
             Cell cell = _cells[r][c];
-            if (cell.getType() != object.getCellType()) return false;
+            if (cell.getType() != object.getPlacementCellType()) return false;
             if (cell.getState() != CellState.EMPTY) return false;
         }
         return true;

@@ -83,6 +83,6 @@ public class ConfigController {
     }
 
     public void setPlayerStrategy(String playerStrategy) {
-        this._gameConfig.setPlayerStrategy(playerStrategy);
+        this._gameConfig.setComputerStrategy(playerStrategy);
     }
 }

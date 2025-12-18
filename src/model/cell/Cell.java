@@ -9,7 +9,6 @@ public abstract class Cell {
     private CellState _state;
     private Placeable _object;
     private boolean _isHit = false;
-    private boolean _isScanned = false;
     
     public Cell(CellType type) {
         this._type = type;
@@ -46,14 +45,6 @@ public abstract class Cell {
 
     public void setHit(boolean hit) {
         this._isHit = hit;
-    }
-
-    public boolean isScanned() {
-        return _isScanned;
-    }
-
-    public void setScanned(boolean scanned) {
-        this._isScanned = scanned;
     }
 
     public AttackResult hit() {

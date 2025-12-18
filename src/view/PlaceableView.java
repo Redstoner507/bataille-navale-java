@@ -22,20 +22,20 @@ public class PlaceableView extends JLabel {
     private final JPanel _segmentPanel = new JPanel();
     private final String _imagePath;
 
-    public PlaceableView(Placeable _placeable, LabeledGridView grid, JLayeredPane topLayer, JPanel originalPanel, int cellSize, String imagePath) {
-        this._placeable =_placeable;
+    public PlaceableView(Placeable placeable, LabeledGridView grid, JLayeredPane topLayer, JPanel originalPanel, int cellSize, String imagePath) {
+        this._placeable = placeable;
         this._grid = grid;
         this._topLayer = topLayer;
         this._originalPanel = originalPanel;
         this._cellSize = cellSize;
-        this._orientation =_placeable.getOrientation();
+        this._orientation = placeable.getOrientation();
         this._imagePath = imagePath;
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setOpaque(false);
 
-        // titre du bateau
-        JLabel title = new JLabel(_placeable.getName(), SwingConstants.CENTER);
+        // titre du placeable
+        JLabel title = new JLabel(placeable.getName(), SwingConstants.CENTER);
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
         add(title);
 

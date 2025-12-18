@@ -13,23 +13,23 @@ import model.weapon.Weapon;
 import model.weapon.WeaponFactory;
 
 public abstract class PlayerStrategy {
-    protected final List<int[]> coordsList = new ArrayList<>();
+    protected final List<int[]> _coordsList = new ArrayList<>();
     protected final Queue<int[]> _priorityCoords = new ArrayDeque<>();
-    protected final Random random = new Random();
-    protected final Weapon missile = new WeaponFactory().createMissile();
-    protected final Weapon bomb = new WeaponFactory().createBomb();
-    protected final Weapon sonar = new WeaponFactory().createSonar();
+    protected final Random _random = new Random();
+    protected final Weapon _missile = new WeaponFactory().createMissile();
+    protected final Weapon _bomb = new WeaponFactory().createBomb();
+    protected final Weapon _sonar = new WeaponFactory().createSonar();
     protected int _bombUses = 1; // Example usage limit (à modfier l'emplacement (inventaire) de cette variable)
     protected int _sonarUses = 1; // Example usage limit
     protected GameConfig _config;
-    protected int _gridSize = 10;
+    protected int _gridSize;
 
     public PlayerStrategy(GameConfig config) {
         this._config = config;
         this._gridSize = config.getGridSize();
         for (int row = 0; row < _gridSize; row++) {
             for (int col = 0; col < _gridSize; col++) {
-                coordsList.add(new int[] { row, col });
+                _coordsList.add(new int[] { row, col });
             }
         }
     }   
@@ -37,25 +37,25 @@ public abstract class PlayerStrategy {
     public abstract Attack getAttack(ArrayList<AttackResult> previousAttackResults);
 
     protected int[] getRandomCoordinates() {
-        if (coordsList.isEmpty()) {
+        if (_coordsList.isEmpty()) {
             throw new IllegalStateException("No more coordinates available");
         }
 
-        int index = random.nextInt(coordsList.size());
-        int lastIndex = coordsList.size() - 1;
-        int[] result = coordsList.get(index);
-        coordsList.set(index, coordsList.get(lastIndex));
-        coordsList.remove(lastIndex);
+        int index = _random.nextInt(_coordsList.size());
+        int lastIndex = _coordsList.size() - 1;
+        int[] result = _coordsList.get(index);
+        _coordsList.set(index, _coordsList.get(lastIndex));
+        _coordsList.remove(lastIndex);
         
         return result;
     }
 
     protected void deleteCoordinates(int[] coords) {
-        coordsList.removeIf(c -> c[0] == coords[0] && c[1] == coords[1]);
+        _coordsList.removeIf(c -> c[0] == coords[0] && c[1] == coords[1]);
     }
 
     protected boolean isRemainingCoordinate(int row, int col) {
-        return coordsList.stream().anyMatch(c -> c[0] == row && c[1] == col);
+        return _coordsList.stream().anyMatch(c -> c[0] == row && c[1] == col);
     }
 
     /*

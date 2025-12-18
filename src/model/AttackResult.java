@@ -17,7 +17,7 @@ public class AttackResult {
     // Informations
     private int _rowHit;                // La ligne touchée
     private int _colHit;                // La colonne touchée
-    private Integer _sonarCount;        // Résultat du Sonar (nombre d'éléments trouvés dans la zone)
+    private int _sonarCount;            // Résultat du Sonar (nombre d'éléments trouvés dans la zone)
     private Weapon _weapon;             // Arme utilisée
 
     public AttackResult(AttackStatus status, String message) {
@@ -34,10 +34,6 @@ public class AttackResult {
         _colHit = col;
     }
 
-    public void setSonarCount(int count) {
-        this._sonarCount = count;
-    }
-
     public AttackStatus getStatus() {
         return _status;
     }
@@ -48,6 +44,10 @@ public class AttackResult {
 
     public Integer getSonarCount() {
         return _sonarCount;
+    }
+
+    public void setSonarCount(int count) {
+        this._sonarCount = count;
     }
 
     public Attack getAttackToRelaunch() {
