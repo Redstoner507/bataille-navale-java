@@ -115,7 +115,7 @@ public class PlacementScreen extends JPanel {
         if (weapons != null && !weapons.isEmpty()) {
             for (Placeable weapon : weapons) {
                 // ShipView doit être créé avec le JLayeredPane central pour le Drag&Drop
-                WaeponView weaponView = new WaeponView((Weapon)weapon, playerGrid, mainLayeredPane, _trapPanel, cellSize);
+                WeaponView weaponView = new WeaponView((Weapon)weapon, playerGrid, mainLayeredPane, _trapPanel, cellSize);
                 weaponView.setAlignmentX(Component.CENTER_ALIGNMENT);
                 _trapPanel.add(weaponView);
             }
