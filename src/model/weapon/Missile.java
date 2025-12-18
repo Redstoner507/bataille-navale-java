@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public class Missile extends Weapon{
 
     public Missile() {
-        super(WeaponType.MISSILE);
+        super(WeaponType.MISSILE,null);
     }
 
     @Override

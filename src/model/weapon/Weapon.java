@@ -9,8 +9,8 @@ import java.util.ArrayList;
 public abstract class Weapon extends Placeable {
     private final WeaponType _weaponType;
 
-    public Weapon(WeaponType type) {
-        super(1, Orientation.HORIZONTAL, type.name().toLowerCase(), CellType.ISLAND, PlaceableType.WEAPON, CellState.OBJECT);
+    public Weapon(WeaponType type, CellState state) {
+        super(1, Orientation.HORIZONTAL, type.name(), CellType.ISLAND, PlaceableType.WEAPON, state);
         _weaponType = type;
     }
 

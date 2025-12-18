@@ -20,16 +20,14 @@ public class PlaceableView extends JLabel {
     private boolean _dragging = false;
     private Point _dragOffset;
     private final JPanel _segmentPanel = new JPanel();
-    private final String _imagePath;
 
-    public PlaceableView(Placeable placeable, LabeledGridView grid, JLayeredPane topLayer, JPanel originalPanel, int cellSize, String imagePath) {
+    public PlaceableView(Placeable placeable, LabeledGridView grid, JLayeredPane topLayer, JPanel originalPanel, int cellSize) {
         this._placeable = placeable;
         this._grid = grid;
         this._topLayer = topLayer;
         this._originalPanel = originalPanel;
         this._cellSize = cellSize;
         this._orientation = placeable.getOrientation();
-        this._imagePath = imagePath;
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setOpaque(false);

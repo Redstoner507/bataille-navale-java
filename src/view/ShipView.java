@@ -7,6 +7,6 @@ import javax.swing.*;
 public class ShipView extends PlaceableView {
 
     public ShipView(Ship ship, LabeledGridView grid, JLayeredPane topLayer, JPanel originalPanel, int cellSize) {
-        super(ship, grid, topLayer, originalPanel, cellSize, "images/ship.png");
+        super(ship, grid, topLayer, originalPanel, cellSize); // A mofifier pour chaque type de bateau
     }
 }
