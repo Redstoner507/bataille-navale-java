@@ -26,6 +26,15 @@ package model {
         + setIslandsEnabled(islandsEnabled: Boolean)
         + getShipConfig() : Integer[*]
         + setShipNumber(shipType: ShipType, number: Integer)
+        + getComputerStrategy() : PlayerStrategies
+        + setComputerStrategy(computerStrategy: String)
+    }
+
+    enum GameState <<enumerate>> {
+        SETUP
+        HUMAN_TURN
+        COMPUTER_TURN
+        GAME_OVER
     }
 
     enum Orientation <<enumerate>> {
@@ -36,17 +45,26 @@ package model {
     class Grid {
         - {static} MIN_SIZE : Integer
         - {static} MAX_SIZE : Integer
+        - {static} ISLAND_START : Integer
+        - {static} ISLAND_END : Integer
+        - {static} TORNADO_DURATION : Integer
         - _size : Integer
-        + <<create>> Grid(size: Integer)
-        + canPlaceShip(ship: Ship, startRow: Integer, startCol: Integer) : Boolean
-        + placeShip(ship: Ship, startRow: Integer, startCol: Integer) : Boolean
+        - _rowOffset : Integer
+        - _colOffset : Integer
+        - _tornadoEffect : Integer
+        + <<create>> Grid(size: Integer, islandMode: Boolean)
+        + canPlaceObject(object: Placeable, startRow: Integer, startCol: Integer) : Boolean
+        + placeObject(object: Placeable, startRow: Integer, startCol: Integer) : Boolean
+        + applyAttack(attack: Attack, result: AttackResult)
+        + isCoordinateInIsland(row: Integer, col: Integer) : Boolean
         + getSize() : Integer
-        + getCell(row: Integer, col: Integer) : Cell
         + getShips() : Ship[*]
-        + allShipsSunk() : Boolean
-        + hit(row: Integer, col: Integer)
-        + bomb(row: Integer, col: Integer)
-        + revealArea(startRow: Integer, startCol: Integer, size: Integer)
+        + getCell(row: Integer, col: Integer) : Cell
+        + resetGrid()
+        + isCoordinateValid(row: Integer, col: Integer) : Boolean
+        + activateTornadoEffect()
+        + applyOffset(realCoordinates : Integer[2]) : Integer[2]
+        + decreaseEffects(baseResult: AttackResult)
     }
 
     abstract class Placeable <<abstract>>{
@@ -54,7 +72,7 @@ package model {
         - _size : Integer
         - _startRow : Integer
         - _startCol : Integer
-        + <<create>> Placeable(size: Integer, defaultOrientation: Orientation, name: String, placementCellType: CellType)
+        + <<create>> Placeable(size: Integer, defaultOrientation: Orientation, name: String, placementCellType: CellType, placeableType: PlaceableType, cellState: CellState)
         + getSize() : Integer
         + setOrientation(orientation: Orientation)
         + getOrientation() : Orientation
@@ -62,8 +80,61 @@ package model {
         + setStartPosition(row: Integer, col: Integer)
         + getStartRow() : Integer
         + getStartCol() : Integer
-        + getCoordinates() : Point[*]
+        + getCoordinates() : Integer[*]
         + getPlacementCellType() : CellType
+        + getPlaceableType() : PlaceableType
+        + getCellState() : CellState
+        + <<abstract>> hit() : AttackResult
+    }
+
+    enum PlaceableType <<enumerate>> {
+        SHIP
+        TRAP
+        WEAPON
+    }
+
+    class Attack {
+        - _realCoordinates : Integer[2]
+        + <<create>> Attack(attackingPlayer: Player, targetPlayer: Player, weapon: Weapon, targetRow: Integer, targetCol: Integer)
+        + setAttackingPlayer(attackingPlayer: Player)
+        + getAttackingPlayer() : Player
+        + setTargetPlayer(targetPlayer: Player)
+        + getTargetPlayer() : Player
+        + getWeapon() : Weapon
+        + getRealCoordinates() : Integer[2]
+        + setRealCoordinates(coords: Integer[2])
+        + getRealRow() : Integer
+        + getRealCol() : Integer
+    }
+
+    class AttackResult {
+        - _message : String
+        - _rowHit : Integer
+        - _colHit : Integer
+        - _sonarCount : Integer
+        + <<create>> AttackResult(status: AttackStatus, message: String)
+        + getHitCoordinates() : Integer[2]
+        + setHitCoordinates(row: Integer, col: Integer)
+        + getStatus() : AttackStatus
+        + getMessage() : String
+        + getSonarCount() : Integer
+        + setSonarCount(count: Integer)
+        + getAttackToRelaunch() : Attack
+        + setAttackToRelaunch(attack: Attack)
+        + setWeapon(weapon: Weapon)
+        + getWeapon() : Weapon
+    }
+
+    enum AttackStatus <<enumerate>> {
+        MISS
+        ISLAND_MISS
+        HIT
+        SUNK
+        BLACKHOLE
+        TORNADO
+        ITEM_FOUND
+        SONAR_RESULT
+        ALREADY_VISITED
     }
 
     package weapon {
@@ -82,24 +153,24 @@ package model {
 
         abstract class Weapon <<abstract>> extends model.Placeable {
             + <<create>> Weapon(type: WeaponType)
-            + {abstract} apply(grid: Grid, row: Integer, col: Integer)
-            + getType() : WeaponType
+            + {abstract} applyAttack(grid: Grid, attack: Attack) : AttackResult[*]
+            + getWeaponType() : WeaponType
+            + hit() : AttackResult
         }
 
         class Missile extends Weapon {
             + <<create>> Missile()
-            + apply(grid: Grid, row: Integer, col: Integer)
+            + applyAttack(grid: Grid, attack: Attack) : AttackResult[*]
         }
 
         class Bomb extends Weapon {
             + <<create>> Bomb()
-            + apply(grid: Grid, row: Integer, col: Integer)
+            + applyAttack(grid: Grid, attack: Attack) : AttackResult[*]
         }
 
         class Sonar extends Weapon {
-            - {static} RADIUS : Integer
             + <<create>> Sonar()
-            + apply(grid: Grid, row: Integer, col: Integer)
+            + applyAttack(grid: Grid, attack: Attack) : AttackResult[*]
         }
     }
 
@@ -116,34 +187,36 @@ package model {
         }
 
         abstract class Trap <<abstract>> extends model.Placeable {
-            + <<create>> Trap(type: TrapType, name: String)
-            + {abstract} activate(grid: Grid, row: Integer, col: Integer)
-            + getType() : TrapType
+            + <<create>> Trap(type: TrapType, state: CellState, attackStatus: AttackStatus)
+            + {abstract} activate(attack: Attack, originalResult: AttackResult) : AttackResult
+            + getTrapType() : TrapType
+            + hit() : AttackResult
         }
 
         class BlackHole extends Trap {
             + <<create>> BlackHole()
-            + activate(grid: Grid, row: Integer, col: Integer)
+            + activate(attack: Attack, originalResult: AttackResult) : AttackResult
         }
 
         class Tornado extends Trap {
             + <<create>> Tornado()
-            + activate(grid: Grid, row: Integer, col: Integer)
+            + activate(attack: Attack, originalResult: AttackResult) : AttackResult
         }
     }
 
     package cell {
         abstract class Cell <<abstract>> {
             - _isHit : Boolean
-            - _type : CellType
-            - _state : CellState
             + <<create>> Cell(cellType: CellType)
-            + {abstract} hit()
-            + isHit() : Boolean
-            + isEmpty() : Boolean
-            + getType() : CellType
-            + placeObject(object: Placeable)
             + getObject() : Placeable
+            + removeObject()
+            + setObject(object: Placeable)
+            + getState() : CellState
+            + setState(state: CellState)
+            + getType() : CellType
+            + isHit() : Boolean
+            + setHit(hit: Boolean)
+            + hit() : AttackResult
         }
 
         enum CellType <<enumerate>> {
@@ -152,33 +225,32 @@ package model {
         }
 
         enum CellState <<enumerate>> {
-            WATER
             SHIP
             HIT
             MISS
             SUNK
-            ISLAND
+            EMPTY
             ISLAND_HIT
+            BLACKHOLE
+            TORNADO
+            OBJECT
         }
 
         class WaterCell extends Cell {
             + <<create>> WaterCell()
-            + hit() : void
         }
 
         class IslandCell extends Cell {
             + <<create>> IslandCell()
-            + hit() : void
         }
     }
 
     package ship {
         abstract class Ship <<abstract>> extends model.Placeable{
             - _cellsRemaining : Integer
-            + <<create>> Ship(type: ShipType, size: Integer, name: String)
-            + hit()
+            + <<create>> Ship(size: Integer, name: String)
             + isSunk() : Boolean
-            + getType() : ShipType
+            + hit() : AttackResult
         }
 
         enum ShipType <<enumerate>> {
@@ -218,94 +290,118 @@ package model {
     package player {
         enum PlayerStrategies <<enumerate>> {
             HUMAN
+            COMPUTER_VERY_EASY
             COMPUTER_EASY
             COMPUTER_MEDIUM
             COMPUTER_HARD
+            COMPUTER_VERY_HARD
         }
 
         class Player {
-            + <<create>> Player()
+            - _name : String
+            + <<create>> Player(gridSize: Integer, cellSize: Integer, playerName: String, isIslandMode: Boolean)
             + setStrategy(strategy: PlayerStrategy)
-            + play()
+            + play(attackResults: AttackResults[*]) : Attack
+            + allShipsSunk() : Boolean
+            + receiveAttack(attack: Attack) : AttackResult[*]
+            + getGrid() : Grid
+            + getGridView() : GridView
+            + getName() : String
+            + addObjectToInventory(placeable: Placeable)
         }
 
         class PlayerStrategyFactory {
             + <<create>> PlayerStrategyFactory()
             + createHumanStrategy() : PlayerStrategy
+            + createComputerVeryEasyStrategy() : PlayerStrategy
             + createComputerEasyStrategy() : PlayerStrategy
             + createComputerMediumStrategy() : PlayerStrategy
             + createComputerHardStrategy() : PlayerStrategy
+            + createComputerVeryHardStrategy() : PlayerStrategy
         }
 
-        interface PlayerStrategy <<interface>> {
-            + playTurn()
+        abstract class PlayerStrategy <<abstract>> {
+            # _coordsList : Integer[*]
+            # _priorityCoords : Integer[*]
+            # _bombUses : Integer
+            # _sonarUses : Integer
+            # _gridSize : Integer
+            + <<create>> PlayerStrategy(config: GameConfig)
+            + getAttack(previousAttackResults: AttackResult[*]) : Attack
+            # getRandomCoordinates() : Integer[*]
+            # deleteCoordinates(coords: Integer[*])
+            # isRemainingCoordinate(row: Integer, col: Integer) : Boolean
+            # addAdjacentCoords(row: Integer, col: Integer)
         }
 
-        class HumanStrategy implements PlayerStrategy {
-            + <<create>> HumanStrategy()
-            + playTurn()
+        class HumanStrategy extends PlayerStrategy {
+            + <<create>> HumanStrategy(config: GameConfig)
+            + getAttack(previousAttackResults: AttackResult[*]) : Attack
         }
 
-        class ComputerEasyStrategy implements PlayerStrategy {
-            + <<create>> ComputerEasyStrategy()
-            + playTurn()
+        class ComputerVeryEasyStrategy extends PlayerStrategy {
+            + <<create>> ComputerVeryEasyStrategy(config: GameConfig)
+            + getAttack(previousAttackResults: AttackResult[*]) : Attack
         }
 
-        class ComputerMediumStrategy implements PlayerStrategy {
-            + <<create>> ComputerMediumStrategy()
-            + playTurn()
+        class ComputerEasyStrategy extends PlayerStrategy {
+            + <<create>> ComputerEasyStrategy(config: GameConfig)
+            + getAttack(previousAttackResults: AttackResult[*]) : Attack
         }
 
-        class ComputerHardStrategy implements PlayerStrategy {
-            + <<create>> ComputerHardStrategy()
-            + playTurn()
+        class ComputerMediumStrategy extends PlayerStrategy {
+            + <<create>> ComputerMediumStrategy(config: GameConfig)
+            + getAttack(previousAttackResults: AttackResult[*]) : Attack
+        }
+
+        class ComputerHardStrategy extends PlayerStrategy {
+            + <<create>> ComputerHardStrategy(config: GameConfig)
+            + getAttack(previousAttackResults: AttackResult[*]) : Attack
+        }
+
+        class ComputerVeryHardStrategy extends PlayerStrategy {
+            + <<create>> ComputerVeryHardStrategy(config: GameConfig)
+            + getAttack(previousAttackResults: AttackResult[*]) : Attack
         }
     }
 }
 
 package view {
     class GameView {
-        + <<create>> GameView(gridSize : Integer, cellSize : Integer)
-        + getPlayerGridView() : LabeledGridView
+        + <<create>> GameView(playerGridView: GridView, computerGridView: GridView, placementController: PlacementController, computerGrid: Grid, configController: ConfigController, gameController: GameController)
         + getComputerGridView() : LabeledGridView
-        + setStatus(text: String)
+        + getHistoryView() : HistoryView
     }
 
     class LabeledGridView {
-        + <<create>> LabeledGridView(title: String, gridSize: Integer, cellSize: Integer)
-        + <<create>> LabeledGridView(title: String, gridSize: Integer, cellSize: Integer, locked: Boolean)
+        + <<create>> LabeledGridView(title: String, gridView: GridView)
+        + <<create>> LabeledGridView(title: String, gridView: GridView, locked: Boolean)
         - setupComponents()
         + getGridView() : GridView
-        + setTitle(title: String)
     }
 
     class GridView {
         - _gridSize : Integer
         - _locked : Boolean
-        + <<create>> GridView(gridSize: Integer, cellSize: Integer)
+        + <<create>> GridView(gridSize: Integer, cellSize: Integer, grid: Grid)
+        - getCellView(cellSize: Integer, row: Integer, col: Integer, grid: Grid) : CellView
+        + updateCellDisplay(result: AttackResult, row: Integer, col: Integer)
         + setLocked(locked: Boolean)
-        + setCellEnabled(row: Integer, col: Integer, enabled: Boolean)
-        + addCellClickListener(listener: ActionListener)
-        + setGridActionListener(listener: GridActionListener)
-        + notifyShipDropped(shipView: ShipView, row: Integer, col: Integer) : Boolean
+        + setObjectPlacementListener(listener: ObjectPlacementListener)
+        + notifyPlaceableDropped(placeableView: PlaceableView, row: Integer, col: Integer) : Boolean
+        + setAttackListener(listener: AttackListener)
+        + notifyCellAttacked(row: Integer, col: Integer)
         + getCell(row: Integer, col: Integer) : CellView
         + getGridSize() : Integer
-        + isLocked() : Boolean
-        + getGrid() : Grid
+        + clearGrid()
     }
 
     class CellView {
-        - _segmentImage : Image
-        - _isClickable : Boolean
-        - _cellPosition : Point
-        - _cellSize : Integer
-        + <<create>> CellView(cellPosition: Point, cellSize: Integer)
-        + setSegmentImage()
-        # paintComponent(g: Graphics)
-        + addMouseListener(l: MouseListener)
-        + setClickable(clickable: Boolean)
-        + isClickable() : Boolean
-        + getCellPosition() : Point
+        - _sonarCountToDisplay : Integer
+        + <<create>> CellView(cellSize: Integer, cellType: CellType)
+        + setCellIcon(state: CellState)
+        + displaySonarScan(sonarCount: Integer)
+        + getCellState() : CellState
     }
 
     class ShipView {
@@ -314,16 +410,17 @@ package view {
 
     class ConfigScreen {
         - {static} MAX_OCCUPIABLE_CELLS : Integer
+        - {static} BASE_HEIGHT : Float
         + <<create>> ConfigScreen(gameController: GameController, configController: ConfigController)
+        - updateResponsiveLayout()
+        - setupListeners(gameController: GameController, configController: ConfigController)
         - getOccupiedCellsCount() : Integer
         - updateOccupiedCellsLabel(occupiedCells: Integer)
-        + getGridSize() : Integer
     }
 
     class PlacementScreen {
-        - {static} SHIP_PANEL_WIDTH : Integer
-        - {static} LABEL_HEIGHT : Integer
-        + <<create>> PlacementScreen(gameController: GameController, gridSize: Integer, ships: Ships[*], cellSize: Integer, PlacementController placementController)
+        + <<create>> PlacementScreen(gameController: GameController, cellSize: Integer, placementController: PlacementController, configController: ConfigController)
+        + clearPlaceableViews()
     }
 
     class StartScreen {
@@ -335,77 +432,93 @@ package view {
     class TerminalOutput
 
     class MainFrame {
-        - {static} START : String
-        - {static} CONFIG : String
-        - {static} PLACEMENT : String
         + <<create>> MainFrame()
-        + addScreen(name: String, screen: JPanel)
         + showScreen(name: String)
     }
 
-    class ShipView {
-        - _topLayer : JLayeredPane
-        - _originalPanel : JPanel
+    class PlaceableView {
         - _cellSize : Integer
         - _dragging : Boolean
-        - _dragOffset : Point
-        - _segmentPanel : JPanel
-        + <<create>> ShipView(ship: ShipView, grid: LabeledGridView, topLayer: JLayeredPane, originalPanel: JPanel, cellSize: Integer)
+        - _dragOffset : Integer[2]
+        - _imagePath : String
+        + <<create>> PlaceableView(placeable: Placeable, grid: LabeledGridView, topLayer: JLayeredPane, originalPanel: JPanel, cellSize: Integer, imagePath: String)
         - loadSegments()
         - updateSize()
         + setOrientation(orientation: Orientation)
         - initDragAndDrop()
-        + getShip() : Ship
+        + getPlaceable() : Placeable
+    }
+
+    class ShipView extends PlaceableView {
+        + <<create>> ShipView(ship: Ship, grid: LabeledGridView, topLayer: JLayeredPane, originalPanel: JPanel, cellSize: Integer)
+    }
+
+    class TrapView extends PlaceableView {
+        + <<create>> TrapView(trap: Trap, grid: LabeledGridView, topLayer: JLayeredPane, originalPanel: JPanel, cellSize: Integer)
+    }
+
+    class HistoryView {
+        + <<create>> HistoryView()
+        + updateHistory(playerLog: String[*], computerLog: String[*])
     }
 }
 
 package controller {
-    class GridController {
-        +placeShip(ship: Ship, position: Position, orientation: Orientation): Boolean
+    interface AttackListener <<interface>> {
+        onCellAttacked(row: Integer, col: Integer)
     }
 
     class GameController {
         - {static} CELL_SIZE : Integer
+        - {static} START : String
+        - {static} CONFIG : String
+        - {static} PLACEMENT : String
+        - {static} GAME : String
+        - _turnNumber : Integer
+        - _playerAttackHistory : String[*]
+        - _botAttackHistory : String[*]
         + <<create>> GameController()
         + showStartScreen()
         + showConfigScreen()
-        + startPlacementScreen(shipConfig: Dictionary<String, Integer>, gridSize: Integer)
+        + showPlacementScreen()
+        + showGameScreen()
+        + handleHumanAttack(row: Integer, col: Integer)
+        - handleComputerAttack()
+        - endTurn(results: AttackResult[*], attack: Attack)
+        - updateHistoryLog(results: AttackResult[*], attack: Attack)
+        - processSingleImpact(result: AttackResult, originalAttack: Attack)
+        - executeCounterAttack(counterAttack: Attack)
+        - updateGameView(result: AttackResult, targetGridView: GridView, row: Integer, col: Integer)
+        - changeTurn()
+        - checkGameOver() : Boolean
+        + getPlayerGrid() : Grid
+        + getPlayerGridView() : GridView
         + quit()
+        + setSelectedWeapon(weaponType: WeaponType)
     }
 
     class PlacementController {
         + <<create>> PlacementController()
-        + placeShip(modelGrid: Grid, viewGrid: GridView, ship: Ship, row: Integer, col: Integer) : Boolean
-        + rotateShip(ship: Ship)
+        + placeObject(modelGrid: Grid, viewGrid: GridView, object: Placeable, row: Integer, col: Integer) : Boolean
+        + randomObjectsPlacement(modelGrid: Grid, viewGrid: GridView, objects: Placeable[*])
+        + rotatePlaceable(placeable: Placeable)
+        + clearGrid(modelGrid: Grid, viewGrid: GridView)
     }
 
-    interface GridActionListener {
-        shipDropped(shipView: ShipView, row: Integer, col: Integer) : Boolean
+    interface ObjectPlacementListener <<interface>> {
+        objectDropped(placeableView: PlaceableView, row: Integer, col: Integer) : Boolean
     }
 
     class ConfigController {
         + <<create>> ConfigController()
-        + getShipConfig(config: Dictionary<String, Integer>) : Ship[*]
-        + getShipConfig(carriers : Integer, batteShips : Integer, cruisers : Integer, submarines : Integer, destroyer : Integer) : Ship[*]
+        + getShipConfig() : Placeable[*]
+        + getShipConfig(carriers : Integer, batteShips : Integer, cruisers : Integer, submarines : Integer, destroyer : Integer) : Placeable[*]
+        + getAllPlaceables() : Placeable[*]
         + setGridSize(gridSize: Integer)
         + setShipNumber(shipType: ShipType, number: Integer)
         + getGameConfig() : GameConfig
-    }
-
-    class PlayerController {
-        + changeStrategy(newStrategy: PlayerStrategy)
-    }
-}
-
-package util {
-    class RandomUtil {
-
-    }
-
-    class ShipImageProvider {
-        - {static} BASE_PATH : String
-        - {static} _segmentBase : Image
-        + {static} getShipSegment(cellSize: Integer) : Image
+        + setIslandModeEnabled(islandsEnabled: Boolean)
+        + setPlayerStrategy(playerStrategy: String)
     }
 }
 
@@ -415,22 +528,59 @@ Main ..> GameController : Instantiates >
 'Model
 Player "1" *--> "*\n-_inventory" Placeable : Can place >
 Player "1" *--> "1\n-_grid" Grid : Has >
-Player ..> PlayerStrategy : Calls >
+Player "1" *--> "1\n-_gridView" GridView : Has >
+Player "1" o--> "1\n-_strategy" PlayerStrategy : Has for strategy >
+Player ..> Grid : Instantiates >
+Player ..> GridView : Instantiates >
+Player ..> Ship : Uses >
+Player ..> Weapon : Uses >
 
-Cell "1" *--> "1\n-_cellType" CellType : Is of type >
-Cell "1" *--> "0,1\n-_object" Placeable : Can contain >
+PlayerStrategy "1" *--> "3" Weapon : Can attack with >
+PlayerStrategy "1" *--> "1\n-_config" GameConfig : Has >
+PlayerStrategy ..> WeaponFactory : Instantiates >
+PlayerStrategy ..> Attack : Instantiates >
+PlayerStrategy ..> AttackResult : Uses >
+
+Cell "1" *--> "1\n-_type" CellType : Is of type >
+Cell "1" o--> "0,1\n-_object" Placeable : Can contain >
+Cell "1" *--> "1\n-_state" CellState : Current state >
+Cell ..> AttackResult : Instantiates >
+Cell ..> AttackStatus: Uses >
 
 Grid "1" *--> "*\n-_cells" Cell : Contains >
-Grid "1" *--> "*\n-_ships" Ship : Contains >
+Grid "1" *--> "*\n-_objects" Placeable : Contains >
+Grid ..> Cell : Instantiates >
+Grid ..> CellState : Uses >
+Grid ..> GridView : Uses >
 
 Placeable "1" *--> "1\n-_orientation" Orientation : Is oriented >
-Placeable "1" *--> "1\n-_cellType" CellType : Can be placed on a cell of type >
+Placeable "1" *--> "1\n-_placementCellType" CellType : Can be placed on a cell of type >
+Placeable "1" *--> "1\n-_cellState" CellState : State of the cell containing the placeable >
+Placeable "1" *--> "1\n-_placeableType" PlaceableType : Is of type >
+Placeable ..> AttackResult : Instantiates >
 
-Ship "1" *--> "1\n-_shipType" ShipType : Is of type >
 Trap "1" *--> "1\n-_trapType" TrapType : Is of type >
+Trap "1" *--> "1\n-_attackStatus" AttackStatus : Propagates the status when activated >
+Trap ..> AttackStatus : Uses >
+
+BlackHole ..> Attack : Instantiates >
+
+Tornado ..> Attack : Uses >
+
 Weapon "1" *--> "1\n-_weaponType" WeaponType : Is of type >
+Weapon ..> Attack : Uses >
+Weapon ..> Grid : Uses >
+Weapon ..> Cell : Uses >
+
+Bomb ..> AttackStatus : Uses >
+Bomb ..> CellType : Uses >
+
+Sonar ..> AttackStatus : Uses >
+Sonar ..> CellType : Uses >
+Sonar ..> CellState : Uses >
 
 PlayerStrategyFactory ..> PlayerStrategy : Instantiates >
+PlayerStrategyFactory ..> GameConfig : Uses >
 
 ShipFactory ..> Ship : Instantiates >
 
@@ -438,43 +588,93 @@ WeaponFactory ..> Weapon : Instantiates >
 
 TrapFactory ..> Trap : Instantiates >
 
+GameConfig "1" o--> "1\n-_computerStrategy" PlayerStrategies : Selects a computer strategy >
 GameConfig ..> ShipType : Uses >
+
+Attack "1" o--> "2" Player : Involves >
+Attack "1" o--> "1" Weapon : Involves >
+
+AttackResult "1" *--> "1\n-_status" AttackStatus : Status of the attack >
+AttackResult "1" *--> "1\n-_attackToRelaunch" Attack : Attack sent back (by BlackHole) >
+AttackResult "1" o--> "1\n-_weapon" Weapon : Weapon used >
 
 'Controller
 GameController "1" *--> "1\n-_frame" MainFrame : Displays >
 GameController "1" *--> "1\n-_configController" ConfigController : Shares the configuration >
+GameController "1" *--> "1\n-_placementController" PlacementController : Shares the placement controller >
+GameController "1" *--> "1\n-_gameState" GameState : Stores >
+GameController "1" *--> "2" Player : Handles the player and the computer >
+GameController "1" *--> "1\n-_selectedWeapon" Weapon : Stores >
+GameController "1" *--> "*\n-_previousBotResults" AttackResult : Stores >
+GameController "1" *--> "1\n-_gameView" GameView : Displays >
 GameController ..> MainFrame : Instantiates >
 GameController ..> ConfigScreen : Instantiates >
 GameController ..> ConfigController : Instantiates >
 GameController ..> StartScreen : Instantiates >
 GameController ..> PlacementScreen : Instantiates >
 GameController ..> PlacementController : Instantiates >
-
-GridController ..> Grid
+GameController ..> Player : Instantiates >
+GameController ..> PlayerStrategyFactory : Instantiates >
+GameController ..> WeaponFactory : Instantiates >
+GameController ..> GameView : Instantiates >
+GameController ..> Attack : Instantiates >
+GameController ..> AttackResult : Instantiates >
+GameController ..> WeaponType : Uses >
 
 ConfigController "1" *--> "1\n-_gameConfig" GameConfig : Controls >
 ConfigController ..> GameConfig : Instantiates >
 ConfigController ..> ShipFactory : Instantiates >
+ConfigController ..> TrapFactory : Instantiates >
+ConfigController ..> Placeable : Uses >
+ConfigController ..> ShipType : Uses >
 
-PlayerController "1" *--> "1\n-_strategy" PlayerStrategy : Selects the strategy >
+PlacementController ..> Grid : Uses >
+PlacementController ..> Orientation : Uses >
+PlacementController ..> Placeable : Uses >
+PlacementController ..> CellView : Uses >
+PlacementController ..> GridView : Uses >
 
 'View
 PlacementScreen "1" *--> "1\n-_currentOrientation" Orientation : Is oriented >
-PlacementScreen ..> PlacementController : Requests the ship placement >
+PlacementScreen ..> LabeledGridView : Instantiates >
+PlacementScreen ..> PlaceableView : Instantiates >
+PlacementScreen ..> PlacementController : Uses >
+PlacementScreen ..> ConfigController : Uses >
+PlacementScreen ..> GameController : Uses >
+PlacementScreen ..> Placeable : Uses >
 
-LabeledGridView "1" *--> "1\n-_gridView" GridView : Contains >
+LabeledGridView "1" o--> "1\n-_gridView" GridView : Contains >
 
 GridView "1" *--> "*\n-_cells" CellView : Contains >
-GridView "1" o--> "1\n-_grid" Grid : Represents >
-GridView "1" o--> "1\n-_listener" GridActionListener : Is listened to by >
+GridView "1" o--> "1\n-_placementListener" ObjectPlacementListener : Is listened to by >
+GridView "1" o--> "1\n-_attackListener" AttackListener : Is listened to by >
+GridView ..> CellView : Instantiates >
+GridView ..> AttackResult : Uses >
+GridView ..> Grid : Uses >
+GridView ..> Cell : Uses >
+GridView ..> CellState : Uses >
 
-CellView ..> ShipImageProvider : Requests the image to display >
+CellView "1" *--> "1\n-_cellState" CellState : Current state >
+CellView "1" *--> "1\n-_cellType" CellType : Is of type >
 
-ShipView "1" o--> "1\n-_ship" Ship : Represents >
-ShipView "1" o--> "1\n-_grid" LabeledGridView : Can be placed inside >
-ShipView "1" *--> "1\n-_orientation" Orientation : Is oriented >
-ShipView ..> ShipImageProvider : Requests the image to display >
+PlaceableView "1" o--> "1\n-_placeable" Placeable : Represents >
+PlaceableView "1" o--> "1\n-_grid" LabeledGridView : Can be placed inside >
+PlaceableView "1" o--> "1\n-_orientation" Orientation : Is oriented >
 
-GameView "1" *--> "2\n-_grid" LabeledGridView : Displays >
+GameView "1" o--> "1\n-_computerGridView" GridView : Displays >
+GameView "1" *--> "1\n-_historyView" HistoryView : Displays >
+GameView ..> HistoryView : Instantiates >
+GameView ..> LabeledGridView : Instantiates >
+GameView ..> ConfigController : Uses >
+GameView ..> GameController : Uses >
+GameView ..> PlacementController : Uses >
+GameView ..> Grid : Uses >
+GameView ..> WeaponType : Uses >
+
+ConfigScreen ..> ConfigController : Uses >
+ConfigScreen ..> GameController : Uses >
+ConfigScreen ..> ShipType : Uses >
+
+StartScreen ..> GameController : Uses >
 
 @enduml
