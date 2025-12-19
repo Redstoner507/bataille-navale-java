@@ -27,6 +27,7 @@ public class Sonar extends Weapon{
         // Ne pas pouvoir utiliser le sonar sur l'île
         if (centerCell.getType() == CellType.ISLAND) {
             AttackResult result = new AttackResult(AttackStatus.ALREADY_VISITED, "");
+            result.setWeapon(attack.getWeapon());
             result.setHitCoordinates(centerRow, centerCol);
             sonarResults.add(result);
             return sonarResults;

@@ -20,6 +20,7 @@ public class Missile extends Weapon{
         Cell cell = grid.getCell(row, col);
         ArrayList<AttackResult> results = new ArrayList<>();
         AttackResult result = cell.hit();
+        result.setWeapon(attack.getWeapon());
         result.setHitCoordinates(row, col);
         results.add(result);
         return results;

@@ -15,8 +15,8 @@ import java.util.ArrayList;
 public class GameController {
     //Variables
     private static final int CELL_SIZE = 50;
-    private final ConfigController _configController;
-    private final PlacementController _placementController;
+    private ConfigController _configController;
+    private PlacementController _placementController;
     private GameState _gameState;
     private Player _player;
     private Player _bot;
@@ -32,21 +32,15 @@ public class GameController {
     private static final String CONFIG = "config";
     private static final String PLACEMENT = "placement";
     private static final String GAME = "game";
+    private static final String END = "end";
 
     public GameController() {
-        _configController = new ConfigController();
-        _placementController = new PlacementController();
-        _player = null;
-        _bot = null;
-
         _frame = new MainFrame();
-
         _frame.addScreen(START, new StartScreen(this));
-        _frame.addScreen(CONFIG, new ConfigScreen(this, _configController));
-
         _frame.setVisible(true);
+        resetGame();
+
         showStartScreen();
-        setSelectedWeapon(WeaponType.MISSILE);
     }
 
     public void showStartScreen() {
@@ -91,6 +85,11 @@ public class GameController {
         _frame.addScreen(GAME, _gameView);
         _frame.showScreen(GAME);
         this._gameState = GameState.HUMAN_TURN;
+    }
+
+    public void showEndScreen(String endMessage) {
+        _frame.addScreen(END, new EndScreen(this, endMessage));
+        _frame.showScreen(END);
     }
 
     public void handleHumanAttack(int row, int col) {
@@ -148,6 +147,12 @@ public class GameController {
 
         // Vérifier la fin du jeu et changer de tour
         if (checkGameOver()) {
+            // Récupérer le joueur qui a gagné
+            Player p = attack.getAttackingPlayer();
+            String endMessage;
+            if (p.getName().equals("Player")) endMessage = "You won !";
+            else endMessage = "You lost !";
+            showEndScreen(endMessage);
             return;
         }
 
@@ -279,7 +284,6 @@ public class GameController {
         // Nécessite la méthode allShipsSunk() dans la classe Player
         if (_player.allShipsSunk() || _bot.allShipsSunk()) {
             _gameState = GameState.GAME_OVER;
-            // Gérer l'affichage de l'écran de fin (E4)
             return true;
         }
         return false;
@@ -304,5 +308,17 @@ public class GameController {
             case BOMB -> this._selectedWeapon = weaponFactory.createBomb();
             case SONAR -> this._selectedWeapon = weaponFactory.createSonar();
         }
+    }
+
+    public void resetGame() {
+        _configController = new ConfigController();
+        _frame.addScreen(CONFIG, new ConfigScreen(this, _configController));
+        _placementController = new PlacementController();
+        _player = null;
+        _bot = null;
+        setSelectedWeapon(WeaponType.MISSILE);
+        _playerAttackHistory.clear();
+        _botAttackHistory.clear();
+        _previousBotResults.clear();
     }
 }
