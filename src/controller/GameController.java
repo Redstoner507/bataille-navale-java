@@ -305,8 +305,8 @@ public class GameController {
         WeaponFactory weaponFactory = new WeaponFactory();
         switch (weaponType) {
             case MISSILE -> this._selectedWeapon = weaponFactory.createMissile();
-            case BOMB -> this._selectedWeapon = weaponFactory.createBomb();
-            case SONAR -> this._selectedWeapon = weaponFactory.createSonar();
+            case BOMB -> this._selectedWeapon = weaponFactory.createBomb(1);
+            case SONAR -> this._selectedWeapon = weaponFactory.createSonar(1);
         }
     }
 

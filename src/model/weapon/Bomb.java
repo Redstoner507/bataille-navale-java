@@ -12,8 +12,8 @@ import java.util.ArrayList;
 
 public class Bomb extends Weapon{
 
-    public Bomb() {
-        super(WeaponType.BOMB, CellState.BOMB);
+    public Bomb(int nbUses) {
+        super(WeaponType.BOMB, CellState.BOMB, nbUses);
     }
 
     @Override

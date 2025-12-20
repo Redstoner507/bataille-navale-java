@@ -74,8 +74,8 @@ public class ConfigController {
         ArrayList<Placeable> weapons = new ArrayList<>();
         if (_gameConfig.isIslandModeEnabled()) {
             WeaponFactory factory = new WeaponFactory();
-            weapons.add(factory.createBomb());
-            weapons.add(factory.createSonar());
+            weapons.add(factory.createBomb(1));
+            weapons.add(factory.createSonar(1));
             System.out.println("Weapons added");
         }
         return weapons;

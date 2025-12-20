@@ -10,17 +10,14 @@ import model.Attack;
 import model.AttackResult;
 import model.GameConfig;
 import model.weapon.Weapon;
-import model.weapon.WeaponFactory;
 
 public abstract class PlayerStrategy {
     protected final List<int[]> _coordsList = new ArrayList<>();
     protected final Queue<int[]> _priorityCoords = new ArrayDeque<>();
+    protected Weapon _missile;
+    protected Weapon _bomb;
+    protected Weapon _sonar;
     protected final Random _random = new Random();
-    protected final Weapon _missile = new WeaponFactory().createMissile();
-    protected final Weapon _bomb = new WeaponFactory().createBomb();
-    protected final Weapon _sonar = new WeaponFactory().createSonar();
-    protected int _bombUses = 1; // Example usage limit (à modfier l'emplacement (inventaire) de cette variable)
-    protected int _sonarUses = 1; // Example usage limit
     protected GameConfig _config;
     protected int _gridSize;
 
@@ -81,5 +78,11 @@ public abstract class PlayerStrategy {
                     _priorityCoords.add(new int[] { newRow, newCol });
             }
         }
+    }
+
+    protected void setWeaponList(Inventory inventory) {
+        this._missile = inventory.getWeaponByType(model.weapon.WeaponType.MISSILE);
+        this._bomb = inventory.getWeaponByType(model.weapon.WeaponType.BOMB);
+        this._sonar = inventory.getWeaponByType(model.weapon.WeaponType.SONAR);
     }
 }
