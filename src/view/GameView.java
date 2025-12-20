@@ -115,7 +115,7 @@ public class GameView extends JPanel {
             buttonGroup.add(button);
             panel.add(button);
 
-            // ⭐ Stockage du bouton
+            // Stockage du bouton
             weaponButtons.put(type, button);
         }
 

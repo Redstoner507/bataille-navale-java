@@ -7,6 +7,7 @@ import model.cell.IslandCell;
 import model.cell.WaterCell;
 import model.ship.Ship;
 import model.trap.Trap;
+import model.weapon.Weapon;
 import view.GridView;
 
 import java.awt.*;
@@ -105,9 +106,9 @@ public class Grid {
             }
             case ITEM_FOUND -> {
                 cellHit.setState(CellState.ISLAND_HIT);
-                Placeable object = cellHit.getObject();
+                Weapon weapon = (Weapon) cellHit.getObject();
                 cellHit.removeObject();
-                //attack.getAttackingPlayer().addObjectToInventory(object); // Inventaire de Placeable à refaire
+                attack.getAttackingPlayer().addToInventory(weapon);
             }
             case ISLAND_MISS -> cellHit.setState(CellState.ISLAND_HIT);
             case SONAR_RESULT -> cellHit.setHit(false);
@@ -208,5 +209,9 @@ public class Grid {
 
     public StatsController getStatsController() {
         return _statsController;
+    }
+
+    public int getIslandSize() {
+        return ISLAND_END - ISLAND_START;
     }
 }

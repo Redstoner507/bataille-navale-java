@@ -76,7 +76,6 @@ public class ConfigController {
             WeaponFactory factory = new WeaponFactory();
             weapons.add(factory.createBomb(1));
             weapons.add(factory.createSonar(1));
-            System.out.println("Weapons added");
         }
         return weapons;
     }

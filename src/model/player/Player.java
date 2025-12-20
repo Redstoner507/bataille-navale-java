@@ -14,7 +14,7 @@ public class Player {
     private final String _name;
     private final Grid _grid;
     private final GridView _gridView;
-    private Inventory _inventory;
+    private final Inventory _inventory;
     private PlayerStrategy _strategy;
 
     public Player(int gridSize, int cellSize, String playerName, boolean islandMode) {

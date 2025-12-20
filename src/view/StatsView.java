@@ -60,7 +60,7 @@ public class StatsView extends JPanel {
         _shipsSunk.setText("Ships sunk: " + statsController.getShipsSunk());
         _misses.setText("Misses: " + statsController.getMisses());
         _shipsHitRatio.setText("Ship cells hit / Total ship cells: " + statsController.getShipCellsHit() + " / " + statsController.getTotalShipCells());
-        _weaponUseRatio.setText("Weapons used / Weapons available: " + statsController.getWeaponsUsed() + " / " + statsController.getWeaponsAvailable());
+        _weaponUseRatio.setText("Weapons available / Weapons used: " + statsController.getWeaponsAvailable() + " / " + statsController.getWeaponsUsed());
         _islandCellsLeft.setText("Islands cells left to search: " + statsController.getIslandCellsLeft());
     }
 }

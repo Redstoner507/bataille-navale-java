@@ -87,6 +87,7 @@ public class GameController {
         _frame.addScreen(GAME, _gameView);
         _frame.showScreen(GAME);
         this._gameState = GameState.HUMAN_TURN;
+        setSelectedWeapon(null);
     }
 
     public void showEndScreen(String endMessage) {
@@ -314,7 +315,8 @@ public class GameController {
         }
 
         if (_configController.getGameConfig().isIslandModeEnabled()) {
-            islandCellsLeft = 9;
+            int islandSize = getPlayerGrid().getIslandSize();
+            islandCellsLeft = islandSize * islandSize;
         }
         else {
             weaponsAvailable = 2;

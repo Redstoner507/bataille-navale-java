@@ -6,22 +6,22 @@ import model.weapon.WeaponType;
 import java.util.ArrayList;
 
 public class Inventory {
-    private ArrayList<Weapon> weapons;
+    private final ArrayList<Weapon> _weapons;
 
     public Inventory() {
-        this.weapons = new ArrayList<>();
+        this._weapons = new ArrayList<>();
     }
 
     public void addWeapon(Weapon weapon) {
-        this.weapons.add(weapon);
+        this._weapons.add(weapon);
     }
 
     public ArrayList<Weapon> getWeapons() {
-        return weapons;
+        return _weapons;
     }
 
     public Weapon getWeaponByType(WeaponType type) {
-        for (Weapon weapon : weapons) {
+        for (Weapon weapon : _weapons) {
             if (weapon.getWeaponType() == type) {
                 return weapon;
             }

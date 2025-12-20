@@ -44,7 +44,11 @@ public class StatsController {
                 _shipCellsHit++;
                 _shipsSunk++;
             }
-            case ISLAND_MISS, ITEM_FOUND -> _islandCellsLeft--;
+            case ISLAND_MISS -> _islandCellsLeft--;
+            case ITEM_FOUND -> {
+                _islandCellsLeft--;
+                _weaponsAvailable++;
+            }
         }
     }
 
