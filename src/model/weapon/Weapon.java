@@ -8,10 +8,12 @@ import java.util.ArrayList;
 
 public abstract class Weapon extends Placeable {
     private final WeaponType _weaponType;
+    private int _nbUses;
 
-    public Weapon(WeaponType type, CellState state) {
+    public Weapon(WeaponType type, CellState state, int nbUses) {
         super(1, Orientation.HORIZONTAL, type.name(), CellType.ISLAND, PlaceableType.WEAPON, state);
         _weaponType = type;
+        _nbUses = nbUses;
     }
 
     public abstract ArrayList<AttackResult> applyAttack(Grid grid, Attack attack);
@@ -23,5 +25,15 @@ public abstract class Weapon extends Placeable {
     @Override
     public AttackResult hit() {
         return new AttackResult(AttackStatus.ITEM_FOUND, "You found a " + getName() + " !");
+    }
+
+    public int getUses() {
+        return _nbUses;
+    }
+
+    public void use() {
+        if (_nbUses > 0) {
+            _nbUses--;
+        }
     }
 }

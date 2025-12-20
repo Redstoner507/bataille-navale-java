@@ -107,7 +107,7 @@ public class Grid {
                 cellHit.setState(CellState.ISLAND_HIT);
                 Placeable object = cellHit.getObject();
                 cellHit.removeObject();
-                attack.getAttackingPlayer().addObjectToInventory(object);
+                //attack.getAttackingPlayer().addObjectToInventory(object); // Inventaire de Placeable à refaire
             }
             case ISLAND_MISS -> cellHit.setState(CellState.ISLAND_HIT);
             case SONAR_RESULT -> cellHit.setHit(false);

@@ -17,11 +17,13 @@ public class ComputerVeryEasyStrategy extends PlayerStrategy {
         int[] coords = super.getRandomCoordinates();
         
         // Randomly choose a weapon (mostly _missile, sometimes bomb)
-        Weapon selectedWeapon = this._missile; // Default weapon for very easy strategy
-        if (_random.nextInt(100) < 10 && this._bombUses > 0) { // 10% chance to use bomb if available
-            selectedWeapon = this._bomb;
-            this._bombUses--;
-        }
+       
+        boolean useBomb =
+            _bomb != null &&
+            _bomb.getUses() > 0 &&
+            _random.nextInt(10) == 0; // 10% chance
+
+        Weapon selectedWeapon = useBomb ? _bomb : _missile;          
         return new Attack(null, null, selectedWeapon, coords[0], coords[1]); // Player will be set later
     }
 }

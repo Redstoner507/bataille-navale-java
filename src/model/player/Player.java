@@ -3,6 +3,8 @@ package model.player;
 import model.*;
 import model.ship.Ship;
 import model.weapon.Weapon;
+import model.weapon.WeaponType;
+import model.weapon.WeaponFactory;
 import view.GridView;
 
 import java.awt.*;
@@ -12,17 +14,26 @@ public class Player {
     private final String _name;
     private final Grid _grid;
     private final GridView _gridView;
-    private ArrayList<Placeable> _inventory;
+    private Inventory _inventory;
     private PlayerStrategy _strategy;
 
     public Player(int gridSize, int cellSize, String playerName, boolean islandMode) {
         _grid = new Grid(gridSize, islandMode);
         _gridView = new GridView(gridSize, cellSize, _grid);
         _name = playerName;
+        _inventory = new Inventory();
+        _inventory.addWeapon(new WeaponFactory().createMissile());
+        if (!islandMode) {
+            _inventory.addWeapon(new WeaponFactory().createBomb(1));
+            _inventory.addWeapon(new WeaponFactory().createSonar(1));
+        }
     }
 
     public void setStrategy(PlayerStrategy strategy) {
         this._strategy = strategy;
+        if (this._strategy != null) {
+            this._strategy.setWeaponList(_inventory);
+        }
     }
 
     public Attack play(ArrayList<AttackResult> attackResults) {
@@ -78,7 +89,11 @@ public class Player {
         return _name;
     }
 
-    public void addObjectToInventory(Placeable placeable) {
-        _inventory.add(placeable);
+    public void addToInventory(Weapon weapon) {
+        _inventory.addWeapon(weapon);
+    }
+
+    public Weapon getWeaponFromInventory(WeaponType type) {
+        return _inventory.getWeaponByType(type);
     }
 }

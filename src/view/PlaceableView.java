@@ -57,6 +57,9 @@ public class PlaceableView extends JLabel {
             case PlaceableType.SHIP:
                 loadShipSegments();
                 break;
+            case PlaceableType.WEAPON:
+                loadWeaponSegment();
+                break;
             default:
                 loadTrapSegments();
                 break;
@@ -82,6 +85,17 @@ public class PlaceableView extends JLabel {
 
     private void loadTrapSegments() {
         Icon img = new ImageIcon(ImageUtils.getTrapImage(_placeable.getName().toLowerCase())); // image générique pour les pièges
+
+        JLabel seg = new JLabel(img);
+        seg.setPreferredSize(new Dimension(_cellSize, _cellSize));
+        seg.setMinimumSize(new Dimension(_cellSize, _cellSize));
+        seg.setMaximumSize(new Dimension(_cellSize, _cellSize));
+        seg.setBorder(new LineBorder(Color.BLACK));
+        _segmentPanel.add(seg);
+    }
+
+    public void loadWeaponSegment() {
+        Icon img = new ImageIcon(ImageUtils.getWeaponImage(_placeable.getName().toLowerCase()));
 
         JLabel seg = new JLabel(img);
         seg.setPreferredSize(new Dimension(_cellSize, _cellSize));

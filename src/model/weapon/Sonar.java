@@ -12,8 +12,8 @@ import java.util.ArrayList;
 
 public class Sonar extends Weapon{
 
-    public Sonar() {
-        super(WeaponType.SONAR, CellState.SONAR);
+    public Sonar(int nbUses) {
+        super(WeaponType.SONAR, CellState.SONAR, nbUses);
     }
 
     @Override

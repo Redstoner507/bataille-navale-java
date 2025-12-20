@@ -8,12 +8,15 @@ import model.weapon.WeaponType;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.EnumMap;
 
 public class GameView extends JPanel {
     private final GridView _computerGridView;
     private final HistoryView _historyView;
     private final StatsView _statsView;
     private final JLabel _turnLabel;
+    private final EnumMap<WeaponType, JRadioButton> weaponButtons = new EnumMap<>(WeaponType.class);
+
 
     public GameView(GridView playerGridView, GridView computerGridView, PlacementController placementController, Grid computerGrid, ConfigController configController, GameController gameController) {
         setLayout(new BorderLayout(10, 10));
@@ -95,28 +98,33 @@ public class GameView extends JPanel {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
         panel.setBorder(BorderFactory.createTitledBorder("Weapons"));
 
-        // Supposons que vous avez une enum WeaponType : MISSILE, BOMB, SONAR
-        WeaponType[] availableWeapons = {WeaponType.MISSILE, WeaponType.BOMB, WeaponType.SONAR};
+        WeaponType[] availableWeapons = {
+            WeaponType.MISSILE,
+            WeaponType.BOMB,
+            WeaponType.SONAR
+        };
 
         for (WeaponType type : availableWeapons) {
             JRadioButton button = new JRadioButton(type.toString());
-            button.setActionCommand(type.toString()); // Utiliser le nom comme commande
+            button.setActionCommand(type.name());
 
-            // Attacher l'écouteur du Contrôleur pour gérer la sélection
-            // Le Contrôleur doit stocker l'arme sélectionnée.
-            button.addActionListener(e -> gameController.setSelectedWeapon(WeaponType.valueOf(e.getActionCommand())));
+            button.addActionListener(e ->
+                gameController.setSelectedWeapon(WeaponType.valueOf(e.getActionCommand()))
+            );
 
             buttonGroup.add(button);
             panel.add(button);
+
+            // ⭐ Stockage du bouton
+            weaponButtons.put(type, button);
         }
 
-        // Sélectionner le Missile par défaut
-        if (buttonGroup.getButtonCount() > 0) {
-            buttonGroup.setSelected(buttonGroup.getElements().nextElement().getModel(), true);
-        }
+        // Sélection par défaut
+        weaponButtons.get(WeaponType.MISSILE).setSelected(true);
 
         return panel;
     }
+
 
     public GridView getComputerGridView() {
         return _computerGridView;
@@ -131,4 +139,12 @@ public class GameView extends JPanel {
     public void setTurnNumber(int turnNumber) {
         _turnLabel.setText("Turn n°" + turnNumber);
     }
+
+    public void setWeaponSelection(WeaponType weaponType) {
+        JRadioButton button = weaponButtons.get(weaponType);
+        if (button != null) {
+            button.setSelected(true);
+        }
+    }
+
 }
