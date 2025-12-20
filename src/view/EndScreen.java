@@ -7,7 +7,7 @@ import java.awt.*;
 
 public class EndScreen extends JPanel {
 
-    public EndScreen(GameController gameController, String endMessage) {
+    public EndScreen(GameController gameController, String endMessage, StatsView statsView) {
         setLayout(new BorderLayout());
 
         JPanel contentPanel = new JPanel();
@@ -23,6 +23,9 @@ public class EndScreen extends JPanel {
         title.setFont(new Font("Arial", Font.BOLD, 50));
         contentPanel.add(title);
         contentPanel.add(Box.createVerticalStrut(50));
+
+        contentPanel.add(statsView);
+        contentPanel.add(Box.createVerticalStrut(20));
 
         JButton playButton = new JButton("Play again");
         playButton.setAlignmentX(CENTER_ALIGNMENT);

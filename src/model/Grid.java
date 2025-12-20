@@ -1,5 +1,6 @@
 package model;
 
+import controller.StatsController;
 import model.cell.Cell;
 import model.cell.CellState;
 import model.cell.IslandCell;
@@ -28,6 +29,7 @@ public class Grid {
     private int _rowOffset = 0;
     private int _colOffset = 0;
     private int _tornadoEffect = 0;
+    private final StatsController _statsController = new StatsController();
 
     public Grid(int size, boolean islandMode) {
         if (size < MIN_SIZE || size > MAX_SIZE)
@@ -87,8 +89,12 @@ public class Grid {
 
         GridView playerGridView = attack.getTargetPlayer().getGridView();
 
+        _statsController.evaluateAttack(result.getStatus(), cellHit.getObject(), result.getWeapon());
+
         switch (result.getStatus()) {
-            case MISS -> cellHit.setState(CellState.MISS);
+            case MISS -> {
+                cellHit.setState(CellState.MISS);
+            }
             case HIT -> {
                 if (cellHit.getState() != CellState.SUNK) cellHit.setState(CellState.HIT);
             }
@@ -200,5 +206,9 @@ public class Grid {
             _rowOffset = 0;
             _colOffset = 0;
         }
+    }
+
+    public StatsController getStatsController() {
+        return _statsController;
     }
 }

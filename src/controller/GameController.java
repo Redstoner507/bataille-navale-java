@@ -2,6 +2,7 @@ package controller;
 
 import model.*;
 import model.player.PlayerStrategyFactory;
+import model.ship.Ship;
 import model.weapon.Weapon;
 import model.player.Player;
 import model.weapon.WeaponFactory;
@@ -11,12 +12,12 @@ import view.*;
 import java.awt.*;
 import java.util.ArrayList;
 
-
 public class GameController {
     //Variables
     private static final int CELL_SIZE = 50;
     private ConfigController _configController;
     private PlacementController _placementController;
+    private StatsController _statsController;
     private GameState _gameState;
     private Player _player;
     private Player _bot;
@@ -82,13 +83,14 @@ public class GameController {
 
     public void showGameScreen() {
         _gameView = new GameView(_player.getGridView(), _bot.getGridView(), _placementController, _bot.getGrid(), _configController, this);
+        fillStatsController();
         _frame.addScreen(GAME, _gameView);
         _frame.showScreen(GAME);
         this._gameState = GameState.HUMAN_TURN;
     }
 
     public void showEndScreen(String endMessage) {
-        _frame.addScreen(END, new EndScreen(this, endMessage));
+        _frame.addScreen(END, new EndScreen(this, endMessage, _gameView.getStatsView()));
         _frame.showScreen(END);
     }
 
@@ -144,6 +146,9 @@ public class GameController {
 
         // Mettre à jour l'historique
         updateHistoryLog(results, attack);
+
+        // Mettre à jour les statistiques
+        _gameView.getStatsView().update(_statsController);
 
         // Vérifier la fin du jeu et changer de tour
         if (checkGameOver()) {
@@ -289,6 +294,38 @@ public class GameController {
         return false;
     }
 
+    private void fillStatsController() {
+        _statsController = _bot.getGrid().getStatsController();
+        int shipsUntouched = 0;
+        int totalShipCells = 0;
+        int weaponsAvailable = 0;
+        int islandCellsLeft = 0;
+
+        ArrayList<Placeable> ships = _configController.getShipConfig();
+        for (Placeable placeable : ships) {
+            Ship ship = (Ship) placeable;
+            int cellsRemaining = ship.getCellsRemaining();
+            int totalCells = ship.getTotalCells();
+            if (cellsRemaining == totalCells) {
+                shipsUntouched++;
+            }
+            totalShipCells += totalCells;
+        }
+
+        if (_configController.getGameConfig().isIslandModeEnabled()) {
+            islandCellsLeft = 9;
+        }
+        else {
+            weaponsAvailable = 2;
+        }
+
+        _statsController.setShipsUntouched(shipsUntouched);
+        _statsController.setTotalShipCells(totalShipCells);
+        _statsController.setWeaponsAvailable(weaponsAvailable);
+        _statsController.setIslandCellsLeft(islandCellsLeft);
+        _gameView.getStatsView().update(_statsController);
+    }
+
     public Grid getPlayerGrid() {
         return _player.getGrid();
     }
@@ -314,6 +351,7 @@ public class GameController {
         _configController = new ConfigController();
         _frame.addScreen(CONFIG, new ConfigScreen(this, _configController));
         _placementController = new PlacementController();
+        _statsController = null;
         _player = null;
         _bot = null;
         setSelectedWeapon(WeaponType.MISSILE);

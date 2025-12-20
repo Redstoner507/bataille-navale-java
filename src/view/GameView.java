@@ -12,6 +12,7 @@ import java.awt.*;
 public class GameView extends JPanel {
     private final GridView _computerGridView;
     private final HistoryView _historyView;
+    private final StatsView _statsView;
 
     public GameView(GridView playerGridView, GridView computerGridView, PlacementController placementController, Grid computerGrid, ConfigController configController, GameController gameController) {
         setLayout(new BorderLayout(10, 10));
@@ -36,32 +37,40 @@ public class GameView extends JPanel {
         JPanel weaponSelectionPanel = createWeaponSelectionPanel(gameController, new ButtonGroup());
         playerControlPanel.add(weaponSelectionPanel, BorderLayout.SOUTH);
 
+        // Panneau de l'ordinateur
+        LabeledGridView computerLabeledGridView = new LabeledGridView("Enemy ships", computerGridView, false);
+        _computerGridView = computerLabeledGridView.getGridView();
+        _computerGridView.setAttackListener(gameController::handleHumanAttack);
+
+        SquarePanel computerSquarePanel = new SquarePanel(computerLabeledGridView);
+
+        // Logique de placement aléatoire de l'ordinateur
+        placementController.randomObjectsPlacement(computerGrid, _computerGridView, configController.getAllPlaceables());
+        _computerGridView.clearGrid(); // Cache les bateaux
 
         // --- 2. Panneau Central contenant les 2 Grilles et l'historique ---
 
         JPanel gridsPanel = new JPanel(new GridLayout(1, 3, 30, 0));
         gridsPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
-        // Grille de l'ordinateur
-        LabeledGridView computerLabeledGridView = new LabeledGridView("Enemy ships", computerGridView, false);
-        _computerGridView = computerLabeledGridView.getGridView();
-        _computerGridView.setAttackListener(gameController::handleHumanAttack);
-
-        // Logique de placement aléatoire de l'ordinateur
-        placementController.randomObjectsPlacement(computerGrid, _computerGridView, configController.getAllPlaceables());
-        _computerGridView.clearGrid(); // Cache les bateaux
+        // Panneau central
+        JPanel centerControlPanel = new JPanel(new BorderLayout());
 
         // Historique
         _historyView = new HistoryView();
+        centerControlPanel.add(_historyView, BorderLayout.CENTER);
+
+        // Statistiques
+        _statsView = new StatsView();
+        centerControlPanel.add(_statsView, BorderLayout.SOUTH);
 
         // Ajouter le Panneau de Contrôle du Joueur à gauche
         gridsPanel.add(playerControlPanel);
 
         // Ajouter l'historique au centre
-        gridsPanel.add(_historyView);
+        gridsPanel.add(centerControlPanel);
 
-        // Ajouter la Grille de l'Ordinateur à droite
-        SquarePanel computerSquarePanel = new SquarePanel(computerLabeledGridView);
+        // Ajouter le Panneau de l'Ordinateur à droite
         gridsPanel.add(computerSquarePanel);
 
         add(gridsPanel, BorderLayout.CENTER);
@@ -111,4 +120,6 @@ public class GameView extends JPanel {
     public HistoryView getHistoryView() {
         return _historyView;
     }
+
+    public StatsView getStatsView() {return _statsView;}
 }

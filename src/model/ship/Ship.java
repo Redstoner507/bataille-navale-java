@@ -6,10 +6,12 @@ import model.cell.CellType;
 
 public abstract class Ship extends Placeable {
     private int _cellsRemaining;
+    private final int _totalCells;
 
     public Ship(int size, String name) {
         super(size, Orientation.HORIZONTAL, name, CellType.WATER, PlaceableType.SHIP, CellState.SHIP);
         _cellsRemaining = size;
+        _totalCells = size;
     }
 
     /**
@@ -29,5 +31,13 @@ public abstract class Ship extends Placeable {
         else {
             return new AttackResult(AttackStatus.SUNK, "You sunk a " + getName() + " !");
         }
+    }
+
+    public int getCellsRemaining() {
+        return _cellsRemaining;
+    }
+
+    public int getTotalCells() {
+        return _totalCells;
     }
 }
