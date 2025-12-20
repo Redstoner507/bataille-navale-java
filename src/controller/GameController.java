@@ -4,7 +4,6 @@ import model.*;
 import model.player.PlayerStrategyFactory;
 import model.weapon.Weapon;
 import model.player.Player;
-import model.weapon.WeaponFactory;
 import model.weapon.WeaponType;
 import view.*;
 
@@ -95,7 +94,9 @@ public class GameController {
     public void handleHumanAttack(int row, int col) {
         if (_gameState != GameState.HUMAN_TURN) return;
 
+        setSelectedWeapon(_selectedWeapon.getWeaponType()); // Ensure weapon is valid
         Attack attack = new Attack(_player, _bot, _selectedWeapon, row, col);
+        _selectedWeapon.use();
         ArrayList<AttackResult> results = _bot.receiveAttack(attack);
 
         if (!results.isEmpty() && results.getFirst().getStatus() == AttackStatus.ALREADY_VISITED) return; //Annuler l'attaque si elle a déjà été faite
@@ -302,11 +303,15 @@ public class GameController {
     }
 
     public void setSelectedWeapon(WeaponType weaponType) {
-        WeaponFactory weaponFactory = new WeaponFactory();
-        switch (weaponType) {
-            case MISSILE -> this._selectedWeapon = weaponFactory.createMissile();
-            case BOMB -> this._selectedWeapon = weaponFactory.createBomb(1);
-            case SONAR -> this._selectedWeapon = weaponFactory.createSonar(1);
+        if (_player == null) return;
+
+        Weapon weapon = _player.getWeaponFromInventory(weaponType);
+        if (weapon != null && weapon.getUses() != 0) {
+            this._selectedWeapon = weapon;
+        }
+        else {
+            this._selectedWeapon = _player.getWeaponFromInventory(WeaponType.MISSILE); // Default Weapon
+            _gameView.setWeaponSelection(WeaponType.MISSILE);
         }
     }
 
