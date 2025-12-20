@@ -1,6 +1,5 @@
 package controller;
 
-import model.AttackResult;
 import model.AttackStatus;
 import model.Placeable;
 import model.ship.Ship;
@@ -91,10 +90,6 @@ public class StatsController {
 
     public int getWeaponsUsed() {
         return _weaponsUsed;
-    }
-
-    public void increaseWeaponsUsed() {
-        _weaponsUsed++;
     }
 
     public int getIslandCellsLeft() {

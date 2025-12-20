@@ -21,8 +21,8 @@ public abstract class PlayerStrategy {
     protected final Weapon _sonar = new WeaponFactory().createSonar();
     protected int _bombUses = 1; // Example usage limit (à modfier l'emplacement (inventaire) de cette variable)
     protected int _sonarUses = 1; // Example usage limit
-    protected GameConfig _config;
-    protected int _gridSize;
+    protected final GameConfig _config;
+    protected final int _gridSize;
 
     public PlayerStrategy(GameConfig config) {
         this._config = config;

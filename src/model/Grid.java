@@ -92,9 +92,7 @@ public class Grid {
         _statsController.evaluateAttack(result.getStatus(), cellHit.getObject(), result.getWeapon());
 
         switch (result.getStatus()) {
-            case MISS -> {
-                cellHit.setState(CellState.MISS);
-            }
+            case MISS -> cellHit.setState(CellState.MISS);
             case HIT -> {
                 if (cellHit.getState() != CellState.SUNK) cellHit.setState(CellState.HIT);
             }

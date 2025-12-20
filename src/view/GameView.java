@@ -13,6 +13,7 @@ public class GameView extends JPanel {
     private final GridView _computerGridView;
     private final HistoryView _historyView;
     private final StatsView _statsView;
+    private final JLabel _turnLabel;
 
     public GameView(GridView playerGridView, GridView computerGridView, PlacementController placementController, Grid computerGrid, ConfigController configController, GameController gameController) {
         setLayout(new BorderLayout(10, 10));
@@ -55,6 +56,10 @@ public class GameView extends JPanel {
 
         // Panneau central
         JPanel centerControlPanel = new JPanel(new BorderLayout());
+
+        // Numéro de tour
+        _turnLabel = new JLabel("", SwingConstants.CENTER);
+        centerControlPanel.add(_turnLabel, BorderLayout.NORTH);
 
         // Historique
         _historyView = new HistoryView();
@@ -122,4 +127,8 @@ public class GameView extends JPanel {
     }
 
     public StatsView getStatsView() {return _statsView;}
+
+    public void setTurnNumber(int turnNumber) {
+        _turnLabel.setText("Turn n°" + turnNumber);
+    }
 }

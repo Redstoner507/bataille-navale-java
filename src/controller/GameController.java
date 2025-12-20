@@ -23,7 +23,7 @@ public class GameController {
     private Player _bot;
     private Weapon _selectedWeapon;
     private ArrayList<AttackResult> _previousBotResults = new ArrayList<>();
-    private int _turnNumber = 0;
+    private int _turnNumber = 1;
     private final ArrayList<String> _playerAttackHistory = new ArrayList<>();
     private final ArrayList<String> _botAttackHistory = new ArrayList<>();
     //Vues
@@ -84,6 +84,7 @@ public class GameController {
     public void showGameScreen() {
         _gameView = new GameView(_player.getGridView(), _bot.getGridView(), _placementController, _bot.getGrid(), _configController, this);
         fillStatsController();
+        _gameView.setTurnNumber(_turnNumber);
         _frame.addScreen(GAME, _gameView);
         _frame.showScreen(GAME);
         this._gameState = GameState.HUMAN_TURN;
@@ -273,7 +274,6 @@ public class GameController {
             _gameView.getComputerGridView().setLocked(true); // Verrouiller la grille d'attaque
 
             // Simuler le tour de l'ordinateur après un petit délai
-            //_gameView.setStatus(_bot.getName() + "'s turn...");
             handleComputerAttack();
         }
         else if (_gameState == GameState.COMPUTER_TURN) {
@@ -281,7 +281,7 @@ public class GameController {
             _gameState = GameState.HUMAN_TURN;
             _gameView.getComputerGridView().setLocked(false);
             _turnNumber++;
-            //_gameView.setStatus("It's your turn !");
+            _gameView.setTurnNumber(_turnNumber);
         }
     }
 

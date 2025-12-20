@@ -36,7 +36,7 @@ public class CellView extends JLabel {
             new ImageIcon(ImageUtils.getWeaponImage("sonar")).getImage();
 
     private Image _baseImage;
-    private ArrayList<Image> _overlays = new ArrayList<>();
+    private final ArrayList<Image> _overlays = new ArrayList<>();
 
     private CellState _cellState;
     private final CellType _cellType;
