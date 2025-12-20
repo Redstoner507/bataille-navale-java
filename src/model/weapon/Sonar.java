@@ -48,7 +48,10 @@ public class Sonar extends Weapon{
             if (grid.isCoordinateValid(currentRow, currentCol)) {
                 Cell targetCell = grid.getCell(currentRow, currentCol);
                 CellState targetState = targetCell.getState();
-                if (targetState == CellState.SHIP || targetState == CellState.HIT || targetState == CellState.SUNK) {
+                if (targetState == CellState.SHIP
+                        || targetState == CellState.BLACKHOLE
+                        || targetState == CellState.HIT
+                        || targetState == CellState.SUNK) {
                     detectedShips++;
                 }
             }

@@ -81,6 +81,9 @@ public class GameController {
     }
 
     public void showGameScreen() {
+        _playerAttackHistory.clear();
+        _botAttackHistory.clear();
+        _previousBotResults.clear();
         _gameView = new GameView(_player.getGridView(), _bot.getGridView(), _placementController, _bot.getGrid(), _configController, this);
         fillStatsController();
         _gameView.setTurnNumber(_turnNumber);
@@ -137,34 +140,13 @@ public class GameController {
             return;
         }
 
-        // Traiter tous les impacts séquentiellement (Missile, ou Bombe sur bateaux/eau)
-        for (AttackResult result : results) {
-            processSingleImpact(result, attack);
-            // Exécuter l'attaque miroir
-            if (result.getStatus() == AttackStatus.BLACKHOLE) {
-                Attack counterAttack = result.getAttackToRelaunch();
-                executeCounterAttack(counterAttack);
-            }
+        // Exécuter l'attaque
+        executeAttack(results, attack);
+
+        // Changer de tour si le jeu n'est pas fini
+        if (_gameState != GameState.GAME_OVER) {
+            changeTurn();
         }
-
-        // Mettre à jour l'historique
-        updateHistoryLog(results, attack);
-
-        // Mettre à jour les statistiques
-        _gameView.getStatsView().update(_statsController);
-
-        // Vérifier la fin du jeu et changer de tour
-        if (checkGameOver()) {
-            // Récupérer le joueur qui a gagné
-            Player p = attack.getAttackingPlayer();
-            String endMessage;
-            if (p.getName().equals("Player")) endMessage = "You won !";
-            else endMessage = "You lost !";
-            showEndScreen(endMessage);
-            return;
-        }
-
-        changeTurn();
     }
 
     /**
@@ -244,23 +226,53 @@ public class GameController {
         updateGameView(result, targetGridView, hitCoordinates.x, hitCoordinates.y);
     }
 
+    private void executeAttack(ArrayList<AttackResult> results, Attack attack) {
+        // Mettre à jour l'historique
+        updateHistoryLog(results, attack);
+
+        // Traiter tous les impacts séquentiellement
+        for (AttackResult result : results) {
+            processSingleImpact(result, attack);
+            // Exécuter l'attaque miroir
+            if (result.getStatus() != AttackStatus.BLACKHOLE) continue;
+            Attack counterAttack = result.getAttackToRelaunch();
+            if (counterAttack != null) {
+                executeCounterAttack(counterAttack);
+            }
+        }
+
+        // Mettre à jour les statistiques
+        _gameView.getStatsView().update(_statsController);
+
+        // Vérifier la fin du jeu et changer de tour
+        if (checkGameOver()) {
+            // Récupérer le joueur qui a gagné
+            Player p = attack.getAttackingPlayer();
+            String endMessage;
+            if (p.getName().equals("Player")) endMessage = "You won !";
+            else endMessage = "You lost !";
+            showEndScreen(endMessage);
+            _gameState = GameState.GAME_OVER;
+        }
+    }
+
     /**
      * Executes the attack returned by the BlackHole.
      * @param counterAttack The Attack Object prepared by the trap.
      */
     private void executeCounterAttack(Attack counterAttack) {
         Player targetOfCounterAttack = counterAttack.getTargetPlayer();
-        GridView attackerGridView = targetOfCounterAttack.getGridView();
 
         // Exécuter la relance complète
         ArrayList<AttackResult> counterResults = targetOfCounterAttack.receiveAttack(counterAttack);
 
-        // Afficher tous les impacts du contre-coup
-        for (AttackResult finalHit : counterResults) {
-            Point hitCoordinates = finalHit.getHitCoordinates();
+        executeAttack(counterResults, counterAttack);
 
-            // Mise à jour de la grille du joueur qui s'est tiré dessus
-            attackerGridView.updateCellDisplay(finalHit, hitCoordinates.x, hitCoordinates.y);
+        // Désactiver la contre-attaque en cas de boucle infinie de trou noir
+        if (counterResults.isEmpty()) return;
+        AttackResult baseResult = counterResults.getFirst();
+        if (baseResult.getStatus() == AttackStatus.BLACKHOLE) {
+            baseResult.setAttackToRelaunch(null);
         }
     }
 
@@ -362,8 +374,5 @@ public class GameController {
         _player = null;
         _bot = null;
         setSelectedWeapon(WeaponType.MISSILE);
-        _playerAttackHistory.clear();
-        _botAttackHistory.clear();
-        _previousBotResults.clear();
     }
 }

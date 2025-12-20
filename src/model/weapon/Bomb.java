@@ -58,6 +58,10 @@ public class Bomb extends Weapon{
                     singleResult.setHitCoordinates(currentRow, currentCol);
                     impactResults.add(singleResult);
                 }
+                if (currentRow == centerRow && currentCol == centerCol && targetCell.getState() == CellState.BLACKHOLE) {
+                    // Ne renvoyer qu'un seul résultat si l'impact central touche le trou noir
+                    break;
+                }
             }
         }
         return impactResults;
