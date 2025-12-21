@@ -12,7 +12,7 @@ public class ComputerVeryEasyStrategy extends PlayerStrategy {
         super(config); // Assuming a default grid size of 10
     }
     @Override
-    public Attack getAttack(ArrayList<AttackResult> previousAttackResults) {    
+    public Attack getAttack(ArrayList<AttackResult> previousAttackResults) {
         // Randomly choose a weapon (mostly _missile, sometimes bomb)
        
         boolean useBomb =

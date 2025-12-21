@@ -71,6 +71,9 @@ public class Player {
         }
         for (AttackResult result : results) {
             _grid.applyAttack(attack, result);
+            Point p = result.getHitCoordinates();
+            Player attackingPlayer = attack.getAttackingPlayer();
+            attackingPlayer.updateStrategyCoords(p);
         }
 
         return results;
@@ -90,5 +93,9 @@ public class Player {
 
     public Weapon getWeaponFromInventory(WeaponType type) {
         return _inventory.getWeaponByType(type);
+    }
+
+    private void updateStrategyCoords(Point realCoords) {
+        _strategy.retrieveRealCoords(realCoords);
     }
 }

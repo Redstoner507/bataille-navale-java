@@ -3,10 +3,7 @@ package model.player;
 import java.awt.*;
 import java.util.ArrayList;
 
-import model.Attack;
-import model.AttackResult;
-import model.AttackStatus;
-import model.GameConfig;
+import model.*;
 import model.weapon.Weapon;
 
 public class ComputerEasyStrategy extends PlayerStrategy {
@@ -26,7 +23,6 @@ public class ComputerEasyStrategy extends PlayerStrategy {
 
         if (!_priorityCoords.isEmpty()) { // If there are priority coordinates (Adjacent case of a hit), attack them first
             int[] coords = _priorityCoords.poll();
-            super.deleteCoordinates(coords);
             Weapon selectedWeapon = this._missile; // Default weapon
             return new Attack(null, null, selectedWeapon, coords[0], coords[1]);
         }
