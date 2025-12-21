@@ -12,7 +12,7 @@ public abstract class Placeable {
     private int _startRow = -1;
     private int _startCol = -1;
     private Orientation _orientation;
-    private final CellType _cellType;
+    private final CellType _cellPlacementType;
     private final CellState _cellState;
     private final PlaceableType _placeableType;
 
@@ -20,13 +20,17 @@ public abstract class Placeable {
         _size = size;
         _orientation = defaultOrientation;
         _name = name;
-        _cellType = placementCellType;
+        _cellPlacementType = placementCellType;
         _placeableType = placeableType;
         _cellState = cellState;
     }
 
     public int getSize() {
         return _size;
+    }
+
+    public Orientation getOrientation() {
+        return _orientation;
     }
 
     public void setOrientation(Orientation orientation) {
@@ -37,16 +41,12 @@ public abstract class Placeable {
         return _placeableType;
     }
 
-    public CellType getCellType() {
-        return _cellType;
+    public CellType getPlacementCellType() {
+        return _cellPlacementType;
     }
 
     public CellState getCellState() {
         return _cellState;
-    }
-
-    public Orientation getOrientation() {
-        return _orientation;
     }
 
     public String getName() {

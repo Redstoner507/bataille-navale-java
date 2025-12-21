@@ -10,12 +10,12 @@ public class GameConfig {
     private int _gridSize;
     private boolean _islandModeEnabled;
     private final Map<ShipType, Integer> _shipConfig;
-    private PlayerStrategies _playerStrategy;
+    private PlayerStrategies _computerStrategy;
 
     public GameConfig() {
         this._gridSize = 10; // Default grid size
         this._islandModeEnabled = false; // Default islands setting
-        this._playerStrategy = PlayerStrategies.COMPUTER_VERY_EASY; // Default player strategy
+        this._computerStrategy = PlayerStrategies.COMPUTER_VERY_EASY; // Default player strategy
         this. _shipConfig = new HashMap<>(); // Default ship configuration
         _shipConfig.put(ShipType.CARRIER, 1);
         _shipConfig.put(ShipType.BATTLESHIP, 1);
@@ -48,26 +48,26 @@ public class GameConfig {
         this._shipConfig.put(shipType, number);
     }
 
-    public PlayerStrategies getPlayerStrategy() {
-        return _playerStrategy;
+    public PlayerStrategies getComputerStrategy() {
+        return _computerStrategy;
     }
 
-    public void setPlayerStrategy(String playerStrategy) {
-        switch (playerStrategy) {
+    public void setComputerStrategy(String computerStrategy) {
+        switch (computerStrategy) {
             case "Very Easy":
-                _playerStrategy = PlayerStrategies.COMPUTER_VERY_EASY;
+                _computerStrategy = PlayerStrategies.COMPUTER_VERY_EASY;
                 break;
             case "Easy":
-                _playerStrategy = PlayerStrategies.COMPUTER_EASY;
+                _computerStrategy = PlayerStrategies.COMPUTER_EASY;
                 break;
             case "Medium":
-                _playerStrategy = PlayerStrategies.COMPUTER_MEDIUM;
+                _computerStrategy = PlayerStrategies.COMPUTER_MEDIUM;
                 break;
             case "Hard":
-                _playerStrategy = PlayerStrategies.COMPUTER_HARD;
+                _computerStrategy = PlayerStrategies.COMPUTER_HARD;
                 break;
             case "Very Hard":
-                _playerStrategy = PlayerStrategies.COMPUTER_VERY_HARD;
+                _computerStrategy = PlayerStrategies.COMPUTER_VERY_HARD;
                 break;
             default:
                 break;

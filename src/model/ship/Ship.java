@@ -1,22 +1,23 @@
 package model.ship;
 
-import model.*;
+import model.AttackResult;
+import model.AttackStatus;
+import model.Orientation;
+import model.Placeable;
+import model.PlaceableType;
 import model.cell.CellState;
 import model.cell.CellType;
 
 public abstract class Ship extends Placeable {
     private int _cellsRemaining;
+    private final int _totalCells;
+    private final ShipType _type;
 
-    public Ship(int size, String name) {
+    public Ship(int size, String name, ShipType type) {
         super(size, Orientation.HORIZONTAL, name, CellType.WATER, PlaceableType.SHIP, CellState.SHIP);
         _cellsRemaining = size;
-    }
-
-    /*
-     * Constructor for copy
-     */
-    public Ship(Ship model) {
-        this(model.getSize(), model.getName());
+        _totalCells = size;
+        _type = type;
     }
 
     /**
@@ -36,5 +37,17 @@ public abstract class Ship extends Placeable {
         else {
             return new AttackResult(AttackStatus.SUNK, "You sunk a " + getName() + " !");
         }
+    }
+
+    public int getCellsRemaining() {
+        return _cellsRemaining;
+    }
+
+    public int getTotalCells() {
+        return _totalCells;
+    }
+
+    public ShipType getType() {
+        return _type;
     }
 }

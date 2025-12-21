@@ -3,7 +3,7 @@ package model.ship;
 public class Cruiser extends Ship {
 
     public Cruiser() {
-        super(3, "Cruiser");
+        super(3, "Cruiser", ShipType.CRUISER);
     }
 
 }

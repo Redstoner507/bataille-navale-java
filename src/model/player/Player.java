@@ -1,9 +1,12 @@
 package model.player;
 
-import model.*;
+import model.Attack;
+import model.AttackResult;
+import model.Grid;
 import model.ship.Ship;
 import model.weapon.Weapon;
-import view.GridView;
+import model.weapon.WeaponType;
+import model.weapon.WeaponFactory;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -11,18 +14,25 @@ import java.util.ArrayList;
 public class Player {
     private final String _name;
     private final Grid _grid;
-    private final GridView _gridView;
-    private ArrayList<Placeable> _inventory;
+    private final Inventory _inventory;
     private PlayerStrategy _strategy;
 
-    public Player(int gridSize, int cellSize, String playerName, boolean islandMode) {
+    public Player(int gridSize, String playerName, boolean islandMode) {
         _grid = new Grid(gridSize, islandMode);
-        _gridView = new GridView(gridSize, cellSize, _grid);
         _name = playerName;
+        _inventory = new Inventory();
+        _inventory.addWeapon(new WeaponFactory().createMissile());
+        if (!islandMode) {
+            _inventory.addWeapon(new WeaponFactory().createBomb(1));
+            _inventory.addWeapon(new WeaponFactory().createSonar(1));
+        }
     }
 
     public void setStrategy(PlayerStrategy strategy) {
         this._strategy = strategy;
+        if (this._strategy != null) {
+            this._strategy.setWeaponList(_inventory);
+        }
     }
 
     public Attack play(ArrayList<AttackResult> attackResults) {
@@ -54,12 +64,16 @@ public class Player {
         Point realCoords = _grid.applyOffset(attack.getRealCoordinates());
         attack.setRealCoordinates(realCoords);
         ArrayList<AttackResult> results = weapon.applyAttack(_grid, attack);
+        if (results == null || results.isEmpty()) return results;
         AttackResult baseResult = results.getFirst();
         if (baseResult != null) {
-            _grid.decreaseEffects(baseResult);
+            _grid.decreaseEffects();
         }
         for (AttackResult result : results) {
             _grid.applyAttack(attack, result);
+            Point p = result.getHitCoordinates();
+            Player attackingPlayer = attack.getAttackingPlayer();
+            attackingPlayer.updateStrategyCoords(p);
         }
 
         return results;
@@ -69,15 +83,19 @@ public class Player {
         return _grid;
     }
 
-    public GridView getGridView() {
-        return _gridView;
-    }
-
     public String getName() {
         return _name;
     }
 
-    public void addObjectToInventory(Placeable placeable) {
-        _inventory.add(placeable);
+    public void addToInventory(Weapon weapon) {
+        _inventory.addWeapon(weapon);
+    }
+
+    public Weapon getWeaponFromInventory(WeaponType type) {
+        return _inventory.getWeaponByType(type);
+    }
+
+    private void updateStrategyCoords(Point realCoords) {
+        _strategy.retrieveRealCoords(realCoords);
     }
 }

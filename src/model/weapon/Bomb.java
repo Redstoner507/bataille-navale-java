@@ -6,13 +6,20 @@ import model.AttackStatus;
 import model.Grid;
 import model.cell.Cell;
 import model.cell.CellType;
+import model.cell.CellState;
 
+import javax.swing.*;
 import java.util.ArrayList;
 
 public class Bomb extends Weapon{
 
-    public Bomb() {
-        super(WeaponType.BOMB);
+    public Bomb(int nbUses) {
+        super(WeaponType.BOMB, CellState.BOMB, nbUses);
+    }
+
+    @Override
+    public AttackResult hit() {
+        return new AttackResult(AttackStatus.BOMB_FOUND, "You found a " + getName() + " !");
     }
 
     @Override
@@ -33,8 +40,8 @@ public class Bomb extends Weapon{
             if (!grid.isCoordinateValid(currentRow, currentCol)) continue;
             Cell tagetCell = grid.getCell(currentRow, currentCol);
             if (tagetCell.getType() == CellType.ISLAND) {
-                impactResults.add(new AttackResult(AttackStatus.ALREADY_VISITED, ""));
-                return impactResults;
+                JOptionPane.showMessageDialog(null, "You can't use the bomb on a cell adjacent to the island", "Invalid bomb placement", JOptionPane.WARNING_MESSAGE);
+                return null;
             }
         }
 
@@ -48,8 +55,18 @@ public class Bomb extends Weapon{
                 // Sauter la case si elle est déja touchée
                 if (!targetCell.isHit()) {
                     AttackResult singleResult = targetCell.hit();
+                    if (currentRow == centerRow && currentCol == centerCol) {
+                        singleResult.setWeapon(attack.getWeapon());
+                    }
+                    else {
+                        singleResult.setWeapon(new WeaponFactory().createMissile());
+                    }
                     singleResult.setHitCoordinates(currentRow, currentCol);
                     impactResults.add(singleResult);
+                }
+                if (currentRow == centerRow && currentCol == centerCol && targetCell.getState() == CellState.BLACKHOLE) {
+                    // Ne renvoyer qu'un seul résultat si l'impact central touche le trou noir
+                    break;
                 }
             }
         }

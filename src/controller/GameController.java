@@ -1,110 +1,146 @@
 package controller;
 
-import model.*;
+import model.Attack;
+import model.AttackResult;
+import model.AttackStatus;
+import model.GameState;
+import model.GameConfig;
+import model.Grid;
+import model.Placeable;
+import model.cell.Cell;
 import model.player.PlayerStrategyFactory;
+import model.ship.Ship;
+import model.ship.ShipType;
 import model.weapon.Weapon;
 import model.player.Player;
-import model.weapon.WeaponFactory;
 import model.weapon.WeaponType;
-import view.*;
+import view.MainFrame;
+import view.GameView;
+import view.GridView;
+import view.PlacementScreen;
+import view.EndScreen;
+import view.ConfigScreen;
+import view.StartScreen;
+import view.ScreenType;
 
 import java.awt.*;
 import java.util.ArrayList;
 
-
 public class GameController {
     //Variables
     private static final int CELL_SIZE = 50;
-    private final ConfigController _configController;
-    private final PlacementController _placementController;
+    private ConfigController _configController;
+    private PlacementController _placementController;
+    private StatsController _statsController;
     private GameState _gameState;
     private Player _player;
     private Player _bot;
     private Weapon _selectedWeapon;
     private ArrayList<AttackResult> _previousBotResults = new ArrayList<>();
-    private int _turnNumber = 0;
+    private int _turnNumber = 1;
     private final ArrayList<String> _playerAttackHistory = new ArrayList<>();
     private final ArrayList<String> _botAttackHistory = new ArrayList<>();
     //Vues
     private final MainFrame _frame;
     private GameView _gameView;
-    private static final String START = "start";
-    private static final String CONFIG = "config";
-    private static final String PLACEMENT = "placement";
-    private static final String GAME = "game";
+    private GridView _playerGridView;
+    private GridView _botGridView;
 
     public GameController() {
-        _configController = new ConfigController();
-        _placementController = new PlacementController();
-        _player = null;
-        _bot = null;
-
         _frame = new MainFrame();
-
-        _frame.addScreen(START, new StartScreen(this));
-        _frame.addScreen(CONFIG, new ConfigScreen(this, _configController));
-
+        _frame.addScreen(ScreenType.START, new StartScreen(this));
         _frame.setVisible(true);
+        resetGame();
+
         showStartScreen();
-        setSelectedWeapon(WeaponType.MISSILE);
     }
 
     public void showStartScreen() {
-        _frame.showScreen(START);
+        _frame.showScreen(ScreenType.START);
     }
 
     public void showConfigScreen() {
-        _frame.showScreen(CONFIG);
+        _frame.showScreen(ScreenType.CONFIG);
     }
 
     public void showPlacementScreen() {
         _gameState = GameState.SETUP;
         GameConfig config = _configController.getGameConfig();
-        _player = new Player(config.getGridSize(), CELL_SIZE, "Player", config.isIslandModeEnabled());
-        _bot = new Player(config.getGridSize(), CELL_SIZE, "Computer", config.isIslandModeEnabled());
+        _player = new Player(config.getGridSize(), "Player", config.isIslandModeEnabled());
+        _bot = new Player(config.getGridSize(), "Computer", config.isIslandModeEnabled());
 
         PlayerStrategyFactory playerStrategyFactory = new PlayerStrategyFactory();
-        _player.setStrategy(playerStrategyFactory.createHumanStrategy(config.getGridSize()));
+        _player.setStrategy(playerStrategyFactory.createHumanStrategy(config));
 
-        switch (config.getPlayerStrategy()) {
+        // Création des Vues
+        _playerGridView = new GridView(config.getGridSize(), CELL_SIZE, _player.getGrid());
+        _botGridView = new GridView(config.getGridSize(), CELL_SIZE, _bot.getGrid());
+
+        switch (config.getComputerStrategy()) {
             case COMPUTER_VERY_EASY ->
-                _bot.setStrategy(playerStrategyFactory.createComputerVeryEasyStrategy(config.getGridSize()));
+                _bot.setStrategy(playerStrategyFactory.createComputerVeryEasyStrategy(config));
             case COMPUTER_EASY ->
-                _bot.setStrategy(playerStrategyFactory.createComputerEasyStrategy(config.getGridSize()));
+                _bot.setStrategy(playerStrategyFactory.createComputerEasyStrategy(config));
             case COMPUTER_MEDIUM ->
-                _bot.setStrategy(playerStrategyFactory.createComputerMediumStrategy(config.getGridSize()));
+                _bot.setStrategy(playerStrategyFactory.createComputerMediumStrategy(config));
             case COMPUTER_HARD ->
-                _bot.setStrategy(playerStrategyFactory.createComputerHardStrategy(config.getGridSize()));
+                _bot.setStrategy(playerStrategyFactory.createComputerHardStrategy(config));
             case COMPUTER_VERY_HARD ->
-                _bot.setStrategy(playerStrategyFactory.createComputerVeryHardStrategy(config.getGridSize()));
+                _bot.setStrategy(playerStrategyFactory.createComputerVeryHardStrategy(config));
             case HUMAN ->
                 // Default to easy if human is selected for bot (à modifier si multi-joueur ou autre)
-                _bot.setStrategy(playerStrategyFactory.createComputerEasyStrategy(config.getGridSize()));
+                _bot.setStrategy(playerStrategyFactory.createComputerEasyStrategy(config));
         }
+
         PlacementScreen placement = new PlacementScreen(this, CELL_SIZE, _placementController, _configController);
-        _frame.addScreen(PLACEMENT, placement);
-        _frame.showScreen(PLACEMENT);
+        _frame.addScreen(ScreenType.PLACEMENT, placement);
+        _frame.showScreen(ScreenType.PLACEMENT);
     }
 
     public void showGameScreen() {
-        _gameView = new GameView(_player.getGridView(), _bot.getGridView(), _placementController, _bot.getGrid(), _configController, this);
-        _frame.addScreen(GAME, _gameView);
-        _frame.showScreen(GAME);
+        _playerAttackHistory.clear();
+        _botAttackHistory.clear();
+        _previousBotResults.clear();
+        _gameView = new GameView(_playerGridView, _botGridView, _placementController, _bot.getGrid(), _configController, this);
+        fillStatsController();
+        _gameView.setTurnNumber(_turnNumber);
+        _frame.addScreen(ScreenType.GAME, _gameView);
+        _frame.showScreen(ScreenType.GAME);
         this._gameState = GameState.HUMAN_TURN;
-        _gameView.setStatus("It's your turn !");
+        setSelectedWeapon(null);
+    }
+
+    public void showEndScreen(String endMessage) {
+        _frame.addScreen(ScreenType.END, new EndScreen(this, endMessage, _gameView.getStatsView()));
+        _frame.showScreen(ScreenType.END);
     }
 
     public void handleHumanAttack(int row, int col) {
         if (_gameState != GameState.HUMAN_TURN) return;
 
+        setSelectedWeapon(_selectedWeapon.getWeaponType()); // Ensure weapon is valid
         Attack attack = new Attack(_player, _bot, _selectedWeapon, row, col);
         ArrayList<AttackResult> results = _bot.receiveAttack(attack);
 
-        if (!results.isEmpty() && results.getFirst().getStatus() == AttackStatus.ALREADY_VISITED) return; //Annuler l'attaque si elle a déjà été faite
+        // Annuler l'attaque si elle est invalide
+        if (results == null) return;
+        if (!results.isEmpty() && results.getFirst().getStatus() == AttackStatus.ALREADY_VISITED) {
+            Point hitPoint = results.getFirst().getHitCoordinates();
+            // Si le point d'impact est identique au point visé, c'est un clic invalide direct
+            if (hitPoint.x == row && hitPoint.y == col) {
+                return;
+            }
+            // Sinon (coordonnées différentes), la tornade est active : l'attaque reste valide
+        }
+
+        // Consommer l'arme utilisée
+        _selectedWeapon.use();
+
+        // Fin du tour
         endTurn(results, attack);
     }
 
-    public void handleComputerAttack() {
+    private void handleComputerAttack() {
         if (_gameState != GameState.COMPUTER_TURN) return;
 
         Attack attack = null;
@@ -119,6 +155,9 @@ public class GameController {
 
         if (attack == null) return;
 
+        // Vérifier l'état des armes du joueur (Sonar désactivé si tous les sous-marins sont coulés)
+        checkWeaponAvailability();
+
         endTurn(_previousBotResults, attack);
     }
 
@@ -128,42 +167,27 @@ public class GameController {
      * * @param results ArrayList containing the impacts of the attack for each cell concerned.
      * @param attack The initial Attack
      */
-    public void endTurn(ArrayList<AttackResult> results, Attack attack) {
+    private void endTurn(ArrayList<AttackResult> results, Attack attack) {
         if (results.isEmpty()) {
             changeTurn();
             return;
         }
 
-        AttackResult mainResult = results.getFirst();
+        // Exécuter l'attaque
+        executeAttack(results, attack);
 
-        // Vérification des pièges
-        if (mainResult.getStatus() == AttackStatus.BLACKHOLE && mainResult.getAttackToRelaunch() != null) {
-
-            // Afficher l'impact unique du Trou Noir sur la grille d'origine
-            processSingleImpact(mainResult, attack);
-
-            // Exécuter l'attaque miroir
-            Attack counterAttack = mainResult.getAttackToRelaunch();
-            executeCounterAttack(counterAttack);
+        // Changer de tour si le jeu n'est pas fini
+        if (_gameState != GameState.GAME_OVER) {
+            changeTurn();
         }
-        // Traitement normal (Missile, Sonar, Bombe sans piège)
-        else {
-            // Traiter tous les impacts séquentiellement (Missile, ou Bombe sur bateaux/eau)
-            for (AttackResult result : results) {
-                processSingleImpact(result, attack);
-            }
-        }
+    }
 
-        // Mettre à jour l'historique
-        updateHistoryLog(results, attack);
+    private void checkWeaponAvailability() {
+        // Vérifier si le joueur a encore des sous-marins
+        boolean hasSubmarine = getPlayerGrid().hasAliveShip(ShipType.SUBMARINE);
 
-        // Vérifier la fin du jeu et changer de tour
-        if (checkGameOver()) {
-            _gameView.setStatus("Game Over !");
-            return;
-        }
-
-        changeTurn();
+        // Mettre à jour la vue
+        _gameView.setWeaponEnabled(WeaponType.SONAR, hasSubmarine);
     }
 
     /**
@@ -237,11 +261,40 @@ public class GameController {
      */
     private void processSingleImpact(AttackResult result, Attack originalAttack) {
         Point hitCoordinates = result.getHitCoordinates();
-        String playerName = originalAttack.getAttackingPlayer().getName();
-        GridView targetGridView = originalAttack.getTargetPlayer().getGridView();
+        GridView targetGridView = (originalAttack.getTargetPlayer() == _player) ? _playerGridView : _botGridView;
 
         // Mise à jour de la grille et du statut de la victime
-        updateGameView(result, playerName, targetGridView, hitCoordinates.x, hitCoordinates.y);
+        updateGameView(result, targetGridView, hitCoordinates.x, hitCoordinates.y);
+    }
+
+    private void executeAttack(ArrayList<AttackResult> results, Attack attack) {
+        // Mettre à jour l'historique
+        updateHistoryLog(results, attack);
+
+        // Traiter tous les impacts séquentiellement
+        for (AttackResult result : results) {
+            processSingleImpact(result, attack);
+            // Exécuter l'attaque miroir
+            if (result.getStatus() != AttackStatus.BLACKHOLE) continue;
+            Attack counterAttack = result.getAttackToRelaunch();
+            if (counterAttack != null) {
+                executeCounterAttack(counterAttack);
+            }
+        }
+
+        // Mettre à jour les statistiques
+        _gameView.getStatsView().update(_statsController);
+
+        // Vérifier la fin du jeu et changer de tour
+        if (checkGameOver()) {
+            // Récupérer le joueur qui a gagné
+            Player p = attack.getAttackingPlayer();
+            String endMessage;
+            if (p.getName().equals("Player")) endMessage = "You won !";
+            else endMessage = "You lost !";
+            showEndScreen(endMessage);
+            _gameState = GameState.GAME_OVER;
+        }
     }
 
     /**
@@ -250,33 +303,37 @@ public class GameController {
      */
     private void executeCounterAttack(Attack counterAttack) {
         Player targetOfCounterAttack = counterAttack.getTargetPlayer();
-        GridView attackerGridView = targetOfCounterAttack.getGridView();
-
-        _gameView.setStatus("Trap triggered ! Attack sent back to " + targetOfCounterAttack.getName() + " !");
 
         // Exécuter la relance complète
         ArrayList<AttackResult> counterResults = targetOfCounterAttack.receiveAttack(counterAttack);
 
-        // Afficher tous les impacts du contre-coup
-        for (AttackResult finalHit : counterResults) {
-            Point hitCoordinates = finalHit.getHitCoordinates();
+        executeAttack(counterResults, counterAttack);
 
-            // Mise à jour de la grille du joueur qui s'est tiré dessus
-            attackerGridView.updateCellDisplay(finalHit, hitCoordinates.x, hitCoordinates.y);
-
-            // Mettre à jour le statut global avec le dernier message
-            _gameView.setStatus(finalHit.getMessage());
+        // Désactiver la contre-attaque en cas de boucle infinie de trou noir
+        if (counterResults.isEmpty()) return;
+        AttackResult baseResult = counterResults.getFirst();
+        if (baseResult.getStatus() == AttackStatus.BLACKHOLE) {
+            baseResult.setAttackToRelaunch(null);
         }
     }
 
-    private void updateGameView(AttackResult result, String playerName, GridView targetGridView, int row, int col) {
-        // Mettre à jour la grille visuelle
-        targetGridView.updateCellDisplay(result, row, col);
+    private void updateGameView(AttackResult result, GridView targetGridView, int row, int col) {
+        // Mettre à jour les statistiques
+        // On ne traite les stats que si c'est le joueur qui attaque le bot
+        if (targetGridView == _botGridView) {
+            Grid targetGrid = _bot.getGrid();
+            Cell cellHit = targetGrid.getCell(row, col);
 
-        // Mettre à jour le statut
-        _gameView.setStatus(playerName + " shot at coordinates " + (char)('A' + col) + (row + 1) + ". Result : " + result.getMessage());
+            // Le StatsController traite les données pures du modèle
+            _statsController.evaluateAttack(
+                    result.getStatus(),
+                    cellHit.getObject(),
+                    result.getWeapon()
+            );
 
-        // Mettre à jour les statistiques (E3)
+            // Rafraîchir l'affichage des stats global
+            _gameView.getStatsView().update(_statsController);
+        }
     }
 
     private void changeTurn() {
@@ -286,7 +343,6 @@ public class GameController {
             _gameView.getComputerGridView().setLocked(true); // Verrouiller la grille d'attaque
 
             // Simuler le tour de l'ordinateur après un petit délai
-            //_gameView.setStatus(_bot.getName() + "'s turn...");
             handleComputerAttack();
         }
         else if (_gameState == GameState.COMPUTER_TURN) {
@@ -294,7 +350,7 @@ public class GameController {
             _gameState = GameState.HUMAN_TURN;
             _gameView.getComputerGridView().setLocked(false);
             _turnNumber++;
-            //_gameView.setStatus("It's your turn !");
+            _gameView.setTurnNumber(_turnNumber);
         }
     }
 
@@ -302,38 +358,77 @@ public class GameController {
         // Nécessite la méthode allShipsSunk() dans la classe Player
         if (_player.allShipsSunk() || _bot.allShipsSunk()) {
             _gameState = GameState.GAME_OVER;
-            // Gérer l'affichage de l'écran de fin (E4)
             return true;
         }
         return false;
+    }
+
+    private void fillStatsController() {
+        if (_statsController == null) _statsController = new StatsController();
+        int shipsUntouched = 0;
+        int totalShipCells = 0;
+        int weaponsAvailable = 0;
+        int islandCellsLeft = 0;
+
+        ArrayList<Placeable> ships = _configController.getShipConfig();
+        for (Placeable placeable : ships) {
+            Ship ship = (Ship) placeable;
+            int cellsRemaining = ship.getCellsRemaining();
+            int totalCells = ship.getTotalCells();
+            if (cellsRemaining == totalCells) {
+                shipsUntouched++;
+            }
+            totalShipCells += totalCells;
+        }
+
+        if (_configController.getGameConfig().isIslandModeEnabled()) {
+            int islandSize = getPlayerGrid().getIslandSize();
+            islandCellsLeft = islandSize * islandSize;
+        }
+        else {
+            weaponsAvailable = 2;
+        }
+
+        _statsController.setShipsUntouched(shipsUntouched);
+        _statsController.setTotalShipCells(totalShipCells);
+        _statsController.setWeaponsAvailable(weaponsAvailable);
+        _statsController.setIslandCellsLeft(islandCellsLeft);
+
+        _gameView.getStatsView().update(_statsController);
     }
 
     public Grid getPlayerGrid() {
         return _player.getGrid();
     }
 
-    public Grid getBotGrid() {
-        return _bot.getGrid();
-    }
-
     public GridView getPlayerGridView() {
-        return _player.getGridView();
+        return _playerGridView;
     }
     
     public void quit() {
         _frame.dispose();
     }
 
-    public Weapon getSelectedWeapon() {
-        return this._selectedWeapon;
+    public void setSelectedWeapon(WeaponType weaponType) {
+        if (_player == null) return;
+
+        Weapon weapon = _player.getWeaponFromInventory(weaponType);
+        if (weapon != null && weapon.getUses() != 0) {
+            this._selectedWeapon = weapon;
+        }
+        else {
+            this._selectedWeapon = _player.getWeaponFromInventory(WeaponType.MISSILE); // Default Weapon
+            _gameView.setWeaponSelection(WeaponType.MISSILE);
+        }
     }
 
-    public void setSelectedWeapon(WeaponType weaponType) {
-        WeaponFactory weaponFactory = new WeaponFactory();
-        switch (weaponType) {
-            case MISSILE -> this._selectedWeapon = weaponFactory.createMissile();
-            case BOMB -> this._selectedWeapon = weaponFactory.createBomb();
-            case SONAR -> this._selectedWeapon = weaponFactory.createSonar();
-        }
+    public void resetGame() {
+        _configController = new ConfigController();
+        _frame.addScreen(ScreenType.CONFIG, new ConfigScreen(this, _configController));
+        _placementController = new PlacementController();
+        _statsController = null;
+        _player = null;
+        _bot = null;
+        setSelectedWeapon(WeaponType.MISSILE);
     }
 }

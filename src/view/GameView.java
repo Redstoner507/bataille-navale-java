@@ -8,11 +8,15 @@ import model.weapon.WeaponType;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.EnumMap;
 
 public class GameView extends JPanel {
-    private final JLabel _statusLabel; // Status du jeu
     private final GridView _computerGridView;
     private final HistoryView _historyView;
+    private final StatsView _statsView;
+    private final JLabel _turnLabel;
+    private final EnumMap<WeaponType, JRadioButton> _weaponButtons = new EnumMap<>(WeaponType.class);
+
 
     public GameView(GridView playerGridView, GridView computerGridView, PlacementController placementController, Grid computerGrid, ConfigController configController, GameController gameController) {
         setLayout(new BorderLayout(10, 10));
@@ -37,41 +41,54 @@ public class GameView extends JPanel {
         JPanel weaponSelectionPanel = createWeaponSelectionPanel(gameController, new ButtonGroup());
         playerControlPanel.add(weaponSelectionPanel, BorderLayout.SOUTH);
 
+        // Panneau de l'ordinateur
+        LabeledGridView computerLabeledGridView = new LabeledGridView("Enemy ships", computerGridView, false);
+        _computerGridView = computerLabeledGridView.getGridView();
+        _computerGridView.setAttackListener(gameController::handleHumanAttack);
+
+        SquarePanel computerSquarePanel = new SquarePanel(computerLabeledGridView);
+
+        // Logique de placement aléatoire de l'ordinateur
+        placementController.randomObjectsPlacement(computerGrid, configController.getAllPlaceables());
+        _computerGridView.clearGrid(); // Cache les bateaux
 
         // --- 2. Panneau Central contenant les 2 Grilles et l'historique ---
 
         JPanel gridsPanel = new JPanel(new GridLayout(1, 3, 30, 0));
         gridsPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
-        // Grille de l'ordinateur
-        LabeledGridView computerLabeledGridView = new LabeledGridView("Enemy ships", computerGridView, false);
-        _computerGridView = computerLabeledGridView.getGridView();
-        _computerGridView.setAttackListener(gameController::handleHumanAttack);
+        // Panneau central
+        JPanel centerControlPanel = new JPanel(new BorderLayout());
 
-        // Logique de placement aléatoire de l'ordinateur
-        placementController.randomObjectsPlacement(computerGrid, _computerGridView, configController.getAllPlaceables());
-        _computerGridView.clearGrid(); // Cache les bateaux
+        // Numéro de tour
+        _turnLabel = new JLabel("", SwingConstants.CENTER);
+        centerControlPanel.add(_turnLabel, BorderLayout.NORTH);
 
         // Historique
         _historyView = new HistoryView();
+        centerControlPanel.add(_historyView, BorderLayout.CENTER);
+
+        // Statistiques
+        _statsView = new StatsView();
+        centerControlPanel.add(_statsView, BorderLayout.SOUTH);
 
         // Ajouter le Panneau de Contrôle du Joueur à gauche
         gridsPanel.add(playerControlPanel);
 
         // Ajouter l'historique au centre
-        gridsPanel.add(_historyView);
+        gridsPanel.add(centerControlPanel);
 
-        // Ajouter la Grille de l'Ordinateur à droite
-        SquarePanel computerSquarePanel = new SquarePanel(computerLabeledGridView);
+        // Ajouter le Panneau de l'Ordinateur à droite
         gridsPanel.add(computerSquarePanel);
 
         add(gridsPanel, BorderLayout.CENTER);
 
-        // Label d'état
-        _statusLabel = new JLabel("Attack the other enemy's grid.", SwingConstants.CENTER);
-        _statusLabel.setFont(new Font("Arial", Font.ITALIC, 16));
-        _statusLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
-        add(_statusLabel, BorderLayout.SOUTH);
+        JPanel buttonPanel = new JPanel(new FlowLayout());
+        JButton quitButton = new JButton("Quit");
+        quitButton.addActionListener(e -> gameController.showPlacementScreen());
+        quitButton.setFont(new Font("Arial", Font.BOLD, 22));
+        buttonPanel.add(quitButton);
+        add(buttonPanel, BorderLayout.SOUTH);
     }
 
     /**
@@ -81,32 +98,33 @@ public class GameView extends JPanel {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
         panel.setBorder(BorderFactory.createTitledBorder("Weapons"));
 
-        // Supposons que vous avez une enum WeaponType : MISSILE, BOMB, SONAR
-        WeaponType[] availableWeapons = {WeaponType.MISSILE, WeaponType.BOMB, WeaponType.SONAR};
+        WeaponType[] availableWeapons = {
+            WeaponType.MISSILE,
+            WeaponType.BOMB,
+            WeaponType.SONAR
+        };
 
         for (WeaponType type : availableWeapons) {
             JRadioButton button = new JRadioButton(type.toString());
-            button.setActionCommand(type.toString()); // Utiliser le nom comme commande
+            button.setActionCommand(type.name());
 
-            // Attacher l'écouteur du Contrôleur pour gérer la sélection
-            // Le Contrôleur doit stocker l'arme sélectionnée.
-            button.addActionListener(e -> gameController.setSelectedWeapon(WeaponType.valueOf(e.getActionCommand())));
+            button.addActionListener(e ->
+                gameController.setSelectedWeapon(WeaponType.valueOf(e.getActionCommand()))
+            );
 
             buttonGroup.add(button);
             panel.add(button);
+
+            // Stockage du bouton
+            _weaponButtons.put(type, button);
         }
 
-        // Sélectionner le Missile par défaut
-        if (buttonGroup.getButtonCount() > 0) {
-            buttonGroup.setSelected(buttonGroup.getElements().nextElement().getModel(), true);
-        }
+        // Sélection par défaut
+        _weaponButtons.get(WeaponType.MISSILE).setSelected(true);
 
         return panel;
     }
 
-    public void setStatus(String text) {
-        _statusLabel.setText(text);
-    }
 
     public GridView getComputerGridView() {
         return _computerGridView;
@@ -115,4 +133,36 @@ public class GameView extends JPanel {
     public HistoryView getHistoryView() {
         return _historyView;
     }
+
+    public StatsView getStatsView() {return _statsView;}
+
+    public void setTurnNumber(int turnNumber) {
+        _turnLabel.setText("Turn n°" + turnNumber);
+    }
+
+    public void setWeaponSelection(WeaponType weaponType) {
+        JRadioButton button = _weaponButtons.get(weaponType);
+        if (button != null) {
+            button.setSelected(true);
+        }
+    }
+
+    /**
+     * Active ou désactive un bouton d'arme spécifique.
+     */
+    public void setWeaponEnabled(WeaponType type, boolean enabled) {
+        if (_weaponButtons.containsKey(type)) {
+            JRadioButton button = _weaponButtons.get(type);
+            button.setEnabled(enabled);
+
+            // Si on désactive l'arme qui est actuellement sélectionnée,
+            // on force le retour au MISSILE (arme par défaut)
+            if (!enabled && button.isSelected()) {
+                if (_weaponButtons.containsKey(WeaponType.MISSILE)) {
+                    _weaponButtons.get(WeaponType.MISSILE).doClick(); // Simule un clic pour trigger le contrôleur
+                }
+            }
+        }
+    }
+
 }

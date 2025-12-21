@@ -1,6 +1,11 @@
 package model.trap;
 
-import model.*;
+import model.Attack;
+import model.AttackResult;
+import model.AttackStatus;
+import model.Placeable;
+import model.Orientation;
+import model.PlaceableType;
 import model.cell.CellState;
 import model.cell.CellType;
 

@@ -6,11 +6,11 @@ public class WeaponFactory {
         return new Missile();
     }
 
-    public Weapon createBomb() {
-        return new Bomb();
+    public Weapon createBomb(int nbUses) {
+        return new Bomb(nbUses);
     }
 
-    public Weapon createSonar() {
-        return new Sonar();
+    public Weapon createSonar(int nbUses) {
+        return new Sonar(nbUses);
     }
 }

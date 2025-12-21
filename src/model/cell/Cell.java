@@ -44,16 +44,12 @@ public abstract class Cell {
         return _isHit;
     }
 
-    public void setHit(boolean hit) {
-        this._isHit = hit;
+    public void setScanned(boolean scanned) {
+        this._isScanned = scanned;
     }
 
     public boolean isScanned() {
         return _isScanned;
-    }
-
-    public void setScanned(boolean scanned) {
-        this._isScanned = scanned;
     }
 
     public AttackResult hit() {

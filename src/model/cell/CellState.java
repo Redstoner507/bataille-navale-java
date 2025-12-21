@@ -9,5 +9,8 @@ public enum CellState {
     ISLAND_HIT,
     BLACKHOLE,
     TORNADO,
-    OBJECT
+    BOMB,
+    SONAR,
+    BOMB_FOUND,
+    SONAR_FOUND
 }

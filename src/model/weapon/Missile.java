@@ -10,7 +10,12 @@ import java.util.ArrayList;
 public class Missile extends Weapon{
 
     public Missile() {
-        super(WeaponType.MISSILE);
+        super(WeaponType.MISSILE, null, -1); // -1 uses means unlimited
+    }
+
+    @Override
+    public AttackResult hit() {
+        return null;
     }
 
     @Override
@@ -20,6 +25,7 @@ public class Missile extends Weapon{
         Cell cell = grid.getCell(row, col);
         ArrayList<AttackResult> results = new ArrayList<>();
         AttackResult result = cell.hit();
+        result.setWeapon(attack.getWeapon());
         result.setHitCoordinates(row, col);
         results.add(result);
         return results;

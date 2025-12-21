@@ -7,6 +7,7 @@ import model.Orientation;
 import model.Placeable;
 import model.ship.Ship;
 import model.trap.Trap;
+import model.weapon.Weapon;
 
 import javax.swing.*;
 import java.awt.*;
@@ -105,9 +106,20 @@ public class PlacementScreen extends JPanel {
         ArrayList<Placeable> objects = new ArrayList<>();
         ArrayList<Placeable> ships = configController.getShipConfig();
         ArrayList<Placeable> traps = configController.getTrapConfig();
+        ArrayList<Placeable> weapons = configController.getWeaponConfig();
         objects.addAll(ships);
         objects.addAll(traps);
+        objects.addAll(weapons);
 
+        // Ajouter les WeaponView dans _trapPanel
+        if (weapons != null && !weapons.isEmpty()) {
+            for (Placeable weapon : weapons) {
+                // ShipView doit être créé avec le JLayeredPane central pour le Drag&Drop
+                WeaponView weaponView = new WeaponView((Weapon)weapon, playerGrid, mainLayeredPane, _trapPanel, cellSize);
+                weaponView.setAlignmentX(Component.CENTER_ALIGNMENT);
+                _trapPanel.add(weaponView);
+            }
+        }
         // Ajouter les TrapView dans _trapPanel
         if (traps != null && !traps.isEmpty()) {
             for (Placeable trap : traps) {
@@ -130,7 +142,7 @@ public class PlacementScreen extends JPanel {
 
         // PlacementController
         playerGrid.getGridView().setObjectPlacementListener((placeableView, row, col) ->
-            placementController.placeObject(gameController.getPlayerGrid(), playerGrid.getGridView(), placeableView.getPlaceable(), row, col)
+                placementController.placeObject(gameController.getPlayerGrid(), placeableView.getPlaceable(), row, col)
         );
 
         rotateButton.addActionListener(e -> {
@@ -148,13 +160,27 @@ public class PlacementScreen extends JPanel {
         });
 
         randomPlacementButton.addActionListener(e -> {
-            placementController.randomObjectsPlacement(gameController.getPlayerGrid(), playerGrid.getGridView(), objects);
-            clearPlaceableViews();
+            try {
+                // On tente de placer les objets
+                placementController.randomObjectsPlacement(gameController.getPlayerGrid(), objects);
+            } catch (Exception ex) {
+                // En cas d'erreur (ex : image manquante pour un piège), on affiche l'erreur,
+                // mais on continue pour vider l'interface.
+                System.err.println("Erreur durant le placement aléatoire : " + ex.getMessage());
+            } finally {
+                // On vide visuellement les listes de gauche et de droite dans cet écran
+                clearPlaceableViews();
+                revalidate();
+                repaint();
+            }
         });
         
         startGameButton.addActionListener(e -> {
-            if (_shipPanel.getComponentCount() == 0) {
+            if (_shipPanel.getComponentCount() == 0 && _trapPanel.getComponentCount() == 0) {
                 gameController.showGameScreen();
+            }
+            else {
+                JOptionPane.showMessageDialog(buttonPanel, "Please place all objects before starting.", "Incomplete Setup", JOptionPane.WARNING_MESSAGE);
             }
         });
 

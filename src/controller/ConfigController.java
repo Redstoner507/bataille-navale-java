@@ -5,6 +5,7 @@ import model.Placeable;
 import model.ship.ShipFactory;
 import model.ship.ShipType;
 import model.trap.TrapFactory;
+import model.weapon.WeaponFactory;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -40,7 +41,7 @@ public class ConfigController {
         return getShipConfig(carriers, battleShips, cruisers, submarines, destroyers);
     }
     
-    public ArrayList<Placeable> getShipConfig(int carriers, int batteShips, int cruisers, int submarines, int destroyer) {
+    private ArrayList<Placeable> getShipConfig(int carriers, int batteShips, int cruisers, int submarines, int destroyer) {
         ArrayList<Placeable> ships = new ArrayList<>();
         ShipFactory factory = new ShipFactory();
         for (int i = 0; i < carriers; i++) {
@@ -64,17 +65,26 @@ public class ConfigController {
     public ArrayList<Placeable> getTrapConfig() {
         ArrayList<Placeable> traps = new ArrayList<>();
         TrapFactory factory = new TrapFactory();
-        if (!_gameConfig.isIslandModeEnabled()) {
-            traps.add(factory.createBlackHole());
-            traps.add(factory.createTornado());
-        }
+        traps.add(factory.createBlackHole());
+        traps.add(factory.createTornado());
         return traps;
+    }
+
+    public ArrayList<Placeable> getWeaponConfig() {
+        ArrayList<Placeable> weapons = new ArrayList<>();
+        if (_gameConfig.isIslandModeEnabled()) {
+            WeaponFactory factory = new WeaponFactory();
+            weapons.add(factory.createBomb(1));
+            weapons.add(factory.createSonar(1));
+        }
+        return weapons;
     }
 
     public ArrayList<Placeable> getAllPlaceables() {
         ArrayList<Placeable> placeables = new ArrayList<>();
         placeables.addAll(getShipConfig());
         placeables.addAll(getTrapConfig());
+        placeables.addAll(getWeaponConfig());
         return placeables;
     }
 
@@ -83,6 +93,6 @@ public class ConfigController {
     }
 
     public void setPlayerStrategy(String playerStrategy) {
-        this._gameConfig.setPlayerStrategy(playerStrategy);
+        this._gameConfig.setComputerStrategy(playerStrategy);
     }
 }

@@ -8,12 +8,18 @@ import model.cell.Cell;
 import model.cell.CellState;
 import model.cell.CellType;
 
+import javax.swing.*;
 import java.util.ArrayList;
 
 public class Sonar extends Weapon{
 
-    public Sonar() {
-        super(WeaponType.SONAR);
+    public Sonar(int nbUses) {
+        super(WeaponType.SONAR, CellState.SONAR, nbUses);
+    }
+
+    @Override
+    public AttackResult hit() {
+        return new AttackResult(AttackStatus.SONAR_FOUND, "You found a " + getName() + " !");
     }
 
     @Override
@@ -24,12 +30,10 @@ public class Sonar extends Weapon{
         int centerCol = attack.getRealCol();
 
         Cell centerCell = grid.getCell(centerRow, centerCol);
-        // Ne pas pouvoir utiliser le sonar sur l'île
-        if (centerCell.getType() == CellType.ISLAND) {
-            AttackResult result = new AttackResult(AttackStatus.ALREADY_VISITED, "");
-            result.setHitCoordinates(centerRow, centerCol);
-            sonarResults.add(result);
-            return sonarResults;
+        // Ne pas pouvoir utiliser le sonar sur l'île ou une case déjà scannée
+        if (centerCell.getType() == CellType.ISLAND || centerCell.isScanned()) {
+            JOptionPane.showMessageDialog(null, "You can't use the sonar on the island", "Invalid sonar placement", JOptionPane.WARNING_MESSAGE);
+            return null;
         }
 
         int detectedShips = 0;
@@ -47,18 +51,22 @@ public class Sonar extends Weapon{
             if (grid.isCoordinateValid(currentRow, currentCol)) {
                 Cell targetCell = grid.getCell(currentRow, currentCol);
                 CellState targetState = targetCell.getState();
-                if (targetState == CellState.SHIP || targetState == CellState.HIT || targetState == CellState.SUNK) {
+                if (targetState == CellState.SHIP
+                        || targetState == CellState.BLACKHOLE
+                        || targetState == CellState.HIT
+                        || targetState == CellState.SUNK) {
                     detectedShips++;
                 }
             }
         }
 
-        centerCell.setScanned(true);
-
         AttackResult result = new AttackResult(AttackStatus.SONAR_RESULT, "You detected " + detectedShips + " !");
         result.setHitCoordinates(centerRow, centerCol);
         result.setSonarCount(detectedShips);
+        result.setWeapon(attack.getWeapon());
         sonarResults.add(result);
+
+        centerCell.setScanned(true);
 
         return sonarResults;
     }

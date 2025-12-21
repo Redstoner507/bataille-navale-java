@@ -6,16 +6,14 @@ import java.util.ArrayList;
 import model.Attack;
 import model.AttackResult;
 import model.AttackStatus;
+import model.GameConfig;
 import model.weapon.Weapon;
 
 public class ComputerEasyStrategy extends PlayerStrategy {
-    public ComputerEasyStrategy (int gridSize) {
-        super(gridSize); // Assuming a default grid size of 10
+    public ComputerEasyStrategy (GameConfig config) {
+        super(config); // Assuming a default grid size of 10
     }
-
-    /*
-    * Generates the next attack based on easy computer strategy
-     */
+    
     @Override
     public Attack getAttack(ArrayList<AttackResult> previousAttackResults) {
         for (AttackResult r : previousAttackResults) {
@@ -28,19 +26,20 @@ public class ComputerEasyStrategy extends PlayerStrategy {
 
         if (!_priorityCoords.isEmpty()) { // If there are priority coordinates (Adjacent case of a hit), attack them first
             int[] coords = _priorityCoords.poll();
-            super.deleteCoordinates(coords);
-            Weapon selectedWeapon = this.missile; // Default weapon
+            Weapon selectedWeapon = this._missile; // Default weapon
             return new Attack(null, null, selectedWeapon, coords[0], coords[1]);
         }
 
-        // If the last attack was a miss, pick new random coordinates
-        int[] coords = super.getRandomCoordinates();
+        boolean useBomb =
+            _bomb != null &&
+            _bomb.getUses() > 0 &&
+            _random.nextInt(10) == 0; // 10% chance
 
-        Weapon selectedWeapon = this.missile; // Default weapon
-        if (random.nextInt(100) < 10 && this._bombUses > 0) { // 10% chance to use bomb if available
-            selectedWeapon = this.bomb;
-            this._bombUses--;
-        }
+        Weapon selectedWeapon = useBomb ? _bomb : _missile; 
+
+        // If the last attack was a miss, pick new _random coordinates
+        int[] coords = super.getRandomCoordinates(selectedWeapon.getWeaponType());
+
         return new Attack(null, null, selectedWeapon, coords[0], coords[1]);
     }
 }

@@ -4,14 +4,17 @@ import javax.swing.*;
 
 import model.cell.CellState;
 import model.cell.CellType;
+import model.weapon.WeaponType;
+import utils.ImageUtils;
 
 import java.awt.*;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class CellView extends JLabel {  
     private static final Image IMG_SHIP =
-        new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/ship.png"))).getImage();
+            new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/ship.png"))).getImage();
     private static final Image IMG_HIT =
             new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/hit.png"))).getImage();
     private static final Image IMG_MISS =
@@ -25,25 +28,35 @@ public class CellView extends JLabel {
     private static final Image IMG_ISLAND_HIT =
             new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/island_hit.png"))).getImage();
     private static final Image IMG_BLACKHOLE =
-            new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/blackhole.png"))).getImage();
+            new ImageIcon(ImageUtils.getTrapImage("blackhole")).getImage();
     private static final Image IMG_TORNADO =
-            new ImageIcon(Objects.requireNonNull(CellView.class.getResource("/images/tornado.png"))).getImage();
+            new ImageIcon(ImageUtils.getTrapImage("tornado")).getImage();
+    private static final Image IMG_BOMB =
+            new ImageIcon(ImageUtils.getWeaponImage("bomb")).getImage();
+    private static final Image IMG_SONAR =
+            new ImageIcon(ImageUtils.getWeaponImage("sonar")).getImage();
 
-    //private Image _currentImage;
     private Image _baseImage;
-    private Image _overlayImage;  // image superposée
+    private final ArrayList<Image> _overlays = new ArrayList<>();
 
-    private boolean _isClickable = true;
-    private final Point _cellPosition;
-    private CellState _cellState;
     private final CellType _cellType;
     private int _sonarCountToDisplay = -1;
+    private String _stringShip;
+    private int _shipSegment;
+    private int _shipOrientation;
 
-    public CellView(Point cellPosition, int cellSize, CellType cellType) {
-        _cellPosition = cellPosition;
+    public CellView(int cellSize, CellType cellType) {
         _cellType = cellType;
         setCellIcon(CellState.EMPTY);
         setPreferredSize(new Dimension(cellSize, cellSize));
+        _stringShip = "";
+        _shipSegment = -1;
+    }
+
+    public void setShipInfo(String shipType, int segmentIndex, int orientation) {
+        _stringShip = shipType;
+        _shipSegment = segmentIndex;
+        _shipOrientation = orientation;
     }
 
     /**
@@ -51,65 +64,63 @@ public class CellView extends JLabel {
      */
     public void setCellIcon(CellState state) {
 
-        _overlayImage = null; // Par défaut pas de superposition
-
+        _overlays.clear();
         switch (state) {
 
             case EMPTY -> {
-                if (_cellType == CellType.ISLAND) {
-                    _baseImage = IMG_WATER;
-                    _overlayImage = IMG_ISLAND;
-                }
+                if (_cellType == CellType.ISLAND) _baseImage = IMG_ISLAND;
                 else _baseImage = IMG_WATER;
             }
 
-            case SHIP -> {
-                _baseImage = IMG_WATER;        // fond eau
-                _overlayImage = IMG_SHIP;      // superposition bateau
-            }
+            case SHIP -> _overlays.add(ImageUtils.getShipSegment(_stringShip, _shipSegment, _shipOrientation));
 
             case HIT -> {
-                _baseImage = IMG_SHIP;
-                _overlayImage = IMG_HIT;       // impact au-dessus du bateau
+                _overlays.add(IMG_SHIP);
+                _overlays.add(IMG_HIT);
             }
 
-            case MISS -> {
-                _baseImage = IMG_WATER;
-                _overlayImage = IMG_MISS;
-            }
+            case MISS -> _overlays.add(IMG_MISS);
 
             case SUNK -> {
-                _baseImage = IMG_SHIP;
-                _overlayImage = IMG_SUNK;
+                _overlays.add(ImageUtils.getShipSegment(_stringShip, _shipSegment, _shipOrientation));
+                _overlays.add(IMG_SUNK);
             }
 
-            case ISLAND_HIT -> {
-                _baseImage = IMG_ISLAND;
-                _overlayImage = IMG_ISLAND_HIT;
+            case ISLAND_HIT -> _overlays.add(IMG_ISLAND_HIT);
+
+            case BLACKHOLE -> _overlays.add(IMG_BLACKHOLE);
+
+            case TORNADO -> _overlays.add(IMG_TORNADO);
+
+            case BOMB -> _overlays.add(IMG_BOMB);
+
+            case SONAR -> _overlays.add(IMG_SONAR);
+
+            case BOMB_FOUND -> {
+                _overlays.add(IMG_ISLAND_HIT);
+                _overlays.add(IMG_BOMB);
             }
 
-            case BLACKHOLE -> {
-                _baseImage = IMG_WATER;
-                _overlayImage = IMG_BLACKHOLE;
+            case SONAR_FOUND -> {
+                _overlays.add(IMG_ISLAND_HIT);
+                _overlays.add(IMG_SONAR);
             }
-            case TORNADO -> {
-                _baseImage = IMG_WATER;
-                _overlayImage = IMG_TORNADO;
-            }      
-            case OBJECT -> {
-                _baseImage = IMG_WATER;
-                // Pas de superposition spécifique pour l'instant
-            }      
         }
 
-        _cellState = state;
         repaint();
     }
 
+    public void displayWeaponUsed(WeaponType weaponType) {
+        switch (weaponType) {
+            case BOMB -> _overlays.add(IMG_BOMB);
+            case SONAR -> {} // On n'affiche pas l'image, car actuellement ça gênerait l'affichage du résultat du sonar
+            case MISSILE -> {} // On ne fait rien, c'est l'affichage par défaut
+        }
+        repaint();
+    }
 
     public void displaySonarScan(int sonarCount) {
         _sonarCountToDisplay = sonarCount;
-        revalidate();
         repaint();
     }
 
@@ -129,8 +140,9 @@ public class CellView extends JLabel {
             g2d.drawImage(_baseImage, 0, 0, getWidth(), getHeight(), this);
 
         // 2) Superposition
-        if (_overlayImage != null)
-            g2d.drawImage(_overlayImage, 0, 0, getWidth(), getHeight(), this);
+        for (Image overlay : _overlays) {
+            g2d.drawImage(overlay, 0, 0, getWidth(), getHeight(), this);
+        }
 
         // 3) Sonar
         if (_sonarCountToDisplay >= 0) {
@@ -153,27 +165,6 @@ public class CellView extends JLabel {
      */
     @Override
     public void addMouseListener(MouseListener l) {
-        if (_isClickable)
-            super.addMouseListener(l);
-    }
-
-    public CellState getCellState() {
-        return _cellState;
-    }
-
-    public CellType getCellType() {
-        return _cellType;
-    }
-
-    public void setClickable(boolean clickable) {
-        this._isClickable = clickable;
-    }
-
-    public boolean isClickable() {
-        return _isClickable;
-    }
-
-    public Point getCellPosition() {
-        return _cellPosition;
+        super.addMouseListener(l);
     }
 }
