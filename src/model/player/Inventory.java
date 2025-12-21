@@ -16,10 +16,6 @@ public class Inventory {
         this._weapons.add(weapon);
     }
 
-    public ArrayList<Weapon> getWeapons() {
-        return _weapons;
-    }
-
     public Weapon getWeaponByType(WeaponType type) {
         for (Weapon weapon : _weapons) {
             if (weapon.getWeaponType() == type) {

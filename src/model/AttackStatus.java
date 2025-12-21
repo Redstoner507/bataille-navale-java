@@ -10,7 +10,6 @@ public enum AttackStatus {
     SUNK,               // Bateau coulé
     BLACKHOLE,          // Trou Noir activé
     TORNADO,            // Tornade activée
-    ITEM_FOUND,
     BOMB_FOUND,         // Bombe trouvée sur l'île
     SONAR_FOUND,        // Sonar trouvé sur l'île
     SONAR_RESULT,       // Résultat d'une analyse Sonar (ne cause pas de dégâts)

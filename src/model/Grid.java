@@ -95,17 +95,6 @@ public class Grid {
         return true;
     }
 
-    public void removePlaceable(Placeable object) {
-        if (_objects.remove(object)) {
-            for (Point p : object.getCoordinates()) {
-                _cells[p.x][p.y].setState(CellState.EMPTY);
-                _cells[p.x][p.y].removeObject();
-                notifyCellUpdated(p.x, p.y);
-            }
-        }
-    }
-
-
     /**
      * Applies the attack to the grid.
      * @param attack The Attack context

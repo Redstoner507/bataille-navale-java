@@ -19,8 +19,8 @@ public abstract class PlayerStrategy {
     protected Weapon _bomb;
     protected Weapon _sonar;
     protected final Random _random = new Random();
-    protected GameConfig _config;
-    protected int _gridSize;
+    protected final GameConfig _config;
+    protected final int _gridSize;
 
     public PlayerStrategy(GameConfig config) {
         this._config = config;
