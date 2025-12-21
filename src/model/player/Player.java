@@ -5,7 +5,6 @@ import model.ship.Ship;
 import model.weapon.Weapon;
 import model.weapon.WeaponType;
 import model.weapon.WeaponFactory;
-import view.GridView;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -13,13 +12,11 @@ import java.util.ArrayList;
 public class Player {
     private final String _name;
     private final Grid _grid;
-    private final GridView _gridView;
     private final Inventory _inventory;
     private PlayerStrategy _strategy;
 
-    public Player(int gridSize, int cellSize, String playerName, boolean islandMode) {
+    public Player(int gridSize, String playerName, boolean islandMode) {
         _grid = new Grid(gridSize, islandMode);
-        _gridView = new GridView(gridSize, cellSize, _grid);
         _name = playerName;
         _inventory = new Inventory();
         _inventory.addWeapon(new WeaponFactory().createMissile());
@@ -79,10 +76,6 @@ public class Player {
 
     public Grid getGrid() {
         return _grid;
-    }
-
-    public GridView getGridView() {
-        return _gridView;
     }
 
     public String getName() {

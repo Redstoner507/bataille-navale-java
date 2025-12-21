@@ -1,6 +1,5 @@
 package model;
 
-import controller.StatsController;
 import model.cell.Cell;
 import model.cell.CellState;
 import model.cell.IslandCell;
@@ -9,7 +8,6 @@ import model.ship.Ship;
 import model.ship.ShipType;
 import model.trap.Trap;
 import model.weapon.Weapon;
-import view.GridView;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -31,7 +29,6 @@ public class Grid {
     private int _rowOffset = 0;
     private int _colOffset = 0;
     private int _tornadoEffect = 0;
-    private final StatsController _statsController = new StatsController();
 
     public Grid(int size, boolean islandMode) {
         if (size < MIN_SIZE || size > MAX_SIZE)
@@ -89,22 +86,12 @@ public class Grid {
         Point hitCoordinates = result.getHitCoordinates();
         Cell cellHit = getCell(hitCoordinates.x, hitCoordinates.y);
 
-        GridView playerGridView = attack.getTargetPlayer().getGridView();
-
-        _statsController.evaluateAttack(result.getStatus(), cellHit.getObject(), result.getWeapon());
-
         switch (result.getStatus()) {
             case MISS -> cellHit.setState(CellState.MISS);
             case HIT -> {
                 if (cellHit.getState() != CellState.SUNK) cellHit.setState(CellState.HIT);
             }
-            case SUNK -> {
-                cellHit.setState(CellState.SUNK);
-                Ship ship = (Ship) cellHit.getObject();
-                for (Point p : ship.getCoordinates()) {
-                    playerGridView.updateCellDisplay(result, p.x, p.y);
-                }
-            }
+            case SUNK -> cellHit.setState(CellState.SUNK);
             case BOMB_FOUND, SONAR_FOUND -> {
                 cellHit.setState(CellState.ISLAND_HIT);
                 Weapon weapon = (Weapon) cellHit.getObject();
@@ -119,14 +106,12 @@ public class Grid {
                 cellHit.removeObject();
                 AttackResult counterSignal = trap.activate(attack, result);
                 result.setAttackToRelaunch(counterSignal.getAttackToRelaunch());
-                playerGridView.updateCellDisplay(result, hitCoordinates.x, hitCoordinates.y);
             }
             case TORNADO -> {
                 cellHit.setState(CellState.TORNADO);
                 Trap trap = (Trap) cellHit.getObject();
                 cellHit.removeObject();
                 trap.activate(attack, result);
-                playerGridView.updateCellDisplay(result, hitCoordinates.x, hitCoordinates.y);
                 activateTornadoEffect();
             }
             case ALREADY_VISITED -> {
@@ -206,10 +191,6 @@ public class Grid {
             _rowOffset = 0;
             _colOffset = 0;
         }
-    }
-
-    public StatsController getStatsController() {
-        return _statsController;
     }
 
     public int getIslandSize() {

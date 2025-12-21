@@ -1,6 +1,7 @@
 package controller;
 
 import model.*;
+import model.cell.Cell;
 import model.player.PlayerStrategyFactory;
 import model.ship.Ship;
 import model.ship.ShipType;
@@ -29,6 +30,8 @@ public class GameController {
     //Vues
     private final MainFrame _frame;
     private GameView _gameView;
+    private GridView _playerGridView;
+    private GridView _botGridView;
     private static final String START = "start";
     private static final String CONFIG = "config";
     private static final String PLACEMENT = "placement";
@@ -55,11 +58,15 @@ public class GameController {
     public void showPlacementScreen() {
         _gameState = GameState.SETUP;
         GameConfig config = _configController.getGameConfig();
-        _player = new Player(config.getGridSize(), CELL_SIZE, "Player", config.isIslandModeEnabled());
-        _bot = new Player(config.getGridSize(), CELL_SIZE, "Computer", config.isIslandModeEnabled());
+        _player = new Player(config.getGridSize(), "Player", config.isIslandModeEnabled());
+        _bot = new Player(config.getGridSize(), "Computer", config.isIslandModeEnabled());
 
         PlayerStrategyFactory playerStrategyFactory = new PlayerStrategyFactory();
         _player.setStrategy(playerStrategyFactory.createHumanStrategy(config));
+
+        // Création des Vues
+        _playerGridView = new GridView(config.getGridSize(), CELL_SIZE, _player.getGrid());
+        _botGridView = new GridView(config.getGridSize(), CELL_SIZE, _bot.getGrid());
 
         switch (config.getComputerStrategy()) {
             case COMPUTER_VERY_EASY ->
@@ -76,6 +83,7 @@ public class GameController {
                 // Default to easy if human is selected for bot (à modifier si multi-joueur ou autre)
                 _bot.setStrategy(playerStrategyFactory.createComputerEasyStrategy(config));
         }
+
         PlacementScreen placement = new PlacementScreen(this, CELL_SIZE, _placementController, _configController);
         _frame.addScreen(PLACEMENT, placement);
         _frame.showScreen(PLACEMENT);
@@ -85,7 +93,7 @@ public class GameController {
         _playerAttackHistory.clear();
         _botAttackHistory.clear();
         _previousBotResults.clear();
-        _gameView = new GameView(_player.getGridView(), _bot.getGridView(), _placementController, _bot.getGrid(), _configController, this);
+        _gameView = new GameView(_playerGridView, _botGridView, _placementController, _bot.getGrid(), _configController, this);
         fillStatsController();
         _gameView.setTurnNumber(_turnNumber);
         _frame.addScreen(GAME, _gameView);
@@ -239,7 +247,7 @@ public class GameController {
      */
     private void processSingleImpact(AttackResult result, Attack originalAttack) {
         Point hitCoordinates = result.getHitCoordinates();
-        GridView targetGridView = originalAttack.getTargetPlayer().getGridView();
+        GridView targetGridView = (originalAttack.getTargetPlayer() == _player) ? _playerGridView : _botGridView;
 
         // Mise à jour de la grille et du statut de la victime
         updateGameView(result, targetGridView, hitCoordinates.x, hitCoordinates.y);
@@ -298,6 +306,26 @@ public class GameController {
     private void updateGameView(AttackResult result, GridView targetGridView, int row, int col) {
         // Mettre à jour la grille visuelle
         targetGridView.updateCellDisplay(result, row, col);
+
+        Grid targetGrid = (targetGridView == _playerGridView) ? _player.getGrid() : _bot.getGrid();
+
+        // Propager l'état "coulé" à toutes les cases du bateau
+        if (result.getStatus() == AttackStatus.SUNK) {
+            Cell cell = targetGrid.getCell(row, col);
+            Placeable object = cell.getObject();
+            if (object.getPlaceableType() == PlaceableType.SHIP) {
+                Ship ship = (Ship) object;
+                for (Point p : ship.getCoordinates()) {
+                    targetGridView.updateCellDisplay(result, p.x, p.y);
+                }
+            }
+        }
+
+        // Mettre à jour les statistiques
+        if (targetGridView == _botGridView) {
+            Cell cellHit = targetGrid.getCell(row, col);
+            _statsController.evaluateAttack(result.getStatus(), cellHit.getObject(), result.getWeapon());
+        }
     }
 
     private void changeTurn() {
@@ -328,7 +356,7 @@ public class GameController {
     }
 
     private void fillStatsController() {
-        _statsController = _bot.getGrid().getStatsController();
+        if (_statsController == null) _statsController = new StatsController();
         int shipsUntouched = 0;
         int totalShipCells = 0;
         int weaponsAvailable = 0;
@@ -357,6 +385,7 @@ public class GameController {
         _statsController.setTotalShipCells(totalShipCells);
         _statsController.setWeaponsAvailable(weaponsAvailable);
         _statsController.setIslandCellsLeft(islandCellsLeft);
+
         _gameView.getStatsView().update(_statsController);
     }
 
@@ -365,7 +394,7 @@ public class GameController {
     }
 
     public GridView getPlayerGridView() {
-        return _player.getGridView();
+        return _playerGridView;
     }
     
     public void quit() {
