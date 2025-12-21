@@ -6,6 +6,7 @@ import model.cell.CellState;
 import model.cell.IslandCell;
 import model.cell.WaterCell;
 import model.ship.Ship;
+import model.ship.ShipType;
 import model.trap.Trap;
 import model.weapon.Weapon;
 import view.GridView;
@@ -213,5 +214,16 @@ public class Grid {
 
     public int getIslandSize() {
         return ISLAND_END - ISLAND_START;
+    }
+
+    public boolean hasAliveShip(ShipType type) {
+        for (Placeable object : _objects) {
+            if (object.getPlaceableType() != PlaceableType.SHIP) continue;
+            Ship ship = (Ship) object;
+            if (ship.getType() == type && !ship.isSunk()) {
+                return true; // Il reste au moins un bateau de ce type vivant.
+            }
+        }
+        return false; // Tous les bateaux de ce type sont coulés.
     }
 }

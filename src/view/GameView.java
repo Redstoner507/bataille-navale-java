@@ -15,7 +15,7 @@ public class GameView extends JPanel {
     private final HistoryView _historyView;
     private final StatsView _statsView;
     private final JLabel _turnLabel;
-    private final EnumMap<WeaponType, JRadioButton> weaponButtons = new EnumMap<>(WeaponType.class);
+    private final EnumMap<WeaponType, JRadioButton> _weaponButtons = new EnumMap<>(WeaponType.class);
 
 
     public GameView(GridView playerGridView, GridView computerGridView, PlacementController placementController, Grid computerGrid, ConfigController configController, GameController gameController) {
@@ -116,11 +116,11 @@ public class GameView extends JPanel {
             panel.add(button);
 
             // Stockage du bouton
-            weaponButtons.put(type, button);
+            _weaponButtons.put(type, button);
         }
 
         // Sélection par défaut
-        weaponButtons.get(WeaponType.MISSILE).setSelected(true);
+        _weaponButtons.get(WeaponType.MISSILE).setSelected(true);
 
         return panel;
     }
@@ -141,9 +141,27 @@ public class GameView extends JPanel {
     }
 
     public void setWeaponSelection(WeaponType weaponType) {
-        JRadioButton button = weaponButtons.get(weaponType);
+        JRadioButton button = _weaponButtons.get(weaponType);
         if (button != null) {
             button.setSelected(true);
+        }
+    }
+
+    /**
+     * Active ou désactive un bouton d'arme spécifique.
+     */
+    public void setWeaponEnabled(WeaponType type, boolean enabled) {
+        if (_weaponButtons.containsKey(type)) {
+            JRadioButton button = _weaponButtons.get(type);
+            button.setEnabled(enabled);
+
+            // Si on désactive l'arme qui est actuellement sélectionnée,
+            // on force le retour au MISSILE (arme par défaut)
+            if (!enabled && button.isSelected()) {
+                if (_weaponButtons.containsKey(WeaponType.MISSILE)) {
+                    _weaponButtons.get(WeaponType.MISSILE).doClick(); // Simule un clic pour trigger le contrôleur
+                }
+            }
         }
     }
 

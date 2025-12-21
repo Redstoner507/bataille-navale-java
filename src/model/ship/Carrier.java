@@ -3,7 +3,7 @@ package model.ship;
 public class Carrier extends Ship {
 
     public Carrier() {
-        super(5, "Carrier");
+        super(5, "Carrier", ShipType.CARRIER);
     }
 
 }

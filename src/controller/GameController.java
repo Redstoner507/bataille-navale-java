@@ -3,6 +3,7 @@ package controller;
 import model.*;
 import model.player.PlayerStrategyFactory;
 import model.ship.Ship;
+import model.ship.ShipType;
 import model.weapon.Weapon;
 import model.player.Player;
 import model.weapon.WeaponType;
@@ -132,6 +133,9 @@ public class GameController {
 
         if (attack == null) return;
 
+        // Vérifier l'état des armes du joueur (Sonar désactivé si tous les sous-marins sont coulés)
+        checkWeaponAvailability();
+
         endTurn(_previousBotResults, attack);
     }
 
@@ -154,6 +158,14 @@ public class GameController {
         if (_gameState != GameState.GAME_OVER) {
             changeTurn();
         }
+    }
+
+    public void checkWeaponAvailability() {
+        // Vérifier si le joueur a encore des sous-marins
+        boolean hasSubmarine = getPlayerGrid().hasAliveShip(ShipType.SUBMARINE);
+
+        // Mettre à jour la vue
+        _gameView.setWeaponEnabled(WeaponType.SONAR, hasSubmarine);
     }
 
     /**

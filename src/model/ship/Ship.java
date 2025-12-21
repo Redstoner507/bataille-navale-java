@@ -7,11 +7,13 @@ import model.cell.CellType;
 public abstract class Ship extends Placeable {
     private int _cellsRemaining;
     private final int _totalCells;
+    private final ShipType _type;
 
-    public Ship(int size, String name) {
+    public Ship(int size, String name, ShipType type) {
         super(size, Orientation.HORIZONTAL, name, CellType.WATER, PlaceableType.SHIP, CellState.SHIP);
         _cellsRemaining = size;
         _totalCells = size;
+        _type = type;
     }
 
     /**
@@ -39,5 +41,9 @@ public abstract class Ship extends Placeable {
 
     public int getTotalCells() {
         return _totalCells;
+    }
+
+    public ShipType getType() {
+        return _type;
     }
 }
