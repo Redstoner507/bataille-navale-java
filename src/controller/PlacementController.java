@@ -18,10 +18,6 @@ public class PlacementController {
         return modelGrid.placeObject(object, row, col);
     }
 
-    public void removeObject(Grid modelGrid, Placeable object) {
-        modelGrid.removePlaceable(object);
-    }
-
     /**
      * Randomly places all ships in the grid.
      */
