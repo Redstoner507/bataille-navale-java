@@ -8,6 +8,7 @@ import model.cell.Cell;
 import model.cell.CellState;
 import model.cell.CellType;
 
+import javax.swing.*;
 import java.util.ArrayList;
 
 public class Sonar extends Weapon{
@@ -31,6 +32,7 @@ public class Sonar extends Weapon{
         Cell centerCell = grid.getCell(centerRow, centerCol);
         // Ne pas pouvoir utiliser le sonar sur l'île ou une case déjà scannée
         if (centerCell.getType() == CellType.ISLAND || centerCell.isScanned()) {
+            JOptionPane.showMessageDialog(null, "You can't use the sonar on the island", "Invalid sonar placement", JOptionPane.WARNING_MESSAGE);
             return null;
         }
 

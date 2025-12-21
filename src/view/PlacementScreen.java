@@ -160,20 +160,27 @@ public class PlacementScreen extends JPanel {
         });
 
         randomPlacementButton.addActionListener(e -> {
-            // On demande au contrôleur de placer les objets dans le modèle
-            placementController.randomObjectsPlacement(gameController.getPlayerGrid(), objects);
-
-            // On vide visuellement les listes de gauche et de droite dans cet écran
-            clearPlaceableViews();
-
-            // On force un rafraîchissement global
-            revalidate();
-            repaint();
+            try {
+                // On tente de placer les objets
+                placementController.randomObjectsPlacement(gameController.getPlayerGrid(), objects);
+            } catch (Exception ex) {
+                // En cas d'erreur (ex : image manquante pour un piège), on affiche l'erreur,
+                // mais on continue pour vider l'interface.
+                System.err.println("Erreur durant le placement aléatoire : " + ex.getMessage());
+            } finally {
+                // On vide visuellement les listes de gauche et de droite dans cet écran
+                clearPlaceableViews();
+                revalidate();
+                repaint();
+            }
         });
         
         startGameButton.addActionListener(e -> {
-            if (_shipPanel.getComponentCount() == 0) {
+            if (_shipPanel.getComponentCount() == 0 && _trapPanel.getComponentCount() == 0) {
                 gameController.showGameScreen();
+            }
+            else {
+                JOptionPane.showMessageDialog(buttonPanel, "Please place all objects before starting.", "Incomplete Setup", JOptionPane.WARNING_MESSAGE);
             }
         });
 

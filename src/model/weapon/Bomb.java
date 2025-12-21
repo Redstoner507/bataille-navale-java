@@ -8,6 +8,7 @@ import model.cell.Cell;
 import model.cell.CellType;
 import model.cell.CellState;
 
+import javax.swing.*;
 import java.util.ArrayList;
 
 public class Bomb extends Weapon{
@@ -39,6 +40,7 @@ public class Bomb extends Weapon{
             if (!grid.isCoordinateValid(currentRow, currentCol)) continue;
             Cell tagetCell = grid.getCell(currentRow, currentCol);
             if (tagetCell.getType() == CellType.ISLAND) {
+                JOptionPane.showMessageDialog(null, "You can't use the bomb on a cell adjacent to the island", "Invalid bomb placement", JOptionPane.WARNING_MESSAGE);
                 return null;
             }
         }
