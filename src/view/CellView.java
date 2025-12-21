@@ -69,11 +69,12 @@ public class CellView extends JLabel {
         switch (state) {
 
             case EMPTY -> {
+                _overlays.clear();
                 if (_cellType == CellType.ISLAND) _baseImage = IMG_ISLAND;
                 else _baseImage = IMG_WATER;
             }
 
-            case SHIP -> _overlays.add(ImageUtils.getShipSegement(_StringShip, _shipSegment, _shipOrientation));
+            case SHIP -> _overlays.add(ImageUtils.getShipSegment(_StringShip, _shipSegment, _shipOrientation));
 
             case HIT -> {
                 _overlays.add(IMG_SHIP);
@@ -83,7 +84,8 @@ public class CellView extends JLabel {
             case MISS -> _overlays.add(IMG_MISS);
 
             case SUNK -> {
-                _overlays.add(ImageUtils.getShipSegement(_StringShip, _shipSegment, _shipOrientation));
+                _overlays.clear();
+                _overlays.add(ImageUtils.getShipSegment(_StringShip, _shipSegment, _shipOrientation));
                 _overlays.add(IMG_SUNK);
             }
 
@@ -96,6 +98,16 @@ public class CellView extends JLabel {
             case BOMB -> _overlays.add(IMG_BOMB);
 
             case SONAR -> _overlays.add(IMG_SONAR);
+
+            case BOMB_FOUND -> {
+                _overlays.add(IMG_ISLAND_HIT);
+                _overlays.add(IMG_BOMB);
+            }
+
+            case SONAR_FOUND -> {
+                _overlays.add(IMG_ISLAND_HIT);
+                _overlays.add(IMG_SONAR);
+            }
         }
 
         _cellState = state;

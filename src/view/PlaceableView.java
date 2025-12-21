@@ -2,7 +2,6 @@ package view;
 
 import model.Orientation;
 import model.Placeable;
-import model.PlaceableType;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -23,12 +22,12 @@ public class PlaceableView extends JLabel {
     private final JPanel _segmentPanel = new JPanel();
 
     public PlaceableView(Placeable _placeable, LabeledGridView grid, JLayeredPane topLayer, JPanel originalPanel, int cellSize) {
-        this._placeable =_placeable;
+        this._placeable = _placeable;
         this._grid = grid;
         this._topLayer = topLayer;
         this._originalPanel = originalPanel;
         this._cellSize = cellSize;
-        this._orientation =_placeable.getOrientation();
+        this._orientation = _placeable.getOrientation();
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setOpaque(false);
@@ -53,19 +52,24 @@ public class PlaceableView extends JLabel {
         _segmentPanel.setLayout(new BoxLayout(_segmentPanel,
                 _orientation == Orientation.HORIZONTAL ? BoxLayout.X_AXIS : BoxLayout.Y_AXIS));
 
+        // Vérification de sécurité pour éviter le nom vide
+        String name = _placeable.getName();
+        if (name == null || name.isEmpty()) {
+            System.err.println("Erreur : Placeable sans nom de type " + _placeable.getPlaceableType());
+            return;
+        }
+        String fileName = name.toLowerCase();
+
         switch (_placeable.getPlaceableType()) {
-            case PlaceableType.SHIP:
-                String shipType = _placeable.getName().toLowerCase();
+            case SHIP -> {
                 for (int i = 0; i < _placeable.getSize(); i++) {
-                    addSegment(ImageUtils.getShipSegement(shipType, i, _orientation == Orientation.HORIZONTAL ? 1 : 0));
+                    addSegment(ImageUtils.getShipSegment(fileName, i, _orientation == Orientation.HORIZONTAL ? 1 : 0));
                 }
-                break;
-            case PlaceableType.WEAPON:
-                addSegment(ImageUtils.getWeaponImage(_placeable.getName().toLowerCase())); 
-                break;
-            default:
-                addSegment(ImageUtils.getTrapImage(_placeable.getName().toLowerCase()));
-                break;
+            }
+
+            case WEAPON -> addSegment(ImageUtils.getWeaponImage(fileName));
+
+            default -> addSegment(ImageUtils.getTrapImage(fileName));
         }
         _segmentPanel.revalidate();
         _segmentPanel.repaint();

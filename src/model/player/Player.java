@@ -65,7 +65,7 @@ public class Player {
         if (results.isEmpty()) return results;
         AttackResult baseResult = results.getFirst();
         if (baseResult != null) {
-            _grid.decreaseEffects(baseResult);
+            _grid.decreaseEffects();
         }
         for (AttackResult result : results) {
             _grid.applyAttack(attack, result);

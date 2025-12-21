@@ -142,7 +142,7 @@ public class PlacementScreen extends JPanel {
 
         // PlacementController
         playerGrid.getGridView().setObjectPlacementListener((placeableView, row, col) ->
-            placementController.placeObject(gameController.getPlayerGrid(), playerGrid.getGridView(), placeableView.getPlaceable(), row, col)
+                placementController.placeObject(gameController.getPlayerGrid(), placeableView.getPlaceable(), row, col)
         );
 
         rotateButton.addActionListener(e -> {
@@ -160,8 +160,15 @@ public class PlacementScreen extends JPanel {
         });
 
         randomPlacementButton.addActionListener(e -> {
-            placementController.randomObjectsPlacement(gameController.getPlayerGrid(), playerGrid.getGridView(), objects);
+            // On demande au contrôleur de placer les objets dans le modèle
+            placementController.randomObjectsPlacement(gameController.getPlayerGrid(), objects);
+
+            // On vide visuellement les listes de gauche et de droite dans cet écran
             clearPlaceableViews();
+
+            // On force un rafraîchissement global
+            revalidate();
+            repaint();
         });
         
         startGameButton.addActionListener(e -> {

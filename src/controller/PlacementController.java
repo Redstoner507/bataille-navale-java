@@ -3,11 +3,7 @@ package controller;
 import model.Grid;
 import model.Orientation;
 import model.Placeable;
-import model.PlaceableType;
-import view.CellView;
-import view.GridView;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -15,51 +11,30 @@ public class PlacementController {
     public PlacementController() {}
 
     /**
-     * Tries to place an object in the grid and updates the view if it was successful.
+     * Tries to place an object in the grid.
      * @return true if the object was placed in the grid, false otherwise.
      */
-    public boolean placeObject(Grid modelGrid, GridView viewGrid, Placeable object, int row, int col) {
-        // placement for the model
-        if (!modelGrid.placeObject(object, row, col)) return false;  
+    public boolean placeObject(Grid modelGrid, Placeable object, int row, int col) {
+        return modelGrid.placeObject(object, row, col);
+    }
 
-        if (object.getPlaceableType() != PlaceableType.SHIP) {
-            // For non-ship objects, update all cells at once
-            for (Point p : object.getCoordinates()) {
-                CellView cell = viewGrid.getCell(p.x, p.y);
-                if (cell != null) {
-                    cell.setCellIcon(object.getCellState());
-                }
-            }
-            return true;
-        }
-        // placement for the view (ships only)
-        int segmentIndex = 0;
-        for (Point p : object.getCoordinates()) {
-            CellView cell = viewGrid.getCell(p.x, p.y);
-            if (cell != null) {
-                cell.setShipInfo(object.getName().toLowerCase(), segmentIndex,
-                    object.getOrientation() == Orientation.HORIZONTAL ? 1 : 0);
-                cell.setCellIcon(object.getCellState());
-            }
-            segmentIndex++;
-        }
-        return true;
+    public void removeObject(Grid modelGrid, Placeable object) {
+        modelGrid.removePlaceable(object);
     }
 
     /**
      * Randomly places all ships in the grid.
      */
-    public void randomObjectsPlacement(Grid modelGrid, GridView viewGrid, ArrayList<Placeable> objects) {
-        clearGrid(modelGrid, viewGrid);
-
+    public void randomObjectsPlacement(Grid modelGrid, ArrayList<Placeable> objects) {
+        modelGrid.resetGrid();
         Random rand = new Random();
 
         for (Placeable placeable : objects) {
             boolean placed;
+            int attempts = 0;
             do {
                 // Random orientation
-                Orientation orientation =
-                    rand.nextBoolean() ? Orientation.HORIZONTAL : Orientation.VERTICAL;
+                Orientation orientation = rand.nextBoolean() ? Orientation.HORIZONTAL : Orientation.VERTICAL;
                 placeable.setOrientation(orientation);
 
                 // Random position
@@ -67,7 +42,10 @@ public class PlacementController {
                 int col = rand.nextInt(modelGrid.getSize());
 
                 // Use controller logic
-                placed = placeObject(modelGrid, viewGrid, placeable, row, col);
+                placed = placeObject(modelGrid, placeable, row, col);
+                attempts++;
+                // Sécurité boucle infinie
+                if (attempts > 1000) break;
             } while (!placed);
         }
     }
@@ -79,10 +57,5 @@ public class PlacementController {
         placeable.setOrientation(
             placeable.getOrientation() == Orientation.HORIZONTAL ? Orientation.VERTICAL : Orientation.HORIZONTAL
         );
-    }
-
-    public void clearGrid(Grid modelGrid, GridView viewGrid) {
-        modelGrid.resetGrid();
-        viewGrid.clearGrid();
     }
 }

@@ -68,6 +68,10 @@ public class GameController {
         _playerGridView = new GridView(config.getGridSize(), CELL_SIZE, _player.getGrid());
         _botGridView = new GridView(config.getGridSize(), CELL_SIZE, _bot.getGrid());
 
+        // Configuration du drag & drop
+        // On connecte le callback de suppression (pour quand on déplace un bateau déjà posé)
+        _playerGridView.setOnPlaceableRemoveListener(placeable -> _placementController.removeObject(_player.getGrid(), placeable));
+
         switch (config.getComputerStrategy()) {
             case COMPUTER_VERY_EASY ->
                 _bot.setStrategy(playerStrategyFactory.createComputerVeryEasyStrategy(config));
@@ -116,7 +120,12 @@ public class GameController {
 
         // Annuler l'attaque si elle est invalide
         if (!results.isEmpty() && results.getFirst().getStatus() == AttackStatus.ALREADY_VISITED) {
-            return;
+            Point hitPoint = results.getFirst().getHitCoordinates();
+            // Si le point d'impact est identique au point visé, c'est un clic invalide direct
+            if (hitPoint.x == row && hitPoint.y == col) {
+                return;
+            }
+            // Sinon (coordonnées différentes), la tornade est active : l'attaque reste valide
         }
 
         // Consommer l'arme utilisée
@@ -304,27 +313,21 @@ public class GameController {
     }
 
     private void updateGameView(AttackResult result, GridView targetGridView, int row, int col) {
-        // Mettre à jour la grille visuelle
-        targetGridView.updateCellDisplay(result, row, col);
-
-        Grid targetGrid = (targetGridView == _playerGridView) ? _player.getGrid() : _bot.getGrid();
-
-        // Propager l'état "coulé" à toutes les cases du bateau
-        if (result.getStatus() == AttackStatus.SUNK) {
-            Cell cell = targetGrid.getCell(row, col);
-            Placeable object = cell.getObject();
-            if (object.getPlaceableType() == PlaceableType.SHIP) {
-                Ship ship = (Ship) object;
-                for (Point p : ship.getCoordinates()) {
-                    targetGridView.updateCellDisplay(result, p.x, p.y);
-                }
-            }
-        }
-
         // Mettre à jour les statistiques
+        // On ne traite les stats que si c'est le joueur qui attaque le bot
         if (targetGridView == _botGridView) {
+            Grid targetGrid = _bot.getGrid();
             Cell cellHit = targetGrid.getCell(row, col);
-            _statsController.evaluateAttack(result.getStatus(), cellHit.getObject(), result.getWeapon());
+
+            // Le StatsController traite les données pures du modèle
+            _statsController.evaluateAttack(
+                    result.getStatus(),
+                    cellHit.getObject(),
+                    result.getWeapon()
+            );
+
+            // Rafraîchir l'affichage des stats global
+            _gameView.getStatsView().update(_statsController);
         }
     }
 

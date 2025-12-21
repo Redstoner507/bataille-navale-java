@@ -11,15 +11,25 @@ import java.awt.geom.AffineTransform;
 
 public class ImageUtils {
 
-    public static BufferedImage getShipSegement(String type, int segment, int orientation) {
+    public static BufferedImage getShipSegment(String type, int segment, int orientation) {
+        if (type == null || type.isEmpty()) {
+            System.err.println("Avertissement : Tentative de chargement d'un segment de bateau sans nom.");
+            // Retourne une image transparente vide de 50x50 par défaut pour éviter le crash
+            return new BufferedImage(50, 50, BufferedImage.TYPE_INT_ARGB);
+        }
+
         int size = 50;
-        String location = "/images/ships/" + type + ".png";
+        String location = "/images/ships/" + type.toLowerCase() + ".png";
         BufferedImage shipSeg;
         try {
-            shipSeg = ImageIO.read(Objects.requireNonNull(
-                    ImageUtils.class.getResource(location)
-            ));
+            var resource = ImageUtils.class.getResource(location);
+            if (resource == null) {
+                throw new IOException("Fichier introuvable : " + location);
+            }
+            shipSeg = ImageIO.read(resource);
         } catch (IOException e) {
+            // En phase de debug, on peut imprimer l'erreur pour voir quel nom de fichier est fautif
+            System.err.println("Erreur de chargement : " + e.getMessage());
             throw new RuntimeException("Impossible de charger le sprite sheet du bateau: " + type, e);
         }
         BufferedImage segmentImg = shipSeg.getSubimage(0, segment * size, size, size);

@@ -49,7 +49,7 @@ public class GameView extends JPanel {
         SquarePanel computerSquarePanel = new SquarePanel(computerLabeledGridView);
 
         // Logique de placement aléatoire de l'ordinateur
-        placementController.randomObjectsPlacement(computerGrid, _computerGridView, configController.getAllPlaceables());
+        placementController.randomObjectsPlacement(computerGrid, configController.getAllPlaceables());
         _computerGridView.clearGrid(); // Cache les bateaux
 
         // --- 2. Panneau Central contenant les 2 Grilles et l'historique ---

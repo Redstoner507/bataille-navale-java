@@ -26,9 +26,9 @@ public class Grid {
     private final Cell[][] _cells;
     private final ArrayList<Placeable> _objects = new ArrayList<>();
     private final boolean _islandMode;
-    private int _rowOffset = 0;
-    private int _colOffset = 0;
     private int _tornadoEffect = 0;
+
+    private final ArrayList<GridListener> _listeners = new ArrayList<>();
 
     public Grid(int size, boolean islandMode) {
         if (size < MIN_SIZE || size > MAX_SIZE)
@@ -37,6 +37,22 @@ public class Grid {
         this._islandMode = islandMode;
         this._cells = new Cell[size][size];
         resetGrid();
+    }
+
+    public void addListener(GridListener listener) {
+        _listeners.add(listener);
+    }
+
+    private void notifyCellUpdated(int row, int col) {
+        for (GridListener listener : _listeners) {
+            listener.onCellUpdated(row, col, _cells[row][col]);
+        }
+    }
+
+    private void notifyGridReset() {
+        for (GridListener listener : _listeners) {
+            listener.onGridReset();
+        }
     }
 
     /**
@@ -71,9 +87,21 @@ public class Grid {
         for (Point p : object.getCoordinates()) {
             _cells[p.x][p.y].setState(object.getCellState());
             _cells[p.x][p.y].setObject(object);
+            // notification automatique
+            notifyCellUpdated(p.x, p.y);
         }
 
         return true;
+    }
+
+    public void removePlaceable(Placeable object) {
+        if (_objects.remove(object)) {
+            for (Point p : object.getCoordinates()) {
+                _cells[p.x][p.y].setState(CellState.EMPTY);
+                _cells[p.x][p.y].removeObject();
+                notifyCellUpdated(p.x, p.y);
+            }
+        }
     }
 
 
@@ -91,9 +119,27 @@ public class Grid {
             case HIT -> {
                 if (cellHit.getState() != CellState.SUNK) cellHit.setState(CellState.HIT);
             }
-            case SUNK -> cellHit.setState(CellState.SUNK);
-            case BOMB_FOUND, SONAR_FOUND -> {
-                cellHit.setState(CellState.ISLAND_HIT);
+            case SUNK -> {
+                cellHit.setState(CellState.SUNK);
+                // Si coulé, on met à jour tout le bateau pour l'affichage visuel
+                Placeable obj = cellHit.getObject();
+                if (obj != null) {
+                    for (Point p : obj.getCoordinates()) {
+                        getCell(p.x, p.y).setState(CellState.SUNK);
+                        notifyCellUpdated(p.x, p.y);
+                    }
+                }
+            }
+            case BOMB_FOUND -> {
+                cellHit.setState(CellState.ISLAND_HIT); // Afficher l'état fouillé
+                cellHit.setState(CellState.BOMB_FOUND); // On définit l'état BOMBE pour l'affichage
+                Weapon weapon = (Weapon) cellHit.getObject();
+                cellHit.removeObject(); // On retire l'objet logique de la grille
+                attack.getAttackingPlayer().addToInventory(weapon); // On le donne au joueur
+            }
+            case SONAR_FOUND -> {
+                cellHit.setState(CellState.ISLAND_HIT); // Afficher l'état fouillé
+                cellHit.setState(CellState.SONAR_FOUND); // On définit l'état SONAR pour l'affichage
                 Weapon weapon = (Weapon) cellHit.getObject();
                 cellHit.removeObject();
                 attack.getAttackingPlayer().addToInventory(weapon);
@@ -116,8 +162,39 @@ public class Grid {
             }
             case ALREADY_VISITED -> {
                 // No state change
+                return;
             }
         }
+
+        // Notification unique
+        notifyCellUpdated(hitCoordinates.x, hitCoordinates.y);
+    }
+
+    public void resetGrid() {
+        for (int r = 0; r < _size; r++) {
+            for (int c = 0; c < _size; c++) {
+                if (_islandMode && isCoordinateInIsland(r, c)) {
+                    _cells[r][c] = new IslandCell();
+                } else {
+                    _cells[r][c] = new WaterCell();
+                }
+            }
+        }
+        _objects.clear();
+        notifyGridReset();
+    }
+
+    public Cell getCell(int row, int col) {
+        // Vérification de la validité de la cible (hors limites ou déjà touchée)
+        if (!isCoordinateValid(row, col)) {
+            throw new IllegalArgumentException("Coordinates must be between " + MIN_SIZE + " and " + MAX_SIZE + "\n" +
+                    "Row : " + row + ", Col : " + col);
+        }
+        return _cells[row][col];
+    }
+
+    public boolean isCoordinateValid(int row, int col) {
+        return (row >= 0 & row < _size && col >= 0 && col < _size);
     }
 
     /**
@@ -142,32 +219,6 @@ public class Grid {
         return ships;
     }
 
-    public Cell getCell(int row, int col) {
-        // Vérification de la validité de la cible (hors limites ou déjà touchée)
-        if (!isCoordinateValid(row, col)) {
-            throw new IllegalArgumentException("Coordinates must be between " + MIN_SIZE + " and " + MAX_SIZE + "\n" +
-            "Row : " + row + ", Col : " + col);
-        }
-        return _cells[row][col];
-    }
-
-    public void resetGrid() {
-        for (int r = 0; r < _size; r++) {
-            for (int c = 0; c < _size; c++) {
-                if (_islandMode && isCoordinateInIsland(r, c)) {
-                    _cells[r][c] = new IslandCell();
-                } else {
-                    _cells[r][c] = new WaterCell();
-                }
-            }
-        }
-        _objects.clear();
-    }
-
-    public boolean isCoordinateValid(int row, int col) {
-        return (row >= 0 & row < _size && col >= 0 && col < _size);
-    }
-
     public void activateTornadoEffect() {
         _tornadoEffect = TORNADO_DURATION;
     }
@@ -176,21 +227,16 @@ public class Grid {
         if (_tornadoEffect <= 0) return realCoordinates;
 
         Random random = new Random();
-        _rowOffset = random.nextInt(1, _size);
-        _colOffset = random.nextInt(1, _size);
+        int rowOffset = random.nextInt(1, _size);
+        int colOffset = random.nextInt(1, _size);
 
-        int realRow = (realCoordinates.x + _rowOffset) % _size;
-        int realCol = (realCoordinates.y + _colOffset) % _size;
+        int realRow = (realCoordinates.x + rowOffset) % _size;
+        int realCol = (realCoordinates.y + colOffset) % _size;
         return new Point(realRow, realCol);
     }
 
-    public void decreaseEffects(AttackResult baseResult) {
-        if (baseResult.getStatus() == AttackStatus.ALREADY_VISITED) return;
-        _tornadoEffect--;
-        if (_tornadoEffect <= 0) {
-            _rowOffset = 0;
-            _colOffset = 0;
-        }
+    public void decreaseEffects() {
+        if (_tornadoEffect > 0) _tornadoEffect--;
     }
 
     public int getIslandSize() {

@@ -10,5 +10,7 @@ public enum CellState {
     BLACKHOLE,
     TORNADO,
     BOMB,
-    SONAR
+    SONAR,
+    BOMB_FOUND,
+    SONAR_FOUND
 }
