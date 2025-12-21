@@ -55,49 +55,24 @@ public class PlaceableView extends JLabel {
 
         switch (_placeable.getPlaceableType()) {
             case PlaceableType.SHIP:
-                loadShipSegments();
+                String shipType = _placeable.getName().toLowerCase();
+                for (int i = 0; i < _placeable.getSize(); i++) {
+                    addSegment(ImageUtils.getShipSegement(shipType, i, _orientation == Orientation.HORIZONTAL ? 1 : 0));
+                }
                 break;
             case PlaceableType.WEAPON:
-                loadWeaponSegment();
+                addSegment(ImageUtils.getWeaponImage(_placeable.getName().toLowerCase())); 
                 break;
             default:
-                loadTrapSegments();
+                addSegment(ImageUtils.getTrapImage(_placeable.getName().toLowerCase()));
                 break;
         }
         _segmentPanel.revalidate();
         _segmentPanel.repaint();
     }
 
-    private void loadShipSegments() {
-        String shipType = _placeable.getName().toLowerCase();
-        Icon img;
-
-        for (int i = 0; i < _placeable.getSize(); i++) {
-            img = new ImageIcon(ImageUtils.getShipSegement(shipType, i, _orientation == Orientation.HORIZONTAL ? 1 : 0));
-            JLabel seg = new JLabel(img);
-            seg.setPreferredSize(new Dimension(_cellSize, _cellSize)); 
-            seg.setMinimumSize(new Dimension(_cellSize, _cellSize)); 
-            seg.setMaximumSize(new Dimension(_cellSize, _cellSize));
-            seg.setBorder(new LineBorder(Color.BLACK));
-            _segmentPanel.add(seg);
-        }
-    }
-
-    private void loadTrapSegments() {
-        Icon img = new ImageIcon(ImageUtils.getTrapImage(_placeable.getName().toLowerCase())); // image générique pour les pièges
-
-        JLabel seg = new JLabel(img);
-        seg.setPreferredSize(new Dimension(_cellSize, _cellSize));
-        seg.setMinimumSize(new Dimension(_cellSize, _cellSize));
-        seg.setMaximumSize(new Dimension(_cellSize, _cellSize));
-        seg.setBorder(new LineBorder(Color.BLACK));
-        _segmentPanel.add(seg);
-    }
-
-    public void loadWeaponSegment() {
-        Icon img = new ImageIcon(ImageUtils.getWeaponImage(_placeable.getName().toLowerCase()));
-
-        JLabel seg = new JLabel(img);
+    private void addSegment(Image image) {
+        JLabel seg = new JLabel(new ImageIcon(image));
         seg.setPreferredSize(new Dimension(_cellSize, _cellSize));
         seg.setMinimumSize(new Dimension(_cellSize, _cellSize));
         seg.setMaximumSize(new Dimension(_cellSize, _cellSize));
