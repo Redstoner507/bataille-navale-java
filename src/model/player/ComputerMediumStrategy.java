@@ -35,15 +35,15 @@ public class ComputerMediumStrategy extends PlayerStrategy {
             return new Attack(null, null, selectedWeapon, coords[0], coords[1]);
         }
 
-        // If the last attack was a miss, pick new _random coordinates
-        int[] coords = super.getRandomCoordinates();
-
         boolean useBomb =
             _bomb != null &&
             _bomb.getUses() > 0 &&
             _random.nextInt(10) == 0; // 10% chance
 
         Weapon selectedWeapon = useBomb ? _bomb : _missile; 
+
+        // If the last attack was a miss, pick new _random coordinates
+        int[] coords = super.getRandomCoordinates(selectedWeapon.getWeaponType());
 
         return new Attack(null, null, selectedWeapon, coords[0], coords[1]);
     }

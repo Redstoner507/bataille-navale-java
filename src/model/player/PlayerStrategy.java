@@ -10,6 +10,7 @@ import model.Attack;
 import model.AttackResult;
 import model.GameConfig;
 import model.weapon.Weapon;
+import model.weapon.WeaponType;
 
 public abstract class PlayerStrategy {
     protected final List<int[]> _coordsList = new ArrayList<>();
@@ -33,7 +34,7 @@ public abstract class PlayerStrategy {
 
     public abstract Attack getAttack(ArrayList<AttackResult> previousAttackResults);
 
-    protected int[] getRandomCoordinates() {
+    protected int[] getRandomCoordinates(WeaponType weaponType) {
         if (_coordsList.isEmpty()) {
             throw new IllegalStateException("No more coordinates available");
         }
@@ -43,6 +44,19 @@ public abstract class PlayerStrategy {
         int[] result = _coordsList.get(index);
         _coordsList.set(index, _coordsList.get(lastIndex));
         _coordsList.remove(lastIndex);
+
+        if (weaponType == WeaponType.BOMB) {
+            int[][] directions = { {-1,0}, {1,0}, {0,-1}, {0,1} };
+
+            for (int[] dir : directions) {
+                int newRow = result[0] + dir[0];
+                int newCol = result[1] + dir[1];
+
+                if (newRow >= 0 && newRow < _gridSize && newCol >= 0 && newCol < _gridSize) {
+                    deleteCoordinates(new int[] { newRow, newCol });
+                }
+            }
+        }
         
         return result;
     }
