@@ -105,53 +105,16 @@ public class Grid {
         Cell cellHit = getCell(hitCoordinates.x, hitCoordinates.y);
 
         switch (result.getStatus()) {
-            case MISS -> cellHit.setState(CellState.MISS);
-            case HIT -> {
-                if (cellHit.getState() != CellState.SUNK) cellHit.setState(CellState.HIT);
-            }
-            case SUNK -> {
-                cellHit.setState(CellState.SUNK);
-                // Si coulé, on met à jour tout le bateau pour l'affichage visuel
-                Placeable obj = cellHit.getObject();
-                if (obj != null) {
-                    for (Point p : obj.getCoordinates()) {
-                        getCell(p.x, p.y).setState(CellState.SUNK);
-                        notifyCellUpdated(p.x, p.y);
-                    }
-                }
-            }
-            case BOMB_FOUND -> {
-                cellHit.setState(CellState.ISLAND_HIT); // Afficher l'état fouillé
-                cellHit.setState(CellState.BOMB_FOUND); // On définit l'état BOMBE pour l'affichage
-                Weapon weapon = (Weapon) cellHit.getObject();
-                cellHit.removeObject(); // On retire l'objet logique de la grille
-                attack.getAttackingPlayer().addToInventory(weapon); // On le donne au joueur
-            }
-            case SONAR_FOUND -> {
-                cellHit.setState(CellState.ISLAND_HIT); // Afficher l'état fouillé
-                cellHit.setState(CellState.SONAR_FOUND); // On définit l'état SONAR pour l'affichage
-                Weapon weapon = (Weapon) cellHit.getObject();
-                cellHit.removeObject();
-                attack.getAttackingPlayer().addToInventory(weapon);
-            }
-            case ISLAND_MISS -> cellHit.setState(CellState.ISLAND_HIT);
-            case SONAR_RESULT -> notifySonarEffect(hitCoordinates.x, hitCoordinates.y, result.getSonarCount());
-            case BLACKHOLE -> {
-                cellHit.setState(CellState.BLACKHOLE);
-                Trap trap = (Trap) cellHit.getObject();
-                cellHit.removeObject();
-                AttackResult counterSignal = trap.activate(attack, result);
-                result.setAttackToRelaunch(counterSignal.getAttackToRelaunch());
-            }
-            case TORNADO -> {
-                cellHit.setState(CellState.TORNADO);
-                Trap trap = (Trap) cellHit.getObject();
-                cellHit.removeObject();
-                trap.activate(attack, result);
-                activateTornadoEffect();
-            }
+            case MISS, HIT, ISLAND_MISS, SONAR_RESULT -> handleStandardStates(cellHit, result);
+
+            case SUNK -> handleSunkShip(cellHit);
+
+            case BOMB_FOUND, SONAR_FOUND -> handleItemFound(attack, cellHit, result);
+
+            case BLACKHOLE, TORNADO -> handleTrapActivation(attack, cellHit, result);
+
             case ALREADY_VISITED -> {
-                // No state change
+                // Pas de changement
                 return;
             }
         }
@@ -163,6 +126,75 @@ public class Grid {
         if (result.getWeapon() != null) {
             notifyWeaponImpact(hitCoordinates.x, hitCoordinates.y, result.getWeapon().getWeaponType());
         }
+    }
+
+    private void handleStandardStates(Cell cell, AttackResult result) {
+        if (result.getStatus() == AttackStatus.MISS) {
+            cell.setState(CellState.MISS);
+        }
+        else if (result.getStatus() == AttackStatus.ISLAND_MISS) {
+            cell.setState(CellState.ISLAND_HIT);
+        }
+        else if (result.getStatus() == AttackStatus.HIT && cell.getState() != CellState.SUNK) {
+            cell.setState(CellState.HIT);
+        }
+        else if (result.getStatus() == AttackStatus.SONAR_RESULT) {
+            Point hitCoordinates = result.getHitCoordinates();
+            notifySonarEffect(hitCoordinates.x, hitCoordinates.y, result.getSonarCount());
+        }
+    }
+
+    private void handleSunkShip(Cell cell) {
+        cell.setState(CellState.SUNK);
+        Placeable object = cell.getObject();
+        if (object != null) {
+            for (Point p : object.getCoordinates()) {
+                getCell(p.x, p.y).setState(CellState.SUNK);
+                notifyCellUpdated(p.x, p.y);
+            }
+        }
+    }
+
+    private void handleItemFound(Attack attack, Cell cell, AttackResult result) {
+        Placeable object = cell.getObject();
+
+        if (object == null || object.getPlaceableType() != PlaceableType.WEAPON) return;
+
+        Weapon weapon = (Weapon) object;
+        cell.removeObject();
+        attack.getAttackingPlayer().addToInventory(weapon);
+
+        cell.setState(CellState.ISLAND_HIT); // Afficher l'état fouillé
+        // Afficher l'état correspondant à l'item trouvé
+        CellState state = switch (result.getStatus()) {
+            case BOMB_FOUND -> CellState.BOMB_FOUND;
+            case SONAR_FOUND -> CellState.SONAR_FOUND;
+            default -> CellState.ISLAND_HIT;
+        };
+
+        cell.setState(state);
+    }
+
+    private void handleTrapActivation(Attack attack, Cell cell, AttackResult result) {
+        Placeable object = cell.getObject();
+
+        if (object == null || object.getPlaceableType() != PlaceableType.TRAP) return;
+
+        Trap trap = (Trap) cell.getObject();
+
+        switch (result.getStatus()) {
+            case BLACKHOLE -> {
+                AttackResult counterSignal = trap.activate(attack, result);
+                result.setAttackToRelaunch(counterSignal.getAttackToRelaunch());
+            }
+            case TORNADO -> {
+                trap.activate(attack, result);
+                activateTornadoEffect();
+            }
+        }
+
+        cell.setState(trap.getCellState());
+        cell.removeObject();
     }
 
     public void resetGrid() {

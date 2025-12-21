@@ -32,15 +32,10 @@ public class GameController {
     private GameView _gameView;
     private GridView _playerGridView;
     private GridView _botGridView;
-    private static final String START = "start";
-    private static final String CONFIG = "config";
-    private static final String PLACEMENT = "placement";
-    private static final String GAME = "game";
-    private static final String END = "end";
 
     public GameController() {
         _frame = new MainFrame();
-        _frame.addScreen(START, new StartScreen(this));
+        _frame.addScreen(ScreenType.START, new StartScreen(this));
         _frame.setVisible(true);
         resetGame();
 
@@ -48,11 +43,11 @@ public class GameController {
     }
 
     public void showStartScreen() {
-        _frame.showScreen(START);
+        _frame.showScreen(ScreenType.START);
     }
 
     public void showConfigScreen() {
-        _frame.showScreen(CONFIG);
+        _frame.showScreen(ScreenType.CONFIG);
     }
 
     public void showPlacementScreen() {
@@ -85,8 +80,8 @@ public class GameController {
         }
 
         PlacementScreen placement = new PlacementScreen(this, CELL_SIZE, _placementController, _configController);
-        _frame.addScreen(PLACEMENT, placement);
-        _frame.showScreen(PLACEMENT);
+        _frame.addScreen(ScreenType.PLACEMENT, placement);
+        _frame.showScreen(ScreenType.PLACEMENT);
     }
 
     public void showGameScreen() {
@@ -96,15 +91,15 @@ public class GameController {
         _gameView = new GameView(_playerGridView, _botGridView, _placementController, _bot.getGrid(), _configController, this);
         fillStatsController();
         _gameView.setTurnNumber(_turnNumber);
-        _frame.addScreen(GAME, _gameView);
-        _frame.showScreen(GAME);
+        _frame.addScreen(ScreenType.GAME, _gameView);
+        _frame.showScreen(ScreenType.GAME);
         this._gameState = GameState.HUMAN_TURN;
         setSelectedWeapon(null);
     }
 
     public void showEndScreen(String endMessage) {
-        _frame.addScreen(END, new EndScreen(this, endMessage, _gameView.getStatsView()));
-        _frame.showScreen(END);
+        _frame.addScreen(ScreenType.END, new EndScreen(this, endMessage, _gameView.getStatsView()));
+        _frame.showScreen(ScreenType.END);
     }
 
     public void handleHumanAttack(int row, int col) {
@@ -416,7 +411,7 @@ public class GameController {
 
     public void resetGame() {
         _configController = new ConfigController();
-        _frame.addScreen(CONFIG, new ConfigScreen(this, _configController));
+        _frame.addScreen(ScreenType.CONFIG, new ConfigScreen(this, _configController));
         _placementController = new PlacementController();
         _statsController = null;
         _player = null;
