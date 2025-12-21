@@ -82,6 +82,7 @@ package model {
             + getName() : String
             + addToInventory(weapon: Weapon)
             + getWeaponFromInventory(type: WeaponType) : Weapon
+            - updateStrategyCoords(realCoords : Integer[2])
         }
 
         class PlayerStrategyFactory {
@@ -105,6 +106,7 @@ package model {
             # isRemainingCoordinate(row: Integer, col: Integer) : Boolean
             # addAdjacentCoords(row: Integer, col: Integer)
             # setWeaponList(inventory: Inventory)
+            # retrieveRealCoords(realCoords : Integer[2])
         }
 
         class HumanStrategy extends PlayerStrategy {

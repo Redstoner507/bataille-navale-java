@@ -3,7 +3,10 @@ package model.player;
 import java.awt.*;
 import java.util.ArrayList;
 
-import model.*;
+import model.Attack;
+import model.AttackResult;
+import model.AttackStatus;
+import model.GameConfig;
 import model.weapon.Weapon;
 
 public class ComputerMediumStrategy extends PlayerStrategy {
