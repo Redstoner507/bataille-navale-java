@@ -41,7 +41,7 @@ public class CellView extends JLabel {
 
     private final CellType _cellType;
     private int _sonarCountToDisplay = -1;
-    private String _StringShip;
+    private String _stringShip;
     private int _shipSegment;
     private int _shipOrientation;
 
@@ -49,12 +49,12 @@ public class CellView extends JLabel {
         _cellType = cellType;
         setCellIcon(CellState.EMPTY);
         setPreferredSize(new Dimension(cellSize, cellSize));
-        _StringShip = "";
+        _stringShip = "";
         _shipSegment = -1;
     }
 
     public void setShipInfo(String shipType, int segmentIndex, int orientation) {
-        _StringShip = shipType;
+        _stringShip = shipType;
         _shipSegment = segmentIndex;
         _shipOrientation = orientation;
     }
@@ -72,7 +72,7 @@ public class CellView extends JLabel {
                 else _baseImage = IMG_WATER;
             }
 
-            case SHIP -> _overlays.add(ImageUtils.getShipSegment(_StringShip, _shipSegment, _shipOrientation));
+            case SHIP -> _overlays.add(ImageUtils.getShipSegment(_stringShip, _shipSegment, _shipOrientation));
 
             case HIT -> {
                 _overlays.add(IMG_SHIP);
@@ -82,7 +82,7 @@ public class CellView extends JLabel {
             case MISS -> _overlays.add(IMG_MISS);
 
             case SUNK -> {
-                _overlays.add(ImageUtils.getShipSegment(_StringShip, _shipSegment, _shipOrientation));
+                _overlays.add(ImageUtils.getShipSegment(_stringShip, _shipSegment, _shipOrientation));
                 _overlays.add(IMG_SUNK);
             }
 

@@ -1,6 +1,8 @@
 package model.player;
 
-import model.*;
+import model.Attack;
+import model.AttackResult;
+import model.Grid;
 import model.ship.Ship;
 import model.weapon.Weapon;
 import model.weapon.WeaponType;

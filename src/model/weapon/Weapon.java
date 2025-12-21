@@ -1,6 +1,11 @@
 package model.weapon;
 
-import model.*;
+import model.Attack;
+import model.AttackResult;
+import model.Orientation;
+import model.Placeable;
+import model.Grid;
+import model.PlaceableType;
 import model.cell.CellState;
 import model.cell.CellType;
 

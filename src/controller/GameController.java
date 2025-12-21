@@ -1,6 +1,12 @@
 package controller;
 
-import model.*;
+import model.Attack;
+import model.AttackResult;
+import model.AttackStatus;
+import model.GameState;
+import model.GameConfig;
+import model.Grid;
+import model.Placeable;
 import model.cell.Cell;
 import model.player.PlayerStrategyFactory;
 import model.ship.Ship;
@@ -8,7 +14,14 @@ import model.ship.ShipType;
 import model.weapon.Weapon;
 import model.player.Player;
 import model.weapon.WeaponType;
-import view.*;
+import view.MainFrame;
+import view.GameView;
+import view.GridView;
+import view.PlacementScreen;
+import view.EndScreen;
+import view.ConfigScreen;
+import view.StartScreen;
+import view.ScreenType;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -169,7 +182,7 @@ public class GameController {
         }
     }
 
-    public void checkWeaponAvailability() {
+    private void checkWeaponAvailability() {
         // Vérifier si le joueur a encore des sous-marins
         boolean hasSubmarine = getPlayerGrid().hasAliveShip(ShipType.SUBMARINE);
 

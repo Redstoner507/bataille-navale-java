@@ -1,6 +1,10 @@
 package model.ship;
 
-import model.*;
+import model.AttackResult;
+import model.AttackStatus;
+import model.Orientation;
+import model.Placeable;
+import model.PlaceableType;
 import model.cell.CellState;
 import model.cell.CellType;
 

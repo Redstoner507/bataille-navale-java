@@ -5,9 +5,11 @@ import controller.ObjectPlacementListener;
 import model.Grid;
 import model.GridListener;
 import model.Placeable;
+import model.PlaceableType;
 import model.cell.Cell;
 import model.cell.CellState;
 import model.weapon.WeaponType;
+import model.Orientation;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -41,17 +43,17 @@ public class GridView extends JPanel implements GridListener {
         CellView view = _cells[row][col];
 
         // Vérification de sécurité avant de charger des segments de bateau
-        if (cell.getObject() != null && cell.getObject().getPlaceableType() == model.PlaceableType.SHIP) {
+        if (cell.getObject() != null && cell.getObject().getPlaceableType() == PlaceableType.SHIP) {
             String shipName = cell.getObject().getName();
 
             if (shipName != null && !shipName.isEmpty()) {
                 Placeable p = cell.getObject();
-                int segmentIndex = (p.getOrientation() == model.Orientation.HORIZONTAL)
+                int segmentIndex = (p.getOrientation() == Orientation.HORIZONTAL)
                         ? col - p.getStartCol()
                         : row - p.getStartRow();
 
                 view.setShipInfo(shipName.toLowerCase(), segmentIndex,
-                        p.getOrientation() == model.Orientation.HORIZONTAL ? 1 : 0);
+                        p.getOrientation() == Orientation.HORIZONTAL ? 1 : 0);
             }
         }
 
@@ -66,13 +68,11 @@ public class GridView extends JPanel implements GridListener {
 
     @Override
     public void onSonarEffect(int row, int col, int count) {
-        // C'est ici qu'on appelle votre méthode !
-        displaySonarScan(row, col, count);
+        _cells[row][col].displaySonarScan(count);
     }
 
     @Override
     public void onWeaponImpact(int row, int col, WeaponType weapon) {
-        // On appelle votre fonction existante sur la cellule concernée
         _cells[row][col].displayWeaponUsed(weapon);
     }
 
@@ -125,10 +125,6 @@ public class GridView extends JPanel implements GridListener {
         }
 
         return panel;
-    }
-
-    public void displaySonarScan(int row, int col, int count) {
-        _cells[row][col].displaySonarScan(count);
     }
 
     /**

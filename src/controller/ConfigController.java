@@ -41,7 +41,7 @@ public class ConfigController {
         return getShipConfig(carriers, battleShips, cruisers, submarines, destroyers);
     }
     
-    public ArrayList<Placeable> getShipConfig(int carriers, int batteShips, int cruisers, int submarines, int destroyer) {
+    private ArrayList<Placeable> getShipConfig(int carriers, int batteShips, int cruisers, int submarines, int destroyer) {
         ArrayList<Placeable> ships = new ArrayList<>();
         ShipFactory factory = new ShipFactory();
         for (int i = 0; i < carriers; i++) {

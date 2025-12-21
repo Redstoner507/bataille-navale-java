@@ -9,7 +9,7 @@ public abstract class Cell {
     private CellState _state;
     private Placeable _object;
     private boolean _isHit = false;
-    private boolean _scanned = false;
+    private boolean _isScanned = false;
     
     public Cell(CellType type) {
         this._type = type;
@@ -45,11 +45,11 @@ public abstract class Cell {
     }
 
     public void setScanned(boolean scanned) {
-        this._scanned = scanned;
+        this._isScanned = scanned;
     }
 
     public boolean isScanned() {
-        return _scanned;
+        return _isScanned;
     }
 
     public AttackResult hit() {
