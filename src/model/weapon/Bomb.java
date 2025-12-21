@@ -39,8 +39,7 @@ public class Bomb extends Weapon{
             if (!grid.isCoordinateValid(currentRow, currentCol)) continue;
             Cell tagetCell = grid.getCell(currentRow, currentCol);
             if (tagetCell.getType() == CellType.ISLAND) {
-                impactResults.add(new AttackResult(AttackStatus.ALREADY_VISITED, ""));
-                return impactResults;
+                return null;
             }
         }
 

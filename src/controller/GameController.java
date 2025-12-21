@@ -68,10 +68,6 @@ public class GameController {
         _playerGridView = new GridView(config.getGridSize(), CELL_SIZE, _player.getGrid());
         _botGridView = new GridView(config.getGridSize(), CELL_SIZE, _bot.getGrid());
 
-        // Configuration du drag & drop
-        // On connecte le callback de suppression (pour quand on déplace un bateau déjà posé)
-        _playerGridView.setOnPlaceableRemoveListener(placeable -> _placementController.removeObject(_player.getGrid(), placeable));
-
         switch (config.getComputerStrategy()) {
             case COMPUTER_VERY_EASY ->
                 _bot.setStrategy(playerStrategyFactory.createComputerVeryEasyStrategy(config));
@@ -119,6 +115,7 @@ public class GameController {
         ArrayList<AttackResult> results = _bot.receiveAttack(attack);
 
         // Annuler l'attaque si elle est invalide
+        if (results == null) return;
         if (!results.isEmpty() && results.getFirst().getStatus() == AttackStatus.ALREADY_VISITED) {
             Point hitPoint = results.getFirst().getHitCoordinates();
             // Si le point d'impact est identique au point visé, c'est un clic invalide direct

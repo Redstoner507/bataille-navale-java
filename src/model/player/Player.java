@@ -62,7 +62,7 @@ public class Player {
         Point realCoords = _grid.applyOffset(attack.getRealCoordinates());
         attack.setRealCoordinates(realCoords);
         ArrayList<AttackResult> results = weapon.applyAttack(_grid, attack);
-        if (results.isEmpty()) return results;
+        if (results == null || results.isEmpty()) return results;
         AttackResult baseResult = results.getFirst();
         if (baseResult != null) {
             _grid.decreaseEffects();

@@ -39,7 +39,6 @@ public class CellView extends JLabel {
     private Image _baseImage;
     private final ArrayList<Image> _overlays = new ArrayList<>();
 
-    private CellState _cellState;
     private final CellType _cellType;
     private int _sonarCountToDisplay = -1;
     private String _StringShip;
@@ -69,7 +68,6 @@ public class CellView extends JLabel {
         switch (state) {
 
             case EMPTY -> {
-                _overlays.clear();
                 if (_cellType == CellType.ISLAND) _baseImage = IMG_ISLAND;
                 else _baseImage = IMG_WATER;
             }
@@ -84,7 +82,6 @@ public class CellView extends JLabel {
             case MISS -> _overlays.add(IMG_MISS);
 
             case SUNK -> {
-                _overlays.clear();
                 _overlays.add(ImageUtils.getShipSegment(_StringShip, _shipSegment, _shipOrientation));
                 _overlays.add(IMG_SUNK);
             }
@@ -110,15 +107,16 @@ public class CellView extends JLabel {
             }
         }
 
-        _cellState = state;
         repaint();
     }
 
     public void displayWeaponUsed(WeaponType weaponType) {
         switch (weaponType) {
             case BOMB -> _overlays.add(IMG_BOMB);
-            case SONAR -> _overlays.add(IMG_SONAR);
+            case SONAR -> {} // On n'affiche pas l'image, car actuellement ça gênerait l'affichage du résultat du sonar
+            case MISSILE -> {} // On ne fait rien, c'est l'affichage par défaut
         }
+        repaint();
     }
 
 
@@ -170,9 +168,5 @@ public class CellView extends JLabel {
     @Override
     public void addMouseListener(MouseListener l) {
         super.addMouseListener(l);
-    }
-
-    public CellState getCellState() {
-        return _cellState;
     }
 }

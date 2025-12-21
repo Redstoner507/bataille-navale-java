@@ -7,13 +7,13 @@ import model.GridListener;
 import model.Placeable;
 import model.cell.Cell;
 import model.cell.CellState;
+import model.weapon.WeaponType;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.function.Consumer;
 
 public class GridView extends JPanel implements GridListener {
     private final int _gridSize;        // Taille de la grille
@@ -23,7 +23,6 @@ public class GridView extends JPanel implements GridListener {
     // Callbacks pour le contrôleur
     private ObjectPlacementListener _placementListener;
     private AttackListener _attackListener;
-    private Consumer<Placeable> _removePlaceableListener;
 
     public GridView(int gridSize, int cellSize, Grid grid) {
         this._gridSize = gridSize;
@@ -63,6 +62,18 @@ public class GridView extends JPanel implements GridListener {
     @Override
     public void onGridReset() {
         clearGrid();
+    }
+
+    @Override
+    public void onSonarEffect(int row, int col, int count) {
+        // C'est ici qu'on appelle votre méthode !
+        displaySonarScan(row, col, count);
+    }
+
+    @Override
+    public void onWeaponImpact(int row, int col, WeaponType weapon) {
+        // On appelle votre fonction existante sur la cellule concernée
+        _cells[row][col].displayWeaponUsed(weapon);
     }
 
     /**
@@ -135,8 +146,6 @@ public class GridView extends JPanel implements GridListener {
         this._attackListener = listener;
     }
 
-    public void setOnPlaceableRemoveListener(Consumer<Placeable> l) { this._removePlaceableListener = l; }
-
     /**
      * Called by ShipView when a ship is dropped.
      */
@@ -145,10 +154,6 @@ public class GridView extends JPanel implements GridListener {
             return _placementListener.objectDropped(placeableView, row, col);
         }
         return false;
-    }
-
-    public void removePlaceableVisuals(Placeable placeable) {
-        if (_removePlaceableListener != null) _removePlaceableListener.accept(placeable);
     }
 
     public CellView getCell(int row, int col) {

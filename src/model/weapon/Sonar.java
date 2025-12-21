@@ -31,11 +31,7 @@ public class Sonar extends Weapon{
         Cell centerCell = grid.getCell(centerRow, centerCol);
         // Ne pas pouvoir utiliser le sonar sur l'île ou une case déjà scannée
         if (centerCell.getType() == CellType.ISLAND || centerCell.isScanned()) {
-            AttackResult result = new AttackResult(AttackStatus.ALREADY_VISITED, "");
-            result.setWeapon(attack.getWeapon());
-            result.setHitCoordinates(centerRow, centerCol);
-            sonarResults.add(result);
-            return sonarResults;
+            return null;
         }
 
         int detectedShips = 0;

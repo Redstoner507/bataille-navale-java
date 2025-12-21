@@ -8,6 +8,7 @@ import model.ship.Ship;
 import model.ship.ShipType;
 import model.trap.Trap;
 import model.weapon.Weapon;
+import model.weapon.WeaponType;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -145,7 +146,7 @@ public class Grid {
                 attack.getAttackingPlayer().addToInventory(weapon);
             }
             case ISLAND_MISS -> cellHit.setState(CellState.ISLAND_HIT);
-            case SONAR_RESULT -> cellHit.setHit(false);
+            case SONAR_RESULT -> notifySonarEffect(hitCoordinates.x, hitCoordinates.y, result.getSonarCount());
             case BLACKHOLE -> {
                 cellHit.setState(CellState.BLACKHOLE);
                 Trap trap = (Trap) cellHit.getObject();
@@ -168,6 +169,11 @@ public class Grid {
 
         // Notification unique
         notifyCellUpdated(hitCoordinates.x, hitCoordinates.y);
+
+        // Ajouter l'effet visuel de l'arme
+        if (result.getWeapon() != null) {
+            notifyWeaponImpact(hitCoordinates.x, hitCoordinates.y, result.getWeapon().getWeaponType());
+        }
     }
 
     public void resetGrid() {
@@ -252,5 +258,17 @@ public class Grid {
             }
         }
         return false; // Tous les bateaux de ce type sont coulés.
+    }
+
+    private void notifySonarEffect(int row, int col, int count) {
+        for (GridListener listener : _listeners) {
+            listener.onSonarEffect(row, col, count);
+        }
+    }
+
+    private void notifyWeaponImpact(int row, int col, WeaponType weapon) {
+        for (GridListener listener : _listeners) {
+            listener.onWeaponImpact(row, col, weapon);
+        }
     }
 }
