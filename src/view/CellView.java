@@ -119,10 +119,8 @@ public class CellView extends JLabel {
         repaint();
     }
 
-
     public void displaySonarScan(int sonarCount) {
         _sonarCountToDisplay = sonarCount;
-        revalidate();
         repaint();
     }
 

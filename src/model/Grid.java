@@ -119,8 +119,10 @@ public class Grid {
             }
         }
 
-        // Notification unique
-        notifyCellUpdated(hitCoordinates.x, hitCoordinates.y);
+        // Notification unique (si ce n'est pas le sonar)
+        if (result.getStatus() != AttackStatus.SONAR_RESULT) {
+            notifyCellUpdated(hitCoordinates.x, hitCoordinates.y);
+        }
 
         // Ajouter l'effet visuel de l'arme
         if (result.getWeapon() != null) {
