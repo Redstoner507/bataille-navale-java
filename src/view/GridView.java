@@ -120,6 +120,10 @@ public class GridView extends JPanel {
                 return;
             }
         }
+
+        // Afficher l'arme utilisée
+        cell.displayWeaponUsed(result.getWeapon().getWeaponType());
+
         // La cellule n'est plus cliquable après avoir été attaquée.
         cell.setFocusable(false);
         for (MouseListener listener : cell.getMouseListeners()) {

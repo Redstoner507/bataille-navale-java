@@ -4,6 +4,7 @@ import javax.swing.*;
 
 import model.cell.CellState;
 import model.cell.CellType;
+import model.weapon.WeaponType;
 import utils.ImageUtils;
 
 import java.awt.*;
@@ -99,6 +100,13 @@ public class CellView extends JLabel {
 
         _cellState = state;
         repaint();
+    }
+
+    public void displayWeaponUsed(WeaponType weaponType) {
+        switch (weaponType) {
+            case BOMB -> _overlays.add(IMG_BOMB);
+            case SONAR -> _overlays.add(IMG_SONAR);
+        }
     }
 
 
