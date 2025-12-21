@@ -23,9 +23,7 @@ public abstract class Weapon extends Placeable {
     }
 
     @Override
-    public AttackResult hit() {
-        return new AttackResult(AttackStatus.ITEM_FOUND, "You found a " + getName() + " !");
-    }
+    public abstract AttackResult hit();
 
     public int getUses() {
         return _nbUses;

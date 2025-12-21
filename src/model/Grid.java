@@ -104,7 +104,7 @@ public class Grid {
                     playerGridView.updateCellDisplay(result, p.x, p.y);
                 }
             }
-            case ITEM_FOUND -> {
+            case BOMB_FOUND, SONAR_FOUND -> {
                 cellHit.setState(CellState.ISLAND_HIT);
                 Weapon weapon = (Weapon) cellHit.getObject();
                 cellHit.removeObject();

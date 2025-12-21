@@ -25,9 +25,11 @@ public class StatsController {
     public StatsController() {}
 
     public void evaluateAttack(AttackStatus status, Placeable placeableHit, Weapon weaponUsed) {
+        if (weaponUsed == null) return;
         if (!_weaponsUsedList.contains(weaponUsed) && weaponUsed.getWeaponType() != WeaponType.MISSILE) {
             _weaponsUsedList.add(weaponUsed);
             _weaponsUsed++;
+            _weaponsAvailable--;
         }
         switch (status) {
             case MISS -> _misses++;
@@ -45,7 +47,7 @@ public class StatsController {
                 _shipsSunk++;
             }
             case ISLAND_MISS -> _islandCellsLeft--;
-            case ITEM_FOUND -> {
+            case BOMB_FOUND, SONAR_FOUND -> {
                 _islandCellsLeft--;
                 _weaponsAvailable++;
             }

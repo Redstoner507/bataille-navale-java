@@ -103,10 +103,17 @@ public class GameController {
 
         setSelectedWeapon(_selectedWeapon.getWeaponType()); // Ensure weapon is valid
         Attack attack = new Attack(_player, _bot, _selectedWeapon, row, col);
-        _selectedWeapon.use();
         ArrayList<AttackResult> results = _bot.receiveAttack(attack);
 
-        if (!results.isEmpty() && results.getFirst().getStatus() == AttackStatus.ALREADY_VISITED) return; //Annuler l'attaque si elle a déjà été faite
+        // Annuler l'attaque si elle est invalide
+        if (!results.isEmpty() && results.getFirst().getStatus() == AttackStatus.ALREADY_VISITED) {
+            return;
+        }
+
+        // Consommer l'arme utilisée
+        _selectedWeapon.use();
+
+        // Fin du tour
         endTurn(results, attack);
     }
 

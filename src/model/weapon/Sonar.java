@@ -17,6 +17,11 @@ public class Sonar extends Weapon{
     }
 
     @Override
+    public AttackResult hit() {
+        return new AttackResult(AttackStatus.SONAR_FOUND, "You found a " + getName() + " !");
+    }
+
+    @Override
     public ArrayList<AttackResult> applyAttack(Grid grid, Attack attack) {
         ArrayList<AttackResult> sonarResults = new ArrayList<>();
 

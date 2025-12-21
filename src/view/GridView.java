@@ -104,7 +104,11 @@ public class GridView extends JPanel {
 
             case MISS -> cell.setCellIcon(CellState.MISS);
 
-            case ITEM_FOUND, ISLAND_MISS -> cell.setCellIcon(CellState.ISLAND_HIT);
+            case BOMB_FOUND -> cell.setCellIcon(CellState.BOMB);
+
+            case SONAR_FOUND -> cell.setCellIcon(CellState.SONAR);
+
+            case ISLAND_MISS -> cell.setCellIcon(CellState.ISLAND_HIT);
 
             case SONAR_RESULT -> {
                 cell.displaySonarScan(result.getSonarCount());

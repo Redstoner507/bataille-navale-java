@@ -17,6 +17,11 @@ public class Bomb extends Weapon{
     }
 
     @Override
+    public AttackResult hit() {
+        return new AttackResult(AttackStatus.BOMB_FOUND, "You found a " + getName() + " !");
+    }
+
+    @Override
     public ArrayList<AttackResult> applyAttack(Grid grid, Attack attack) {
         int centerRow = attack.getRealRow();
         int centerCol = attack.getRealCol();
